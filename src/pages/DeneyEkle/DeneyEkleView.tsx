@@ -134,8 +134,7 @@ function DeneyEkleView({
         display: 'flex', 
         gap: '20px', 
         marginBottom: '20px',
-        height: 'auto',
-        minHeight: '400px'
+        height: '500px'
       }}>
         {/* Sol Üst Panel */}
         <div style={{ 
@@ -143,7 +142,8 @@ function DeneyEkleView({
           border: '2px solid #213547', 
           borderRadius: '8px', 
           padding: '20px',
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          height: '100%'
         }}>
           <h3 style={{ marginBottom: '20px', color: '#213547' }}>Genel Bilgiler</h3>
           
@@ -274,6 +274,7 @@ function DeneyEkleView({
           borderRadius: '8px', 
           padding: '20px',
           backgroundColor: '#ffffff',
+          height: '100%',
           overflowY: 'auto'
         }}>
           <h3 style={{ marginBottom: '20px', color: '#213547' }}>Deney Detayları</h3>
@@ -311,7 +312,7 @@ function DeneyEkleView({
         marginBottom: '20px'
       }}>
         <h3 style={{ marginBottom: '20px', color: '#213547' }}>
-          Kayıtlı Deneyler ({kayitlariListesi.length} adet)
+          Son Kayıtlar
         </h3>
         <div style={{ 
           border: '1px solid #ddd', 
@@ -333,7 +334,7 @@ function DeneyEkleView({
                 </tr>
               </thead>
               <tbody>
-                {kayitlariListesi.map((kayit) => (
+                {kayitlariListesi.slice(-5).reverse().map((kayit) => (
                   <tr key={kayit.id}>
                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>{kayit.firmaAdi}</td>
                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>{kayit.basvuruNo}</td>
