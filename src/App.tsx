@@ -1,6 +1,6 @@
 import { BrowserRouter } from 'react-router-dom';
 import Rotalar from './routes/Rotalar';
-import './App.css';
+import './styles/App.css';
 
 function App() {
   return (
