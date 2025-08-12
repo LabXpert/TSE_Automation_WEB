@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import type { Firma } from '../../models/Firma.tsx';
 import type { Personel } from '../../models/Personel.tsx';
 import type { DeneyTuru } from '../../models/DeneyTurleri.tsx';
@@ -124,13 +123,19 @@ function DeneyEkleView({
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ 
+      padding: '20px', 
+      fontFamily: 'Arial, sans-serif',
+      minHeight: '100vh',
+      boxSizing: 'border-box'
+    }}>
       {/* Üst Paneller */}
       <div style={{ 
         display: 'flex', 
         gap: '20px', 
         marginBottom: '20px',
-        height: '500px'
+        height: 'auto',
+        minHeight: '400px'
       }}>
         {/* Sol Üst Panel */}
         <div style={{ 
@@ -301,7 +306,9 @@ function DeneyEkleView({
         borderRadius: '8px', 
         padding: '20px',
         backgroundColor: '#ffffff',
-        height: '300px'
+        height: 'auto',
+        minHeight: '250px',
+        marginBottom: '20px'
       }}>
         <h3 style={{ marginBottom: '20px', color: '#213547' }}>
           Kayıtlı Deneyler ({kayitlariListesi.length} adet)
@@ -351,27 +358,6 @@ function DeneyEkleView({
             </div>
           )}
         </div>
-      </div>
-
-      {/* Navigasyon Butonları */}
-      <div style={{ marginTop: '30px', textAlign: 'center' }}>
-        <Link to="/deney-ekle">
-          <button style={{ margin: '10px', padding: '10px 20px' }}>
-            Deney Ekle Sayfası
-          </button>
-        </Link>
-        
-        <Link to="/duzenle-sil">
-          <button style={{ margin: '10px', padding: '10px 20px' }}>
-            Deney Düzenle/Sil Sayfası
-          </button>
-        </Link>
-        
-        <Link to="/raporla">
-          <button style={{ margin: '10px', padding: '10px 20px' }}>
-            Raporla Sayfası
-          </button>
-        </Link>
       </div>
     </div>
   );
