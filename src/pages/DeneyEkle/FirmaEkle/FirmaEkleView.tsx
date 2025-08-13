@@ -1,6 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const FirmaEkleView: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleCancel = () => {
+    navigate('/deney-ekle');
+  };
+
   return (
     <div style={{ 
       padding: '32px', 
@@ -239,6 +246,7 @@ const FirmaEkleView: React.FC = () => {
         }}>
           <button
             type="button"
+            onClick={handleCancel}
             style={{
               display: 'flex',
               alignItems: 'center',
