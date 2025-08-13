@@ -10,7 +10,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
       padding: '32px', 
       fontFamily: 'inherit',
       minHeight: '100vh',
-      background: '#ffffff'
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
     }}>
       {/* Page Header */}
       <div style={{ 
