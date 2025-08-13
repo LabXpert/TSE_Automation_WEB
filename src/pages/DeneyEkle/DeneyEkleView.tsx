@@ -13,6 +13,7 @@ interface DeneyEkleViewProps {
   basvuruTarihi: string;
   deneyler: Deney[];
   kayitlariListesi: DeneyKaydi[];
+  duzenlemeModu: boolean;
   
   // Setterlar
   setDeneySeayisi: (value: number) => void;
@@ -24,6 +25,9 @@ interface DeneyEkleViewProps {
   // Fonksiyonlar
   deneyGuncelle: (index: number, field: keyof Deney, value: string | boolean) => void;
   kaydet: () => void;
+  kayitDuzenle: (id: string) => void;
+  kayitSilmeOnayi: (id: string) => void;
+  duzenlemeyiIptalEt: () => void;
   
   // Sabit veriler
   firmalar: Firma[];
@@ -39,6 +43,7 @@ function DeneyEkleView({
   basvuruTarihi,
   deneyler,
   kayitlariListesi,
+  duzenlemeModu,
   setDeneySeayisi,
   setBelgelendirmeTuru,
   setFirmaAdi,
@@ -46,6 +51,9 @@ function DeneyEkleView({
   setBasvuruTarihi,
   deneyGuncelle,
   kaydet,
+  kayitDuzenle,
+  kayitSilmeOnayi,
+  duzenlemeyiIptalEt,
   firmalar,
   personeller,
   deneyTurleri
@@ -59,7 +67,9 @@ function DeneyEkleView({
           marginBottom: '16px',
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           border: '1px solid #e2e8f0',
-          transition: 'all 0.2s ease'
+          transition: 'all 0.2s ease',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           <div style={{ 
             display: 'flex', 
@@ -102,6 +112,7 @@ function DeneyEkleView({
               <select 
                 value={deneyler[i]?.deneyTuru || ''}
                 onChange={(e) => deneyGuncelle(i, 'deneyTuru', e.target.value)}
+                style={{ width: '100%', boxSizing: 'border-box' }}
               >
                 <option value="">Deney türü seçiniz...</option>
                 {deneyTurleri.map((tur) => (
@@ -115,6 +126,7 @@ function DeneyEkleView({
               <select 
                 value={deneyler[i]?.sorumluPersonel || ''}
                 onChange={(e) => deneyGuncelle(i, 'sorumluPersonel', e.target.value)}
+                style={{ width: '100%', boxSizing: 'border-box' }}
               >
                 <option value="">Personel seçiniz...</option>
                 {personeller.map((personel) => (
@@ -175,88 +187,84 @@ function DeneyEkleView({
           marginBottom: '8px',
           letterSpacing: '-0.025em'
         }}>
-          Yeni Deney Kaydı
+          {duzenlemeModu ? 'Deney Kaydını Düzenle' : 'Yeni Deney Kaydı'}
         </h1>
         <p style={{ 
           color: '#64748b',
           fontSize: '16px',
           margin: 0
         }}>
-          Deney bilgilerini ekleyin ve kaydedin
+          {duzenlemeModu ? 'Mevcut deney bilgilerini güncelleyin' : 'Deney bilgilerini ekleyin ve kaydedin'}
         </p>
-      </div>
-
-      {/* Üst Paneller + Kaydet Butonu */}
-      <div style={{ 
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '24px', 
-        marginBottom: '32px'
-      }}>
-        {/* Sol Panel - Genel Bilgiler */}
-        <div className="card" style={{
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-          border: '1px solid #e2e8f0'
-        }}>
-          <div style={{ 
+        
+        {/* Düzenleme modu uyarısı */}
+        {duzenlemeModu && (
+          <div style={{
+            marginTop: '16px',
+            padding: '12px 16px',
+            backgroundColor: '#fef3c7',
+            border: '1px solid #f59e0b',
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#92400e',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            marginBottom: '24px',
-            paddingBottom: '16px',
-            borderBottom: '1px solid #f1f5f9'
+            gap: '8px'
           }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '18px'
-            }}>
-              📋
-            </div>
-            <h3 style={{ 
-              margin: 0, 
-              color: '#0f172a',
-              fontSize: '18px',
-              fontWeight: '600'
-            }}>
-              Genel Bilgiler
-            </h3>
+            <span>⚠️</span>
+            <span><strong>Düzenleme Modu:</strong> Mevcut kayıt düzenleniyor. Değişiklikleri kaydetmeyi unutmayın!</span>
           </div>
+        )}
+      </div>
+
+      {/* Ana Layout: Sol-Sağ Düzen */}
+      <div style={{ 
+        display: 'grid',
+        gridTemplateColumns: window.innerWidth > 1024 ? '600px 1fr' : '1fr',
+        gap: '24px', 
+        marginBottom: '32px',
+        alignItems: 'start'
+      }}>
+        
+        {/* Sol Panel - Temel Bilgiler + Deney Sayısı */}
+        <div className="card" style={{ 
+          position: window.innerWidth > 1024 ? 'sticky' : 'static', 
+          top: '20px',
+          height: '600px', // Sağ panel ile aynı yükseklik
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <h3 style={{ 
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#0f172a',
+            marginBottom: '20px',
+            paddingBottom: '12px',
+            borderBottom: '2px solid #f1f5f9',
+            flexShrink: 0
+          }}>
+            📋 Temel Bilgiler
+          </h3>
           
-          <div style={{ display: 'grid', gap: '20px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gap: '16px',
+            gridTemplateColumns: window.innerWidth > 768 && window.innerWidth <= 1024 ? 'repeat(2, 1fr)' : '1fr',
+            flex: 1,
+            alignContent: 'start'
+          }}>
             <div>
               <label>Firma Adı *</label>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'stretch' }}>
-                <select 
-                  value={firmaAdi}
-                  onChange={(e) => setFirmaAdi(e.target.value)}
-                  style={{ flex: 1 }}
-                >
-                  <option value="">Firma seçiniz...</option>
-                  {firmalar.map((firma) => (
-                    <option key={firma.id} value={firma.ad}>{firma.ad}</option>
-                  ))}
-                </select>
-                <button 
-                  className="secondary"
-                  style={{ 
-                    width: '44px',
-                    padding: '0',
-                    fontSize: '18px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  title="Yeni firma ekle"
-                >
-                  +
-                </button>
-              </div>
+              <select 
+                value={firmaAdi}
+                onChange={(e) => setFirmaAdi(e.target.value)}
+                style={{ width: '100%', boxSizing: 'border-box' }}
+              >
+                <option value="">Firma seçiniz...</option>
+                {firmalar.map((firma) => (
+                  <option key={firma.id} value={firma.ad}>{firma.ad}</option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -265,7 +273,8 @@ function DeneyEkleView({
                 type="text" 
                 value={basvuruNo}
                 onChange={(e) => setBasvuruNo(e.target.value)}
-                placeholder="Başvuru numarasını giriniz"
+                placeholder="Başvuru numarası giriniz..."
+                style={{ width: '100%', boxSizing: 'border-box' }}
               />
             </div>
 
@@ -275,365 +284,299 @@ function DeneyEkleView({
                 type="date" 
                 value={basvuruTarihi}
                 onChange={(e) => setBasvuruTarihi(e.target.value)}
+                style={{ width: '100%', boxSizing: 'border-box' }}
               />
             </div>
 
             <div>
-              <label style={{ marginBottom: '12px' }}>Belgelendirme Türü *</label>
-              <div style={{ 
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '12px'
-              }}>
-                <label style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 16px',
-                  border: `2px solid ${belgelendirmeTuru === 'özel' ? '#2563eb' : '#e2e8f0'}`,
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  background: belgelendirmeTuru === 'özel' ? '#dbeafe' : '#ffffff'
-                }}>
-                  <input 
-                    type="radio" 
-                    name="belgelendirme" 
-                    value="özel"
-                    checked={belgelendirmeTuru === 'özel'}
-                    onChange={(e) => setBelgelendirmeTuru(e.target.value as 'özel' | 'belgelendirme')}
-                    style={{ margin: 0 }}
-                  />
-                  <span style={{ 
-                    fontWeight: '500',
-                    color: belgelendirmeTuru === 'özel' ? '#2563eb' : '#475569'
-                  }}>
-                    Özel
-                  </span>
-                </label>
-                <label style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 16px',
-                  border: `2px solid ${belgelendirmeTuru === 'belgelendirme' ? '#2563eb' : '#e2e8f0'}`,
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  background: belgelendirmeTuru === 'belgelendirme' ? '#dbeafe' : '#ffffff'
-                }}>
-                  <input 
-                    type="radio" 
-                    name="belgelendirme" 
-                    value="belgelendirme"
-                    checked={belgelendirmeTuru === 'belgelendirme'}
-                    onChange={(e) => setBelgelendirmeTuru(e.target.value as 'özel' | 'belgelendirme')}
-                    style={{ margin: 0 }}
-                  />
-                  <span style={{ 
-                    fontWeight: '500',
-                    color: belgelendirmeTuru === 'belgelendirme' ? '#2563eb' : '#475569'
-                  }}>
-                    Belgelendirme
-                  </span>
-                </label>
-              </div>
+              <label>Belgelendirme Türü</label>
+              <select 
+                value={belgelendirmeTuru}
+                onChange={(e) => setBelgelendirmeTuru(e.target.value as 'özel' | 'belgelendirme')}
+                style={{ width: '100%', boxSizing: 'border-box' }}
+              >
+                <option value="özel">Özel</option>
+                <option value="belgelendirme">Belgelendirme</option>
+              </select>
             </div>
 
-            <div>
-              <label>Deney Sayısı *</label>
-              <input 
-                type="number" 
-                min="1" 
-                max="20"
+            {/* Deney Sayısı - Temel Bilgiler içinde */}
+            <div style={{ 
+              marginTop: '20px',
+              paddingTop: '16px',
+              borderTop: '1px solid #f1f5f9'
+            }}>
+              <label>🧪 Deney Sayısı</label>
+              <select 
                 value={deneySayisi}
-                onChange={(e) => setDeneySeayisi(parseInt(e.target.value) || 1)}
-              />
+                onChange={(e) => setDeneySeayisi(parseInt(e.target.value))}
+                style={{ width: '100%', boxSizing: 'border-box' }}
+              >
+                {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                  <option key={num} value={num}>{num} Deney</option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
 
-        {/* Sağ Taraf - Panel + Kaydet Butonu */}
-        <div style={{ 
-          display: 'flex', 
+        {/* Sağ Panel - Deney Detayları (Scroll) */}
+        <div style={{
+          height: '600px', // Sabit yükseklik
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          paddingRight: '8px',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          background: 'white',
+          minWidth: '0', // Flexbox overflow fix
+          display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between'
-        }}>
-          {/* Sağ Panel - Deney Detayları */}
-          <div className="card" style={{
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-            border: '1px solid #e2e8f0',
-            height: '550px',
+          // Custom scrollbar styles
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#cbd5e1 #f1f5f9'
+        }}
+        className="custom-scrollbar">
+          <style>{`
+            .custom-scrollbar::-webkit-scrollbar {
+              width: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+              background: #f1f5f9;
+              border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+              background: #cbd5e1;
+              border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+              background: #94a3b8;
+            }
+          `}</style>
+          
+          <h2 style={{ 
+            fontSize: '22px',
+            fontWeight: '600',
+            color: '#0f172a',
+            marginBottom: '0',
             display: 'flex',
-            flexDirection: 'column'
+            alignItems: 'center',
+            gap: '8px',
+            background: 'white',
+            padding: '20px 16px 16px 16px',
+            borderRadius: '12px 12px 0 0',
+            borderBottom: '1px solid #f1f5f9',
+            flexShrink: 0
           }}>
-            <div style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              marginBottom: '24px',
-              paddingBottom: '16px',
-              borderBottom: '1px solid #f1f5f9'
+            🔬 Deney Detayları
+            <span style={{ 
+              fontSize: '14px',
+              color: '#64748b',
+              fontWeight: '400'
             }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '18px'
-              }}>
-                🧪
-              </div>
-              <h3 style={{ 
-                margin: 0, 
-                color: '#0f172a',
-                fontSize: '18px',
-                fontWeight: '600'
-              }}>
-                Deney Detayları
-              </h3>
-            </div>
-            
-            <div style={{ 
-              flex: 1,
-              overflowY: 'auto',
-              paddingRight: '4px'
-            }}>
-              {renderDeneyGrupları()}
-            </div>
-          </div>
-
-          {/* Kaydet Butonu */}
+              ({deneySayisi} deney)
+            </span>
+          </h2>
+          
           <div style={{ 
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-end'
+            padding: '16px',
+            flex: 1,
+            overflowY: 'auto'
           }}>
-            <button 
-              onClick={kaydet}
-              style={{ 
-                padding: '16px 32px', 
-                fontSize: '16px', 
-                fontWeight: '600',
-                background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                border: 'none',
-                borderRadius: '12px',
-                minWidth: '160px'
-              }}
-            >
-              💾 Kaydet
-            </button>
+            {renderDeneyGrupları()}
           </div>
         </div>
       </div>
 
-      {/* Alt Panel - Kayıtlar */}
-      <div className="card" style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-        border: '1px solid #e2e8f0'
-      }}>
-        <div style={{ 
+      {/* Alt Kısım - Kaydet Butonu */}
+      <div style={{ marginBottom: '32px' }}>
+        <div className="card" style={{ 
+          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          color: 'white',
+          textAlign: 'center',
+          maxWidth: '600px',
+          margin: '0 auto'
+        }}>
+          <button 
+            onClick={kaydet}
+            style={{
+              width: '100%',
+              padding: '16px',
+              fontSize: '16px',
+              fontWeight: '600',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            {duzenlemeModu ? '💾 Güncelle' : '💾 Kaydet'}
+          </button>
+          
+          {duzenlemeModu && (
+            <button 
+              onClick={duzenlemeyiIptalEt}
+              style={{
+                width: '100%',
+                padding: '12px',
+                fontSize: '14px',
+                fontWeight: '500',
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                marginTop: '8px',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
+              }}
+            >
+              ❌ İptal Et
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Kayıtlar Listesi */}
+      <div className="card">
+        <h2 style={{ 
+          fontSize: '22px',
+          fontWeight: '600',
+          color: '#0f172a',
+          marginBottom: '20px',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
-          marginBottom: '24px',
-          paddingBottom: '16px',
-          borderBottom: '1px solid #f1f5f9'
+          gap: '8px'
         }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '18px'
+          📊 Kayıtlar Listesi
+          <span style={{ 
+            fontSize: '14px',
+            color: '#64748b',
+            fontWeight: '400'
           }}>
-            📈
-          </div>
-          <h3 style={{ 
-            margin: 0, 
-            color: '#0f172a',
-            fontSize: '18px',
-            fontWeight: '600'
-          }}>
-            Son Kayıtlar
-          </h3>
-          {kayitlariListesi.length > 0 && (
-            <div style={{
-              backgroundColor: '#dbeafe',
-              color: '#2563eb',
-              padding: '4px 12px',
-              borderRadius: '20px',
-              fontSize: '12px',
-              fontWeight: '600'
-            }}>
-              {kayitlariListesi.length} kayıt
-            </div>
-          )}
-        </div>
+            ({kayitlariListesi.length} kayıt)
+          </span>
+        </h2>
         
-        <div style={{ 
-          border: '1px solid #e2e8f0', 
-          borderRadius: '12px', 
-          minHeight: '240px',
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          overflowY: 'auto',
-          overflowX: 'auto'
-        }}>
-          {kayitlariListesi.length > 0 ? (
-            <table style={{ 
-              width: '100%', 
-              borderCollapse: 'collapse',
-              fontSize: '14px'
-            }}>
-              <thead>
-                <tr style={{ 
-                  background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)',
-                  borderBottom: '2px solid #94a3b8'
+        {kayitlariListesi.length === 0 ? (
+          <div style={{
+            padding: '40px',
+            textAlign: 'center',
+            color: '#64748b',
+            fontSize: '16px'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📝</div>
+            <div>Henüz kayıt bulunmuyor</div>
+            <div style={{ fontSize: '14px', marginTop: '8px' }}>
+              İlk kaydınızı eklemek için yukarıdaki formu doldurun
+            </div>
+          </div>
+        ) : (
+          <div style={{ 
+            display: 'grid',
+            gap: '12px'
+          }}>
+            {kayitlariListesi.map((kayit) => (
+              <div key={kayit.id} style={{
+                padding: '20px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                transition: 'all 0.2s ease'
+              }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr auto',
+                  gap: '16px',
+                  alignItems: 'start'
                 }}>
-                  <th style={{ 
-                    padding: '16px', 
-                    textAlign: 'left',
-                    fontWeight: '600',
-                    color: '#334155',
-                    fontSize: '13px',
-                    letterSpacing: '0.025em'
-                  }}>Firma</th>
-                  <th style={{ 
-                    padding: '16px', 
-                    textAlign: 'left',
-                    fontWeight: '600',
-                    color: '#334155',
-                    fontSize: '13px',
-                    letterSpacing: '0.025em'
-                  }}>Başvuru No</th>
-                  <th style={{ 
-                    padding: '16px', 
-                    textAlign: 'left',
-                    fontWeight: '600',
-                    color: '#334155',
-                    fontSize: '13px',
-                    letterSpacing: '0.025em'
-                  }}>Tarih</th>
-                  <th style={{ 
-                    padding: '16px', 
-                    textAlign: 'center',
-                    fontWeight: '600',
-                    color: '#334155',
-                    fontSize: '13px',
-                    letterSpacing: '0.025em'
-                  }}>Deney Sayısı</th>
-                  <th style={{ 
-                    padding: '16px', 
-                    textAlign: 'left',
-                    fontWeight: '600',
-                    color: '#334155',
-                    fontSize: '13px',
-                    letterSpacing: '0.025em'
-                  }}>Tür</th>
-                </tr>
-              </thead>
-              <tbody>
-                {kayitlariListesi.slice(-5).reverse().map((kayit, index) => (
-                  <tr 
-                    key={kayit.id}
-                    style={{ 
-                      borderBottom: '1px solid #e2e8f0',
-                      transition: 'all 0.2s ease',
-                      backgroundColor: index % 2 === 0 ? 'rgba(248, 250, 252, 0.5)' : 'transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f1f5f9';
-                      e.currentTarget.style.transform = 'scale(1.01)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'rgba(248, 250, 252, 0.5)' : 'transparent';
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                  >
-                    <td style={{ 
-                      padding: '16px',
+                  <div>
+                    <h4 style={{ 
+                      fontSize: '16px',
+                      fontWeight: '600',
                       color: '#0f172a',
-                      fontWeight: '500'
-                    }}>{kayit.firmaAdi}</td>
-                    <td style={{ 
-                      padding: '16px',
-                      color: '#475569',
-                      fontFamily: 'monospace',
-                      fontSize: '13px'
-                    }}>{kayit.basvuruNo}</td>
-                    <td style={{ 
-                      padding: '16px',
+                      marginBottom: '8px'
+                    }}>
+                      {kayit.firmaAdi}
+                    </h4>
+                    <div style={{ 
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: '8px',
+                      fontSize: '14px',
                       color: '#64748b'
                     }}>
-                      {new Date(kayit.basvuruTarihi).toLocaleDateString('tr-TR')}
-                    </td>
-                    <td style={{ 
-                      padding: '16px',
-                      textAlign: 'center'
-                    }}>
-                      <div style={{
-                        backgroundColor: '#dbeafe',
-                        color: '#2563eb',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        display: 'inline-block'
-                      }}>
-                        {kayit.deneySayisi}
-                      </div>
-                    </td>
-                    <td style={{ 
-                      padding: '16px'
-                    }}>
-                      <div style={{
-                        backgroundColor: kayit.belgelendirmeTuru === 'özel' ? '#fef3c7' : '#d1fae5',
-                        color: kayit.belgelendirmeTuru === 'özel' ? '#d97706' : '#059669',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
+                      <div><strong>Başvuru No:</strong> {kayit.basvuruNo}</div>
+                      <div><strong>Tarih:</strong> {new Date(kayit.basvuruTarihi).toLocaleDateString('tr-TR')}</div>
+                      <div><strong>Tür:</strong> {kayit.belgelendirmeTuru}</div>
+                      <div><strong>Deney Sayısı:</strong> {kayit.deneySayisi}</div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => kayitDuzenle(kayit.id)}
+                      style={{
+                        padding: '8px 12px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        display: 'inline-block'
-                      }}>
-                        {kayit.belgelendirmeTuru}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div style={{ 
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '240px',
-              color: '#64748b',
-              gap: '12px'
-            }}>
-              <div style={{ fontSize: '48px', opacity: 0.5 }}>📋</div>
-              <div style={{ 
-                fontSize: '16px',
-                fontWeight: '500'
-              }}>
-                Henüz kayıt bulunmamaktadır
+                        backgroundColor: '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#2563eb';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = '#3b82f6';
+                      }}
+                    >
+                      ✏️ Düzenle
+                    </button>
+                    <button 
+                      onClick={() => kayitSilmeOnayi(kayit.id)}
+                      style={{
+                        padding: '8px 12px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        backgroundColor: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#dc2626';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = '#ef4444';
+                      }}
+                    >
+                      🗑️ Sil
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div style={{ 
-                fontSize: '14px',
-                color: '#94a3b8'
-              }}>
-                İlk deney kaydınızı oluşturun
-              </div>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

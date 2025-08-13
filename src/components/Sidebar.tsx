@@ -146,35 +146,7 @@ function SidebarComponent() {
                     letterSpacing: '-0.01em',
                     lineHeight: '1.4'
                   }}>
-                    Deney Ekle
-                  </span>
-                )}
-              </div>
-            </MenuItem>
-
-            <MenuItem 
-              active={location.pathname === '/duzenle-sil'}
-              component={<Link to="/duzenle-sil" />}
-            >
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: collapsed ? '0' : '12px' 
-              }}>
-                <span style={{ 
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '20px',
-                  height: '20px'
-                }}>✏️</span>
-                {!collapsed && (
-                  <span style={{ 
-                    letterSpacing: '-0.01em',
-                    lineHeight: '1.4'
-                  }}>
-                    Düzenle/Sil
+                    Deney Yönetimi
                   </span>
                 )}
               </div>
