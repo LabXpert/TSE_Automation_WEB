@@ -482,81 +482,101 @@ function DeneyEkleView({
 
       {/* Alt Kısım - Kaydet Butonu */}
       <div style={{ marginBottom: '32px' }}>
-        <div className="card" style={{ 
-          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-          color: 'white',
-          textAlign: 'center',
-          maxWidth: '600px',
-          margin: '0 auto'
-        }}>
-          <button 
-            onClick={kaydet}
-            style={{
-              width: '100%',
-              padding: '16px',
-              fontSize: '16px',
-              fontWeight: '600',
-              backgroundColor: 'transparent',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            {duzenlemeModu ? (
-              <>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
-                  <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"/>
-                </svg>
-                Güncelle
-              </>
-            ) : (
-              <>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
-                  <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"/>
-                </svg>
-                Kaydet
-              </>
-            )}
-          </button>
-          
-          {duzenlemeModu && (
-            <button 
-              onClick={duzenlemeyiIptalEt}
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '14px',
-                fontWeight: '500',
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                marginTop: '8px',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/>
-              </svg>
-              İptal Et
-            </button>
-          )}
-        </div>
+        {/* Kaydet/Güncelle ve İptal Butonları */}
+<div style={{
+  marginTop: '32px',
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '16px',
+  paddingBottom: '32px'
+}}>
+  <button
+    onClick={kaydet}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      padding: '16px 32px',
+      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+      color: '#ffffff',
+      border: 'none',
+      borderRadius: '12px',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)',
+      minWidth: '180px',
+      justifyContent: 'center',
+      position: 'relative',
+      overflow: 'hidden'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.4)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.3)';
+    }}
+    onMouseDown={(e) => {
+      e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+    }}
+    onMouseUp={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+    }}
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 21H5C4.45 21 4 20.55 4 20V4C4 3.45 4.45 3 5 3H16L20 7V20C20 20.55 19.55 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+    {duzenlemeModu ? 'Güncelle' : 'Kaydet'}
+  </button>
+
+  {duzenlemeModu && (
+    <button
+      onClick={duzenlemeyiIptalEt}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '16px 32px',
+        background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '12px',
+        fontSize: '16px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)',
+        minWidth: '140px',
+        justifyContent: 'center'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
+      }}
+      onMouseDown={(e) => {
+        e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+      }}
+      onMouseUp={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+      }}
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      İptal
+    </button>
+  )}
+</div>
       </div>
 
       {/* Kayıtlar Listesi */}
