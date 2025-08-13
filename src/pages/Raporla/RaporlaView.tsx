@@ -13,7 +13,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
       background: '#ffffff'
     }}>
       {/* Page Header */}
-      <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+      <div style={{ marginBottom: '32px', textAlign: 'left' }}>
         <h1 style={{ 
           fontSize: '32px',
           fontWeight: '700',
@@ -43,6 +43,9 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
           alignItems: 'center',
           gap: '8px'
         }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
+            <path d="M3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5ZM5 5H19V19H5V5ZM7 7V9H17V7H7ZM7 11V13H17V11H7ZM7 15V17H14V15H7Z"/>
+          </svg>
           Tüm Kayıtlar
           <span style={{ 
             fontSize: '14px',
@@ -60,7 +63,17 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
             color: '#64748b',
             fontSize: '16px'
           }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px', color: '#94a3b8' }}>○</div>
+            <div style={{ 
+              fontSize: '48px', 
+              marginBottom: '16px', 
+              color: '#94a3b8',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM12 17C13.1 17 14 16.1 14 15C14 13.9 13.1 13 12 13C10.9 13 10 13.9 10 15C10 16.1 10.9 17 12 17ZM12 7C10.9 7 10 7.9 10 9C10 10.1 10.9 11 12 11C13.1 11 14 10.1 14 9C14 7.9 13.1 7 12 7Z"/>
+              </svg>
+            </div>
             <div style={{ fontSize: '20px', marginBottom: '8px', color: '#374151' }}>
               Henüz kayıt bulunmuyor
             </div>

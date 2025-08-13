@@ -86,7 +86,18 @@ function SidebarComponent() {
               e.currentTarget.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
             }}
           >
-            {collapsed ? '→' : '← Daralt'}
+            {collapsed ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"/>
+              </svg>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px' }}>
+                  <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z"/>
+                </svg>
+                Daralt
+              </>
+            )}
           </button>
         </div>
 
@@ -140,7 +151,11 @@ function SidebarComponent() {
                   justifyContent: 'center',
                   width: '20px',
                   height: '20px'
-                }}>🧪</span>
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 2V4H7C5.9 4 5 4.9 5 6V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6C19 4.9 18.1 4 17 4H15V2H9ZM17 6V18H7V6H17ZM12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15Z"/>
+                  </svg>
+                </span>
                 {!collapsed && (
                   <span style={{ 
                     letterSpacing: '-0.01em',
@@ -168,7 +183,11 @@ function SidebarComponent() {
                   justifyContent: 'center',
                   width: '20px',
                   height: '20px'
-                }}>📊</span>
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5ZM5 5H19V19H5V5ZM7 7V9H17V7H7ZM7 11V13H17V11H7ZM7 15V17H14V15H7Z"/>
+                  </svg>
+                </span>
                 {!collapsed && (
                   <span style={{ 
                     letterSpacing: '-0.01em',

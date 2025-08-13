@@ -243,7 +243,10 @@ function DeneyEkleView({
             borderBottom: '2px solid #f1f5f9',
             flexShrink: 0
           }}>
-            📋 Temel Bilgiler
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
+              <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM5 5H19V7H5V5ZM5 19V9H19V19H5ZM7 11H17V13H7V11ZM7 15H14V17H7V15Z"/>
+            </svg>
+            Temel Bilgiler
           </h3>
           
           <div style={{ 
@@ -306,7 +309,12 @@ function DeneyEkleView({
               paddingTop: '16px',
               borderTop: '1px solid #f1f5f9'
             }}>
-              <label>🧪 Deney Sayısı</label>
+              <label>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
+                  <path d="M9 2V4H7C5.9 4 5 4.9 5 6V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6C19 4.9 18.1 4 17 4H15V2H9ZM17 6V18H7V6H17ZM12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15Z"/>
+                </svg>
+                Deney Sayısı
+              </label>
               <select 
                 value={deneySayisi}
                 onChange={(e) => setDeneySeayisi(parseInt(e.target.value))}
@@ -368,7 +376,10 @@ function DeneyEkleView({
             borderBottom: '1px solid #f1f5f9',
             flexShrink: 0
           }}>
-            🔬 Deney Detayları
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
+              <path d="M9 2V4H7C5.9 4 5 4.9 5 6V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6C19 4.9 18.1 4 17 4H15V2H9ZM17 6V18H7V6H17ZM12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15Z"/>
+            </svg>
+            Deney Detayları
             <span style={{ 
               fontSize: '14px',
               color: '#64748b',
@@ -418,7 +429,21 @@ function DeneyEkleView({
               e.currentTarget.style.backgroundColor = 'transparent';
             }}
           >
-            {duzenlemeModu ? '💾 Güncelle' : '💾 Kaydet'}
+            {duzenlemeModu ? (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
+                  <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"/>
+                </svg>
+                Güncelle
+              </>
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
+                  <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"/>
+                </svg>
+                Kaydet
+              </>
+            )}
           </button>
           
           {duzenlemeModu && (
@@ -444,7 +469,10 @@ function DeneyEkleView({
                 e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
               }}
             >
-              ❌ İptal Et
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/>
+              </svg>
+              İptal Et
             </button>
           )}
         </div>
@@ -461,7 +489,10 @@ function DeneyEkleView({
           alignItems: 'center',
           gap: '8px'
         }}>
-          📊 Kayıtlar Listesi
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
+            <path d="M3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5ZM5 5H19V19H5V5ZM7 7V9H17V7H7ZM7 11V13H17V11H7ZM7 15V17H14V15H7Z"/>
+          </svg>
+          Kayıtlar Listesi
           <span style={{ 
             fontSize: '14px',
             color: '#64748b',
@@ -478,7 +509,16 @@ function DeneyEkleView({
             color: '#64748b',
             fontSize: '16px'
           }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📝</div>
+            <div style={{ 
+              fontSize: '48px', 
+              marginBottom: '16px',
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="#94a3b8">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20ZM11 15L8.5 12.5L7 14L11 18L17 12L15.5 10.5L11 15Z"/>
+              </svg>
+            </div>
             <div>Henüz kayıt bulunmuyor</div>
             <div style={{ fontSize: '14px', marginTop: '8px' }}>
               İlk kaydınızı eklemek için yukarıdaki formu doldurun
@@ -547,7 +587,10 @@ function DeneyEkleView({
                         e.currentTarget.style.backgroundColor = '#3b82f6';
                       }}
                     >
-                      ✏️ Düzenle
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
+                        <path d="M14.06 9L15 9.94L5.92 19H5V18.08L14.06 9ZM17.66 3C17.41 3 17.15 3.1 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.17 3.09 17.92 3 17.66 3ZM14.06 6.19L3 17.25V21H6.75L17.81 9.94L14.06 6.19Z"/>
+                      </svg>
+                      Düzenle
                     </button>
                     <button 
                       onClick={() => kayitSilmeOnayi(kayit.id)}
@@ -569,7 +612,10 @@ function DeneyEkleView({
                         e.currentTarget.style.backgroundColor = '#ef4444';
                       }}
                     >
-                      🗑️ Sil
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
+                        <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"/>
+                      </svg>
+                      Sil
                     </button>
                   </div>
                 </div>
