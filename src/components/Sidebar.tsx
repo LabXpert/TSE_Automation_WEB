@@ -220,41 +220,43 @@ function SidebarComponent() {
           <button
             onClick={toggleSidebar}
             style={{
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-              border: '1px solid #e2e8f0',
-              color: '#64748b',
-              padding: '10px 14px',
-              borderRadius: '8px',
+              background: '#dc2626',
+              border: 'none',
+              color: '#ffffff',
+              padding: '0',
+              borderRadius: '50%',
               cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              width: collapsed ? '44px' : 'auto',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+              width: '40px',
+              height: '40px',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 6px rgba(220, 38, 38, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
+              e.currentTarget.style.background = '#b91c1c';
+              e.currentTarget.style.transform = 'scale(1.1)';
+              e.currentTarget.style.boxShadow = '0 4px 10px rgba(220, 38, 38, 0.3)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
+              e.currentTarget.style.background = '#dc2626';
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(220, 38, 38, 0.2)';
             }}
           >
-            {collapsed ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"/>
-              </svg>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px' }}>
-                  <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z"/>
-                </svg>
-                Daralt
-              </>
-            )}
+            <svg 
+              width="18" 
+              height="18" 
+              viewBox="0 0 24 24" 
+              fill="currentColor"
+              style={{ 
+                transition: 'transform 0.2s ease',
+                transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)'
+              }}
+            >
+              <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"/>
+            </svg>
           </button>
         </div>
 
