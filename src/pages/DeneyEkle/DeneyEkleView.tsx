@@ -181,12 +181,16 @@ function DeneyEkleView({
       background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
     }}>
       {/* Page Header */}
-      <div style={{ marginBottom: '32px' }}>
+      <div style={{ 
+        marginBottom: '32px',
+        borderBottom: '2px solid #dc2626',
+        paddingBottom: '16px'
+      }}>
         <h1 style={{ 
-          fontSize: '28px',
+          fontSize: '32px',
           fontWeight: '700',
           color: '#0f172a',
-          marginBottom: '8px',
+          margin: '0 0 8px 0',
           letterSpacing: '-0.025em'
         }}>
           {duzenlemeModu ? 'Deney Kaydını Düzenle' : 'Yeni Deney Kaydı'}
@@ -228,29 +232,41 @@ function DeneyEkleView({
         alignItems: 'start'
       }}>
         
-        {/* Sol Panel - Temel Bilgiler + Deney Sayısı */}
-        <div className="card" style={{ 
-          position: window.innerWidth > 1024 ? 'sticky' : 'static', 
-          top: '20px',
-          height: '600px', // Sağ panel ile aynı yükseklik
-          display: 'flex',
-          flexDirection: 'column'
+        {/* Sol Panel - Temel Bilgiler */}
+        <div style={{
+        width: '600px',
+        height: '600px',
+        background: '#ffffff',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e2e8f0',
+        position: 'sticky',
+        top: '32px',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Başlık - Kırmızı çizgi ile */}
+        <div style={{ 
+          marginBottom: '24px'
         }}>
-          <h3 style={{ 
-            fontSize: '18px',
-            fontWeight: '600',
-            color: '#0f172a',
-            marginBottom: '20px',
-            paddingBottom: '12px',
-            borderBottom: '2px solid #f1f5f9',
-            flexShrink: 0
+          <h2 style={{ 
+            fontSize: '24px', 
+            fontWeight: '700', 
+            color: '#0f172a', 
+            margin: '0 0 8px 0' 
           }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
-              <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM5 5H19V7H5V5ZM5 19V9H19V19H5ZM7 11H17V13H7V11ZM7 15H14V17H7V15Z"/>
-            </svg>
             Temel Bilgiler
-          </h3>
-          
+          </h2>
+          <p style={{ 
+            fontSize: '14px', 
+            color: '#64748b', 
+            margin: '0' 
+          }}>
+            Deney kaydı için gerekli temel bilgileri girin
+          </p>
+        </div>
+
           <div style={{ 
             display: 'grid', 
             gap: '16px',
@@ -384,12 +400,8 @@ function DeneyEkleView({
               </select>
             </div>
 
-            {/* Deney Sayısı - Temel Bilgiler içinde */}
-            <div style={{ 
-              marginTop: '20px',
-              paddingTop: '16px',
-              borderTop: '1px solid #f1f5f9'
-            }}>
+            {/* Deney Sayısı */}
+            <div>
               <label>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px', verticalAlign: 'middle' }}>
                   <path d="M9 2V4H7C5.9 4 5 4.9 5 6V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6C19 4.9 18.1 4 17 4H15V2H9ZM17 6V18H7V6H17ZM12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15Z"/>
@@ -487,6 +499,7 @@ function DeneyEkleView({
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 

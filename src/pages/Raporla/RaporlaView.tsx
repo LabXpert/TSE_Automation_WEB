@@ -13,19 +13,24 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
       background: '#ffffff'
     }}>
       {/* Page Header */}
-      <div style={{ marginBottom: '32px', textAlign: 'left' }}>
+      <div style={{ 
+        marginBottom: '32px', 
+        textAlign: 'left',
+        borderBottom: '2px solid #dc2626',
+        paddingBottom: '16px'
+      }}>
         <h1 style={{ 
           fontSize: '32px',
           fontWeight: '700',
           color: '#0f172a',
-          marginBottom: '8px',
+          margin: '0 0 8px 0',
           letterSpacing: '-0.025em'
         }}>
           Deney Raporları
         </h1>
         <p style={{ 
           color: '#64748b',
-          fontSize: '18px',
+          fontSize: '16px',
           margin: 0
         }}>
           Kayıtlı tüm deney verilerini görüntüleyin
