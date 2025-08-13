@@ -11,6 +11,23 @@ function SidebarComponent() {
     setCollapsed(!collapsed);
   };
 
+  // CSS animasyonları için style element
+  const styleElement = document.createElement('style');
+  styleElement.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+  `;
+  if (!document.head.querySelector('[data-sidebar-styles]')) {
+    styleElement.setAttribute('data-sidebar-styles', 'true');
+    document.head.appendChild(styleElement);
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       <Sidebar 
@@ -24,33 +41,173 @@ function SidebarComponent() {
       >
         {/* Header */}
         <div style={{ 
-          padding: collapsed ? '24px 16px' : '24px 24px', 
+          padding: collapsed ? '20px 12px' : '24px 20px', 
           borderBottom: '1px solid #e2e8f0',
           textAlign: 'center',
-          height: '80px',
+          height: '90px',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-          position: 'relative'
+          position: 'relative',
+          overflow: 'hidden'
         }}>
+          {/* Logo Icon */}
           <div style={{
-            color: 'white',
-            fontWeight: '700',
-            fontSize: collapsed ? '16px' : '20px',
-            letterSpacing: '-0.025em'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: collapsed ? '0' : '6px',
+            transition: 'all 0.3s ease'
           }}>
-            {collapsed ? 'TSE' : 'TSE Automation'}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: collapsed ? '0' : '12px',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{
+                width: collapsed ? '36px' : '44px',
+                height: collapsed ? '36px' : '44px',
+                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 245, 247, 0.95) 100%)',
+                borderRadius: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backdropFilter: 'blur(20px)',
+                border: '2px solid rgba(255, 255, 255, 0.4)',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}>
+                {/* İç glow efekti */}
+                <div style={{
+                  position: 'absolute',
+                  top: '1px',
+                  left: '1px',
+                  right: '1px',
+                  height: '50%',
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%)',
+                  borderRadius: '12px 12px 0 0',
+                  pointerEvents: 'none'
+                }} />
+                
+                <img 
+                  src="/tse-logo.png" 
+                  alt="TSE Logo"
+                  style={{ 
+                    width: collapsed ? '22px' : '28px',
+                    height: collapsed ? '22px' : '28px',
+                    objectFit: 'contain',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    zIndex: 1,
+                    filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2))'
+                  }}
+                  onError={(e) => {
+                    // Eğer logo yüklenemezse, eski icon'u göster
+                    e.currentTarget.style.display = 'none';
+                    const nextElement = e.currentTarget.parentElement?.nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
+                  }}
+                />
+              </div>
+              <div style={{
+                width: collapsed ? '32px' : '40px',
+                height: collapsed ? '32px' : '40px',
+                background: 'rgba(255, 255, 255, 0.15)',
+                borderRadius: '12px',
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <svg 
+                  width={collapsed ? '18' : '22'} 
+                  height={collapsed ? '18' : '22'} 
+                  viewBox="0 0 24 24" 
+                  fill="white"
+                  style={{ 
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                  <path d="M2 17L12 22L22 17"/>
+                  <path d="M2 12L12 17L22 12"/>
+                </svg>
+              </div>
+            </div>
+            
+            {!collapsed && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                animation: 'fadeIn 0.3s ease-in-out'
+              }}>
+                <div style={{
+                  color: 'white',
+                  fontWeight: '800',
+                  fontSize: '18px',
+                  letterSpacing: '-0.02em',
+                  lineHeight: '1.2',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                }}>
+                  TSE LABORATUVAR SİSTEMİ
+                </div>
+              </div>
+            )}
           </div>
+
+          {collapsed && (
+            <div style={{
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontWeight: '700',
+              fontSize: '10px',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              marginTop: '4px',
+              animation: 'fadeIn 0.3s ease-in-out'
+            }}>
+              TSE
+            </div>
+          )}
           
-          {/* Decorative element */}
+          {/* Decorative elements */}
           <div style={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
             height: '2px',
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)'
+            background: 'linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%)'
+          }} />
+          
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '1px',
+            background: 'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%)'
+          }} />
+
+          {/* Background pattern */}
+          <div style={{
+            position: 'absolute',
+            top: '-20px',
+            right: '-20px',
+            width: '80px',
+            height: '80px',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+            borderRadius: '50%'
           }} />
         </div>
 
