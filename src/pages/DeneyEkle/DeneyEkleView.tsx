@@ -1,4 +1,5 @@
 // src/pages/DeneyEkle/DeneyEkleView.tsx
+import { useNavigate } from 'react-router-dom';
 import type { Firma } from '../../models/Firma.tsx';
 import type { Personel } from '../../models/Personel.tsx';
 import type { DeneyTuru } from '../../models/DeneyTurleri.tsx';
@@ -58,6 +59,7 @@ function DeneyEkleView({
   personeller,
   deneyTurleri
 }: DeneyEkleViewProps) {
+  const navigate = useNavigate();
 
   const renderDeneyGrupları = () => {
     const gruplar = [];
@@ -309,10 +311,7 @@ function DeneyEkleView({
     
     <button
       type="button"
-      onClick={() => {
-        // Gelecekte firma ekleme modal'ı açılacak
-        alert('Firma ekleme özelliği yakında eklenecek!');
-      }}
+      onClick={() => navigate('/firma-ekle')}
       style={{
         display: 'flex',
         alignItems: 'center',
