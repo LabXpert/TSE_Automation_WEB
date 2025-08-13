@@ -1,10 +1,94 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FIRMALAR } from '../../../models/Firma';
 
 const FirmaEkleView: React.FC = () => {
   const navigate = useNavigate();
+  
+  // Form state'leri
+  const [formData, setFormData] = useState({
+    ad: '',
+    vergiNo: '',
+    yetkili: '',
+    telefon: '',
+    adres: '',
+    email: ''
+  });
+
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const handleCancel = () => {
+    navigate('/deney-ekle');
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Hata varsa temizle
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    if (!formData.ad.trim()) {
+      newErrors.ad = 'Firma adı zorunludur';
+    }
+
+    if (!formData.vergiNo.trim()) {
+      newErrors.vergiNo = 'Vergi numarası zorunludur';
+    } else if (formData.vergiNo.length !== 10) {
+      newErrors.vergiNo = 'Vergi numarası 10 haneli olmalıdır';
+    }
+
+    if (!formData.yetkili.trim()) {
+      newErrors.yetkili = 'Yetkili kişi zorunludur';
+    }
+
+    if (!formData.telefon.trim()) {
+      newErrors.telefon = 'Telefon numarası zorunludur';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email adresi zorunludur';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Geçerli bir email adresi giriniz';
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Yeni firma oluştur
+    const yeniFirma = {
+      id: (FIRMALAR.length + 1).toString(),
+      ad: formData.ad.trim(),
+      email: formData.email.trim(),
+      adres: formData.adres.trim() || undefined,
+      telefon: formData.telefon.trim() || undefined
+    };
+
+    // Firmalar listesine ekle
+    FIRMALAR.push(yeniFirma);
+
+    // Başarı mesajı göster ve geri dön
+    alert(`${yeniFirma.ad} başarıyla eklendi!`);
     navigate('/deney-ekle');
   };
 
@@ -49,6 +133,7 @@ const FirmaEkleView: React.FC = () => {
         maxWidth: '600px',
         margin: '0 auto'
       }}>
+        <form onSubmit={handleSubmit}>
         {/* Firma Adı */}
         <div style={{ marginBottom: '24px' }}>
           <label style={{ 
@@ -63,10 +148,12 @@ const FirmaEkleView: React.FC = () => {
           <input 
             type="text" 
             placeholder="Örn: ABC Makina San. Tic. Ltd. Şti."
+            value={formData.ad}
+            onChange={(e) => handleInputChange('ad', e.target.value)}
             style={{ 
               width: '100%', 
               padding: '12px',
-              border: '2px solid #e5e7eb',
+              border: `2px solid ${errors.ad ? '#dc2626' : '#e5e7eb'}`,
               borderRadius: '8px',
               fontSize: '14px',
               backgroundColor: '#ffffff',
@@ -80,10 +167,15 @@ const FirmaEkleView: React.FC = () => {
               e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#e5e7eb';
+              e.target.style.borderColor = errors.ad ? '#dc2626' : '#e5e7eb';
               e.target.style.boxShadow = 'none';
             }}
           />
+          {errors.ad && (
+            <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+              {errors.ad}
+            </p>
+          )}
         </div>
 
         {/* Vergi No */}
@@ -100,10 +192,13 @@ const FirmaEkleView: React.FC = () => {
           <input 
             type="text" 
             placeholder="10 haneli vergi numarası"
+            value={formData.vergiNo}
+            onChange={(e) => handleInputChange('vergiNo', e.target.value)}
+            maxLength={10}
             style={{ 
               width: '100%', 
               padding: '12px',
-              border: '2px solid #e5e7eb',
+              border: `2px solid ${errors.vergiNo ? '#dc2626' : '#e5e7eb'}`,
               borderRadius: '8px',
               fontSize: '14px',
               backgroundColor: '#ffffff',
@@ -117,10 +212,15 @@ const FirmaEkleView: React.FC = () => {
               e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#e5e7eb';
+              e.target.style.borderColor = errors.vergiNo ? '#dc2626' : '#e5e7eb';
               e.target.style.boxShadow = 'none';
             }}
           />
+          {errors.vergiNo && (
+            <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+              {errors.vergiNo}
+            </p>
+          )}
         </div>
 
         {/* Yetkili İsmi */}
@@ -137,10 +237,12 @@ const FirmaEkleView: React.FC = () => {
           <input 
             type="text" 
             placeholder="Yetkili kişinin adı soyadı"
+            value={formData.yetkili}
+            onChange={(e) => handleInputChange('yetkili', e.target.value)}
             style={{ 
               width: '100%', 
               padding: '12px',
-              border: '2px solid #e5e7eb',
+              border: `2px solid ${errors.yetkili ? '#dc2626' : '#e5e7eb'}`,
               borderRadius: '8px',
               fontSize: '14px',
               backgroundColor: '#ffffff',
@@ -154,10 +256,15 @@ const FirmaEkleView: React.FC = () => {
               e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#e5e7eb';
+              e.target.style.borderColor = errors.yetkili ? '#dc2626' : '#e5e7eb';
               e.target.style.boxShadow = 'none';
             }}
           />
+          {errors.yetkili && (
+            <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+              {errors.yetkili}
+            </p>
+          )}
         </div>
 
         {/* Telefon */}
@@ -174,10 +281,12 @@ const FirmaEkleView: React.FC = () => {
           <input 
             type="tel" 
             placeholder="0212 123 45 67"
+            value={formData.telefon}
+            onChange={(e) => handleInputChange('telefon', e.target.value)}
             style={{ 
               width: '100%', 
               padding: '12px',
-              border: '2px solid #e5e7eb',
+              border: `2px solid ${errors.telefon ? '#dc2626' : '#e5e7eb'}`,
               borderRadius: '8px',
               fontSize: '14px',
               backgroundColor: '#ffffff',
@@ -191,10 +300,57 @@ const FirmaEkleView: React.FC = () => {
               e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#e5e7eb';
+              e.target.style.borderColor = errors.telefon ? '#dc2626' : '#e5e7eb';
               e.target.style.boxShadow = 'none';
             }}
           />
+          {errors.telefon && (
+            <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+              {errors.telefon}
+            </p>
+          )}
+        </div>
+
+        {/* Email */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <label style={{
+            fontWeight: '600',
+            color: '#374151',
+            fontSize: '14px'
+          }}>
+            Email Adresi *
+          </label>
+          <input 
+            type="email"
+            placeholder="info@firma.com"
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            style={{ 
+              width: '100%', 
+              padding: '12px',
+              border: errors.email ? '2px solid #dc2626' : '2px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              backgroundColor: '#ffffff',
+              color: '#374151',
+              outline: 'none',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box'
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = '#dc2626';
+              e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = errors.email ? '#dc2626' : '#e5e7eb';
+              e.target.style.boxShadow = 'none';
+            }}
+          />
+          {errors.email && (
+            <span style={{ color: '#dc2626', fontSize: '12px', fontWeight: '500' }}>
+              {errors.email}
+            </span>
+          )}
         </div>
 
         {/* Adres */}
@@ -211,6 +367,8 @@ const FirmaEkleView: React.FC = () => {
           <textarea 
             placeholder="Firma adresi"
             rows={4}
+            value={formData.adres}
+            onChange={(e) => handleInputChange('adres', e.target.value)}
             style={{ 
               width: '100%', 
               padding: '12px',
@@ -302,6 +460,7 @@ const FirmaEkleView: React.FC = () => {
             Firma Ekle
           </button>
         </div>
+        </form>
       </div>
     </div>
   );
