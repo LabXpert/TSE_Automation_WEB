@@ -256,19 +256,101 @@ function DeneyEkleView({
             flex: 1,
             alignContent: 'start'
           }}>
-            <div>
-              <label>Firma Adı *</label>
-              <select 
-                value={firmaAdi}
-                onChange={(e) => setFirmaAdi(e.target.value)}
-                style={{ width: '100%', boxSizing: 'border-box' }}
-              >
-                <option value="">Firma seçiniz...</option>
-                {firmalar.map((firma) => (
-                  <option key={firma.id} value={firma.ad}>{firma.ad}</option>
-                ))}
-              </select>
-            </div>
+            {/* Firma Adı */}
+<div style={{ 
+  display: 'flex', 
+  flexDirection: 'column', 
+  marginBottom: '20px' 
+}}>
+  <label style={{ 
+    marginBottom: '8px', 
+    fontWeight: '600', 
+    color: '#374151' 
+  }}>
+    Firma Adı:
+  </label>
+  <div style={{
+    display: 'flex',
+    gap: '12px',
+    alignItems: 'stretch'
+  }}>
+    <select
+      value={firmaAdi}
+      onChange={(e) => setFirmaAdi(e.target.value)}
+      style={{
+        flex: 1,
+        padding: '12px',
+        border: '2px solid #e5e7eb',
+        borderRadius: '8px',
+        fontSize: '14px',
+        backgroundColor: '#ffffff',
+        color: '#374151',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        outline: 'none',
+        boxSizing: 'border-box'
+      }}
+      onFocus={(e) => {
+        e.target.style.borderColor = '#dc2626';
+        e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+      }}
+      onBlur={(e) => {
+        e.target.style.borderColor = '#e5e7eb';
+        e.target.style.boxShadow = 'none';
+      }}
+    >
+      <option value="">Firma Seçin</option>
+      {firmalar.map((firma) => (
+        <option key={firma.id} value={firma.ad}>
+          {firma.ad}
+        </option>
+      ))}
+    </select>
+    
+    <button
+      type="button"
+      onClick={() => {
+        // Gelecekte firma ekleme modal'ı açılacak
+        alert('Firma ekleme özelliği yakında eklenecek!');
+      }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '48px',
+        height: '48px',
+        background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 2px 8px rgba(220, 38, 38, 0.2)',
+        fontSize: '32px',
+        fontWeight: '600',
+        lineHeight: '1',
+        paddingTop: '3px'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-1px)';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+      }}
+      onMouseDown={(e) => {
+        e.currentTarget.style.transform = 'translateY(0) scale(0.95)';
+      }}
+      onMouseUp={(e) => {
+        e.currentTarget.style.transform = 'translateY(-1px) scale(1)';
+      }}
+      title="Yeni Firma Ekle"
+    >
+      +
+    </button>
+  </div>
+</div>
 
             <div>
               <label>Başvuru No *</label>
