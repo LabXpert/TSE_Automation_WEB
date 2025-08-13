@@ -83,7 +83,7 @@ function DeneyEkleView({
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
               color: 'white',
               display: 'flex',
               alignItems: 'center',
@@ -315,15 +315,96 @@ function DeneyEkleView({
                 </svg>
                 Deney Sayısı
               </label>
-              <select 
-                value={deneySayisi}
-                onChange={(e) => setDeneySeayisi(parseInt(e.target.value))}
-                style={{ width: '100%', boxSizing: 'border-box' }}
-              >
-                {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                  <option key={num} value={num}>{num} Deney</option>
-                ))}
-              </select>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                marginTop: '8px' 
+              }}>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="10" 
+                  value={deneySayisi}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (value >= 1 && value <= 10) {
+                      setDeneySeayisi(value);
+                    }
+                  }}
+                  style={{ 
+                    flex: 1,
+                    textAlign: 'center',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (deneySayisi < 10) {
+                        setDeneySeayisi(deneySayisi + 1);
+                      }
+                    }}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      backgroundColor: '#dc2626',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      minWidth: '32px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = '#b91c1c';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = '#dc2626';
+                    }}
+                  >
+                    ▲
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (deneySayisi > 1) {
+                        setDeneySeayisi(deneySayisi - 1);
+                      }
+                    }}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      backgroundColor: '#dc2626',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      minWidth: '32px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = '#b91c1c';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = '#dc2626';
+                    }}
+                  >
+                    ▼
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -573,7 +654,7 @@ function DeneyEkleView({
                         padding: '8px 12px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: '#dc2626',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
@@ -581,10 +662,10 @@ function DeneyEkleView({
                         transition: 'all 0.2s ease'
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#2563eb';
+                        e.currentTarget.style.backgroundColor = '#b91c1c';
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = '#3b82f6';
+                        e.currentTarget.style.backgroundColor = '#dc2626';
                       }}
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>

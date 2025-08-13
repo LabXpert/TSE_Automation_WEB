@@ -7,10 +7,10 @@
 }
 
 :root {
-  /* Modern Color Palette */
-  --primary-blue: #2563eb;
-  --primary-blue-hover: #1d4ed8;
-  --primary-blue-light: #dbeafe;
+  /* Modern Color Palette - RED THEME */
+  --primary-red: #dc2626;
+  --primary-red-hover: #b91c1c;
+  --primary-red-light: #fecaca;
   --secondary-gray: #64748b;
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -77,12 +77,12 @@ p {
 
 /* LINKS */
 a {
-  color: var(--primary-blue);
+  color: var(--primary-red);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 a:hover {
-  color: var(--primary-blue-hover);
+  color: var(--primary-red-hover);
 }
 
 /* MODERN BUTTONS */
@@ -93,7 +93,7 @@ button {
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--primary-blue);
+  background-color: var(--primary-red);
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -105,7 +105,7 @@ button {
 }
 
 button:hover {
-  background-color: var(--primary-blue-hover);
+  background-color: var(--primary-red-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -149,8 +149,8 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+  border-color: var(--primary-red);
+  box-shadow: 0 0 0 3px rgb(220 38 38 / 0.1);
   transform: translateY(-1px);
 }
 
@@ -171,7 +171,7 @@ label {
 input[type="checkbox"], input[type="radio"] {
   width: auto;
   margin-right: 0.5rem;
-  accent-color: var(--primary-blue);
+  accent-color: var(--primary-red);
 }
 
 /* MODERN CARD STYLES */

@@ -95,14 +95,14 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
               {/* Sabit Başlık */}
               <thead>
                 <tr style={{
-                  background: '#374151',
+                  background: '#7f1d1d',
                   color: 'white'
                 }}>
                   <th style={{ 
                     padding: '12px 8px', 
                     textAlign: 'center', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '5%'
                   }}>
                     SIRA
@@ -111,7 +111,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                     padding: '12px 8px', 
                     textAlign: 'left', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '18%'
                   }}>
                     FİRMA ADI
@@ -120,7 +120,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                     padding: '12px 8px', 
                     textAlign: 'left', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '10%'
                   }}>
                     BAŞVURU NO
@@ -129,7 +129,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                     padding: '12px 8px', 
                     textAlign: 'left', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '10%'
                   }}>
                     BAŞVURU TARİHİ
@@ -138,7 +138,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                     padding: '12px 8px', 
                     textAlign: 'center', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '8%'
                   }}>
                     TÜR
@@ -147,7 +147,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                     padding: '12px 8px', 
                     textAlign: 'left', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '18%'
                   }}>
                     DENEY TÜRÜ
@@ -156,7 +156,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                     padding: '12px 8px', 
                     textAlign: 'left', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '15%'
                   }}>
                     SORUMLU PERSONEL
@@ -165,7 +165,7 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                     padding: '12px 8px', 
                     textAlign: 'center', 
                     fontWeight: '600', 
-                    borderRight: '1px solid #4b5563',
+                    borderRight: '1px solid #991b1b',
                     width: '10%'
                   }}>
                     AKREDİTE DURUMU
@@ -256,9 +256,9 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                           borderRadius: '3px',
                           fontSize: '10px',
                           fontWeight: '600',
-                          background: kayit.belgelendirmeTuru === 'belgelendirme' ? '#e0f2fe' : '#fef7cd',
-                          color: kayit.belgelendirmeTuru === 'belgelendirme' ? '#0369a1' : '#a16207',
-                          border: `1px solid ${kayit.belgelendirmeTuru === 'belgelendirme' ? '#0284c7' : '#ca8a04'}`
+                          background: kayit.belgelendirmeTuru === 'belgelendirme' ? '#fed7aa' : '#fef7cd',
+                          color: kayit.belgelendirmeTuru === 'belgelendirme' ? '#c2410c' : '#a16207',
+                          border: `1px solid ${kayit.belgelendirmeTuru === 'belgelendirme' ? '#f97316' : '#ca8a04'}`
                         }}>
                           {kayit.belgelendirmeTuru === 'belgelendirme' ? 'BELG.' : 'ÖZEL'}
                         </span>
@@ -320,9 +320,9 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
                           borderRadius: '3px',
                           fontSize: '10px',
                           fontWeight: '600',
-                          background: '#e0f2fe',
-                          color: '#0369a1',
-                          border: '1px solid #0284c7'
+                          background: '#dbeafe',
+                          color: '#1d4ed8',
+                          border: '1px solid #3b82f6'
                         }}>
                           TAMAM
                         </span>

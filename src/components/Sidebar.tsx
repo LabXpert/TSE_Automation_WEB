@@ -31,7 +31,7 @@ function SidebarComponent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+          background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
           position: 'relative'
         }}>
           <div style={{
@@ -106,8 +106,8 @@ function SidebarComponent() {
           <Menu
             menuItemStyles={{
               button: ({ active }) => ({
-                color: active ? '#2563eb' : '#475569',
-                backgroundColor: active ? '#dbeafe' : 'transparent',
+                color: active ? '#dc2626' : '#475569',
+                backgroundColor: active ? '#fecaca' : 'transparent',
                 margin: '4px 12px',
                 borderRadius: '8px',
                 fontWeight: active ? '600' : '500',
@@ -117,8 +117,8 @@ function SidebarComponent() {
                 transition: 'all 0.2s ease',
                 position: 'relative',
                 '&:hover': {
-                  backgroundColor: active ? '#dbeafe' : '#f8fafc',
-                  color: active ? '#2563eb' : '#1e293b',
+                  backgroundColor: active ? '#fecaca' : '#f8fafc',
+                  color: active ? '#dc2626' : '#1e293b',
                   transform: 'translateX(2px)'
                 },
                 '&::before': active ? {
@@ -129,7 +129,7 @@ function SidebarComponent() {
                   transform: 'translateY(-50%)',
                   width: '3px',
                   height: '20px',
-                  backgroundColor: '#2563eb',
+                  backgroundColor: '#dc2626',
                   borderRadius: '2px'
                 } : {}
               }),
