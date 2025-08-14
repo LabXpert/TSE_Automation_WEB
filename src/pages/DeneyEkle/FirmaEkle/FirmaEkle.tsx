@@ -111,20 +111,20 @@ const FirmaEkle: React.FC = () => {
               });
               if (!response.ok) {
                 const err = await response.json();
-                alert((method === 'POST' ? 'Error adding company: ' : 'Error updating company: ') + (err.error || 'Unknown error'));
+                alert((method === 'POST' ? 'Firma eklenirken hata oluştu: ' : 'Firma güncellenirken hata oluştu: ') + (err.error || 'Bilinmeyen hata'));
                 return;
               }
               const resultFirma = await response.json();
               if (method === 'POST') {
                 setFirmaListesi(prev => [...prev, resultFirma]);
-                alert(`${resultFirma.name} added successfully!`);
+                alert(`${resultFirma.name} başarıyla eklendi!`);
               } else {
                 setFirmaListesi(prev => prev.map(f => f.id === resultFirma.id ? resultFirma : f));
-                alert(`${resultFirma.name} updated successfully!`);
+                alert(`${resultFirma.name} başarıyla güncellendi!`);
               }
               formTemizle();
             } catch (error) {
-              alert('Error saving company!');
+                alert('Firma kaydedilirken hata oluştu!');
               console.error(error);
             }
           };
@@ -132,7 +132,7 @@ const FirmaEkle: React.FC = () => {
           const firmaDuzenle = (id: number) => {
             const firma = firmaListesi.find(f => f.id === id);
             if (!firma) {
-              alert('Firma bulunamadı!');
+                alert('Firma bulunamadı!');
               return;
             }
             setFormData({
@@ -152,7 +152,7 @@ const FirmaEkle: React.FC = () => {
           const firmaSilmeOnayi = async (id: number) => {
             const firma = firmaListesi.find(f => f.id === id);
             if (!firma) {
-              alert('Company not found!');
+              alert('Firma bulunamadı!');
               return;
             }
             const confirmMsg = `Are you sure you want to delete "${firma.name}"?\n\nThis action cannot be undone!`;
@@ -161,14 +161,14 @@ const FirmaEkle: React.FC = () => {
                 const response = await fetch(`/api/companies/${id}`, { method: 'DELETE' });
                 if (!response.ok) {
                   const err = await response.json();
-                  alert('Error deleting company: ' + (err.error || 'Unknown error'));
+                    alert('Firma silinirken hata oluştu: ' + (err.error || 'Bilinmeyen hata'));
                   return;
                 }
                 setFirmaListesi(prev => prev.filter(f => f.id !== id));
-                alert(`${firma.name} deleted successfully!`);
+                    alert(`${firma.name} başarıyla silindi!`);
                 formTemizle();
               } catch (error) {
-                alert('Error deleting company!');
+                alert('Firma silinirken hata oluştu!');
                 console.error(error);
               }
             }

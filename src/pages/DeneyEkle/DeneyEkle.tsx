@@ -4,7 +4,10 @@ import DeneyEkleView from './DeneyEkleView.tsx';
 // import kaldırıldı, personel listesi API'den gelecek
 // import kaldırıldı, deney türleri API'den gelecek
 import type { Deney, DeneyKaydi } from '../../models/Deney.tsx';
-import { kayitEkle, kayitGuncelle, kayitSil, tumKayitlariGetir, kayitBul } from '../../data/DeneyListesi.tsx';
+import type { Firma } from '../../models/Firma.tsx';
+import type { Personel } from '../../models/Personel.tsx';
+import type { DeneyTuru } from '../../models/DeneyTurleri.tsx';
+import { kayitSil, tumKayitlariGetir, kayitBul } from '../../data/DeneyListesi.tsx';
 
 function DeneyEkle() {
   const [deneySayisi, setDeneySeayisi] = useState(1);
@@ -15,9 +18,9 @@ function DeneyEkle() {
   const [deneyler, setDeneyler] = useState<Deney[]>([]);
   const [kayitlariListesi, setKayitlariListesi] = useState<DeneyKaydi[]>([]);
   // Deney türleri, personel ve firma listesi API'den gelecek
-  const [deneyTurleri, setDeneyTurleri] = useState([]);
-  const [personeller, setPersoneller] = useState([]);
-  const [firmalar, setFirmalar] = useState([]);
+  const [deneyTurleri, setDeneyTurleri] = useState<DeneyTuru[]>([]);
+  const [personeller, setPersoneller] = useState<Personel[]>([]);
+  const [firmalar, setFirmalar] = useState<Firma[]>([]);
 
   // Düzenleme modu state'leri
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
@@ -25,7 +28,27 @@ function DeneyEkle() {
 
   // Sayfa yüklendiğinde kayıtları ve deney türlerini getir
   useEffect(() => {
-    setKayitlariListesi(tumKayitlariGetir());
+    // Son 5 başvuru kaydını API'den çek
+    fetch('/api/applications/recent')
+      .then((res) => res.json())
+      .then((data) => {
+        // API'den gelen veriyi arayüzde beklenen formata dönüştür
+  const mapped = data.map((app: any) => ({
+          id: app.id,
+          firmaAdi: app.companies?.name || '',
+          basvuruNo: app.application_no,
+          basvuruTarihi: app.application_date,
+          belgelendirmeTuru: app.certification_type,
+          deneySayisi: app.test_count,
+          deneyler: app.tests || []
+        }));
+        setKayitlariListesi(mapped);
+      })
+      .catch((err) => {
+        console.error('Recent applications fetch error:', err);
+        setKayitlariListesi([]);
+      });
+
     // Deney türlerini API'den çek
     fetch('/api/experiment-types')
       .then((res) => res.json())
@@ -34,7 +57,7 @@ function DeneyEkle() {
         console.error('Deney türleri alınamadı:', err);
         setDeneyTurleri([]);
       });
-      
+
     // Personel listesini API'den çek
     fetch('/api/personnel')
       .then((res) => res.json())
@@ -96,45 +119,76 @@ function DeneyEkle() {
     }
   };
 
-  const kaydet = () => {
-    // Basit validasyon
+  const kaydet = async () => {
+    // Basic validation
     if (!firmaAdi || !basvuruNo || !basvuruTarihi) {
-      alert('Lütfen tüm zorunlu alanları doldurunuz!');
+      alert('Lütfen tüm zorunlu alanları doldurun!');
       return;
     }
-
-    // Deney alanları validasyonu
     for (let i = 0; i < deneyler.length; i++) {
       if (!deneyler[i].deneyTuru || !deneyler[i].sorumluPersonel) {
-        alert(`Deney ${i + 1} için tüm alanları doldurunuz!`);
+      alert(`Lütfen ${i + 1}. deney için tüm alanları doldurun!`);
         return;
       }
     }
 
-    const kayitVerisi = {
-      firmaAdi,
-      basvuruNo,
-      basvuruTarihi,
-      belgelendirmeTuru,
-      deneySayisi,
-      deneyler
+    // Find selected company id
+    const selectedCompany = firmalar.find(f => f.name === firmaAdi);
+    if (!selectedCompany) {
+      alert('Seçilen firma bulunamadı!');
+      return;
+    }
+
+    // Prepare tests array for API
+    const testsPayload = deneyler.map((d) => {
+      const experimentType = deneyTurleri.find(t => t.name === d.deneyTuru);
+      const personnel = personeller.find(p => `${p.first_name} ${p.last_name}` === d.sorumluPersonel);
+      return {
+        experiment_type_id: experimentType?.id,
+        responsible_personnel_id: personnel?.id,
+        unit_price: experimentType?.base_price || 0,
+        is_accredited: d.akredite || false
+      };
+    });
+
+    const payload = {
+      company_id: selectedCompany.id,
+      application_no: basvuruNo,
+      application_date: basvuruTarihi,
+      certification_type: belgelendirmeTuru,
+      tests: testsPayload
     };
 
     try {
-      if (duzenlemeModu && duzenlenecekKayitId) {
-        // Güncelleme işlemi
-        kayitGuncelle(duzenlenecekKayitId, kayitVerisi);
-        alert('Kayıt başarıyla güncellendi!');
-      } else {
-        // Yeni kayıt ekleme
-        kayitEkle(kayitVerisi);
-        alert('Kayıt başarıyla eklendi!');
+      const response = await fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        alert('Başvuru kaydedilirken hata oluştu: ' + (err.error || 'Bilinmeyen hata'));
+        return;
       }
-      
-      setKayitlariListesi(tumKayitlariGetir());
+        alert('Başvuru ve deneyler başarıyla kaydedildi!');
       formTemizle();
+      // Yeni eklenen kaydı hemen listeye ekle
+      fetch('/api/applications/recent')
+        .then(res => res.json())
+        .then(data => {
+          const mapped = data.map((app: any) => ({
+            id: app.id,
+            firmaAdi: app.companies?.name || '',
+            basvuruNo: app.application_no,
+            basvuruTarihi: app.application_date,
+            belgelendirmeTuru: app.certification_type,
+            deneySayisi: app.test_count,
+            deneyler: app.tests || []
+          }));
+          setKayitlariListesi(mapped);
+        });
     } catch (error) {
-      alert(duzenlemeModu ? 'Kayıt güncellenirken hata oluştu!' : 'Kayıt eklenirken hata oluştu!');
+      alert('Başvuru kaydedilirken hata oluştu!');
       console.error(error);
     }
   };
@@ -182,7 +236,7 @@ function DeneyEkle() {
           formTemizle();
         }
       } catch (error) {
-        alert('Kayıt silinirken hata oluştu!');
+       alert('Kayıt silinirken hata oluştu!');
         console.error(error);
       }
     }

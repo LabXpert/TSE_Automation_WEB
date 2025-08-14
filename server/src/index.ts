@@ -67,8 +67,6 @@ app.get('/api/companies', async (_req, res) => {
 });
 
 // --- ADD COMPANY ---
-
-// --- ADD COMPANY ---
 app.post('/api/companies', async (req, res) => {
   try {
     const { name, tax_no, contact_name, address, phone, email } = req.body;
@@ -130,6 +128,95 @@ app.put('/api/companies/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+// --- ADD APPLICATION & TESTS ---
+app.post('/api/applications', async (req, res) => {
+  try {
+    const {
+      company_id,
+      application_no,
+      application_date,
+      certification_type,
+      tests
+    } = req.body;
+
+    if (!company_id || !application_no || !application_date || !certification_type || !Array.isArray(tests) || tests.length === 0) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Create application
+    const newApp = await prisma.applications.create({
+      data: {
+        company_id,
+        application_no,
+        application_date: new Date(application_date),
+        certification_type,
+        test_count: tests.length,
+        tests: {
+          create: tests.map(test => ({
+            experiment_type_id: test.experiment_type_id,
+            responsible_personnel_id: test.responsible_personnel_id,
+            unit_price: test.unit_price || 0,
+            is_accredited: !!test.is_accredited
+          }))
+        }
+      },
+      include: { tests: true }
+    });
+    res.status(201).json(newApp);
+  } catch (error) {
+    console.error('Error creating application:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// --- GET RECENT APPLICATIONS ---
+app.get('/api/applications/recent', async (_req, res) => {
+  try {
+      const recentApps = await prisma.applications.findMany({
+        orderBy: { created_at: 'desc' },
+        take: 5,
+        include: {
+          companies: true,
+          tests: {
+            include: {
+              experiment_types: true,
+              personnel: true
+            }
+          }
+        }
+      });
+      res.json(recentApps);
+  } catch (error) {
+    console.error('Error fetching recent applications:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+// --- GET ALL APPLICATIONS ---
+app.get('/api/applications/all', async (_req, res) => {
+  try {
+    const allApps = await prisma.applications.findMany({
+      orderBy: { created_at: 'desc' },
+      include: {
+        companies: true,
+        tests: {
+          include: {
+            experiment_types: true,
+            personnel: true
+          }
+        }
+      }
+    });
+    res.json(allApps);
+  } catch (error) {
+    console.error('Error fetching all applications:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`);
