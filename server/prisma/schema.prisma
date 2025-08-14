@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model applications {
+  id                 Int        @id @default(autoincrement())
+  company_id         Int?
+  application_no     String     @unique @db.VarChar(50)
+  application_date   DateTime   @db.Date
+  certification_type String     @default("özel") @db.VarChar(50)
+  test_count         Int        @default(0)
+  created_at         DateTime?  @default(now()) @db.Timestamp(6)
+  companies          companies? @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tests              tests[]
+}
+
+model companies {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(255)
+  tax_no       String?        @unique @db.VarChar(50)
+  contact_name String?        @db.VarChar(255)
+  address      String?
+  phone        String?        @db.VarChar(20)
+  email        String?        @db.VarChar(255)
+  created_at   DateTime?      @default(now()) @db.Timestamp(6)
+  applications applications[]
+}
+
+model experiment_types {
+  id                    Int       @id @default(autoincrement())
+  name                  String    @db.VarChar(255)
+  base_price            Decimal   @default(0) @db.Decimal(10, 2)
+  accredited_multiplier Decimal   @default(1.0) @db.Decimal(3, 2)
+  created_at            DateTime? @default(now()) @db.Timestamp(6)
+  tests                 tests[]
+}
+
+model personnel {
+  id         Int       @id @default(autoincrement())
+  first_name String    @db.VarChar(100)
+  last_name  String    @db.VarChar(100)
+  title      String    @db.VarChar(100)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  tests      tests[]
+}
+
+model tests {
+  id                       Int               @id @default(autoincrement())
+  application_id           Int?
+  experiment_type_id       Int?
+  responsible_personnel_id Int?
+  unit_price               Decimal           @default(0) @db.Decimal(10, 2)
+  is_accredited            Boolean?          @default(false)
+  created_at               DateTime?         @default(now()) @db.Timestamp(6)
+  applications             applications?     @relation(fields: [application_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  experiment_types         experiment_types? @relation(fields: [experiment_type_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  personnel                personnel?        @relation(fields: [responsible_personnel_id], references: [id], onUpdate: NoAction)
+}
+
+model users {
+  id            Int       @id @default(autoincrement())
+  username      String    @unique @db.VarChar(50)
+  first_name    String    @db.VarChar(100)
+  last_name     String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(255)
+  password_hash String    @db.VarChar(255)
+  role          String    @default("user") @db.VarChar(50)
+  unvan         String?   @db.VarChar(100)
+  phone         String?   @db.VarChar(20)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+}
