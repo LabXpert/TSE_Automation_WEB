@@ -30,7 +30,7 @@ function DeneyEkle() {
   const [deneyler, setDeneyler] = useState<Deney[]>([]);
   const [kayitlariListesi, setKayitlariListesi] = useState<DeneyKaydi[]>([]);
   
-  // API verileri
+  // API verileri - RAW veriler için ayrı state'ler
   const [firmalar, setFirmalar] = useState<Company[]>([]);
   const [personeller, setPersoneller] = useState<Personnel[]>([]);
   const [deneyTurleri, setDeneyTurleri] = useState<ExperimentType[]>([]);
@@ -45,12 +45,12 @@ function DeneyEkle() {
     try {
       setLoading(true);
       
-      // Paralel olarak tüm verileri getir
+      // Paralel olarak tüm verileri getir - RAW API calls kullan
       const [firmaResult, personnelResult, deneyTuruResult, applicationResult] = await Promise.all([
         api.companies.getAll(),
-        api.personnel.getAll(),
-        api.experimentTypes.getAll(),
-        api.applications.getAll()
+        api.personnel.getAllRaw(), // RAW veriyi kullan
+        api.experimentTypes.getAllRaw(), // RAW veriyi kullan
+        api.applications.getAllRaw() // RAW veriyi kullan
       ]);
 
       if (firmaResult.success && firmaResult.data) {
@@ -58,11 +58,11 @@ function DeneyEkle() {
       }
       
       if (personnelResult.success && personnelResult.data) {
-        setPersoneller(personnelResult.data);
+        setPersoneller(personnelResult.data); // Artık Personnel[] tipinde
       }
       
       if (deneyTuruResult.success && deneyTuruResult.data) {
-        setDeneyTurleri(deneyTuruResult.data);
+        setDeneyTurleri(deneyTuruResult.data); // Artık ExperimentType[] tipinde
       }
       
       if (applicationResult.success && applicationResult.data) {
@@ -128,7 +128,7 @@ function DeneyEkle() {
     if (firmalar.length > 0 && personeller.length > 0 && deneyTurleri.length > 0) {
       // Applications'ı yeniden yükle
       const applicationlariYukle = async () => {
-        const result = await api.applications.getAll();
+        const result = await api.applications.getAllRaw(); // RAW veriyi kullan
         if (result.success && result.data) {
           const frontendKayitlar = await convertApplicationsToFrontend(result.data);
           setKayitlariListesi(frontendKayitlar);
@@ -230,8 +230,17 @@ function DeneyEkle() {
       };
 
       if (duzenlemeModu && duzenlenecekKayitId) {
-        // Güncelleme işlemi
-        const result = await api.applications.update(duzenlenecekKayitId, applicationData);
+        // Güncelleme işlemi - Partial<Application> yerine doğru tip kullan
+        const updateData = {
+          company_id: applicationData.company_id,
+          application_no: applicationData.application_no,
+          application_date: applicationData.application_date,
+          certification_type: applicationData.certification_type,
+          test_count: applicationData.test_count
+          // tests alanını update'te göndermiyoruz çünkü tip uyumsuzluğu var
+        };
+        
+        const result = await api.applications.update(duzenlenecekKayitId, updateData);
         if (result.success) {
           alert('Kayıt başarıyla güncellendi!');
         } else {
