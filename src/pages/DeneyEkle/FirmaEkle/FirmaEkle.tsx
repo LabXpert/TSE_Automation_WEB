@@ -1,16 +1,8 @@
+// src/pages/DeneyEkle/FirmaEkle/FirmaEkle.tsx
 import { useState, useEffect } from 'react';
 import FirmaEkleView from './FirmaEkleView';
-import { api } from '../../../services/apiService';
-
-interface Firma {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  contact_name?: string;
-  tax_no?: string;
-}
+import { api } from '../../../../backend/services/apiService';
+import type { Company } from '../../../../backend/services/apiService';
 
 const FirmaEkle: React.FC = () => {
   // Form state'leri
@@ -24,7 +16,7 @@ const FirmaEkle: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [firmaListesi, setFirmaListesi] = useState<Firma[]>([]);
+  const [firmaListesi, setFirmaListesi] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
   
   // Düzenleme modu state'leri
@@ -132,8 +124,23 @@ const FirmaEkle: React.FC = () => {
       setLoading(true);
       
       if (duzenlemeModu && duzenlenecekFirmaId) {
-        // TODO: Güncelleme API'si eklenecek
-        alert('Güncelleme özelliği henüz eklenmedi!');
+        // Güncelleme işlemi
+        const result = await api.companies.update(duzenlenecekFirmaId, {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || undefined,
+          address: formData.address.trim() || undefined,
+          contact_name: formData.contact_name.trim(),
+          tax_no: formData.tax_no.trim(),
+        });
+
+        if (result.success) {
+          alert(`${formData.name} başarıyla güncellendi!`);
+          formTemizle();
+          await firmalariYukle();
+        } else {
+          alert('Firma güncellenirken hata oluştu: ' + result.error);
+        }
       } else {
         // Yeni firma ekle
         const result = await api.companies.create({
@@ -188,7 +195,7 @@ const FirmaEkle: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const firmaSilmeOnayi = (id: string) => {
+  const firmaSilmeOnayi = async (id: string) => {
     const firma = firmaListesi.find(f => f.id === id);
     if (!firma) {
       alert('Firma bulunamadı!');
@@ -198,8 +205,27 @@ const FirmaEkle: React.FC = () => {
     const onayMesaji = `"${firma.name}" firmasını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`;
     
     if (confirm(onayMesaji)) {
-      alert('Silme özelliği henüz eklenmedi!');
-      // TODO: Silme API'si eklenecek
+      try {
+        setLoading(true);
+        const result = await api.companies.delete(id);
+        
+        if (result.success) {
+          alert('Firma başarıyla silindi!');
+          // Eğer silinen firma düzenlenmekteyse formu temizle
+          if (duzenlemeModu && duzenlenecekFirmaId === id) {
+            formTemizle();
+          }
+          // Firma listesini yenile
+          await firmalariYukle();
+        } else {
+          alert('Firma silinirken hata oluştu: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Silme hatası:', error);
+        alert('Firma silinirken hata oluştu!');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

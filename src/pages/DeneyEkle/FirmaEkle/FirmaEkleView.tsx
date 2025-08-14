@@ -1,15 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface Firma {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  contact_name?: string;
-  tax_no?: string;
-}
+import type { Company } from '../../../../backend/services/apiService';
 
 interface FirmaEkleViewProps {
   // State'ler
@@ -22,7 +13,7 @@ interface FirmaEkleViewProps {
     email: string;
   };
   errors: {[key: string]: string};
-  firmaListesi: Firma[];
+  firmaListesi: Company[];
   duzenlemeModu: boolean;
   loading: boolean;
   
