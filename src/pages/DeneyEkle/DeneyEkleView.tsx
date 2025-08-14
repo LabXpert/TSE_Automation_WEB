@@ -118,7 +118,7 @@ function DeneyEkleView({
               >
                 <option value="">Deney türü seçiniz...</option>
                 {deneyTurleri.map((tur) => (
-                  <option key={tur.id} value={tur.ad}>{tur.ad}</option>
+                  <option key={tur.id} value={tur.name}>{tur.name}</option>
                 ))}
               </select>
             </div>
@@ -132,7 +132,9 @@ function DeneyEkleView({
               >
                 <option value="">Personel seçiniz...</option>
                 {personeller.map((personel) => (
-                  <option key={personel.id} value={personel.tamAd}>{personel.tamAd}</option>
+                  <option key={personel.id} value={personel.first_name + ' ' + personel.last_name}>
+                    {personel.first_name + ' ' + personel.last_name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -319,8 +321,8 @@ function DeneyEkleView({
     >
       <option value="">Firma Seçin</option>
       {firmalar.map((firma) => (
-        <option key={firma.id} value={firma.ad}>
-          {firma.ad}
+        <option key={firma.id} value={firma.name}>
+          {firma.name}
         </option>
       ))}
     </select>

@@ -38,6 +38,58 @@ app.get('/api/experiment-types', async (_req, res) => {
   }
 });
 
+
+// --- PERSONNEL LIST ---
+app.get('/api/personnel', async (_req, res) => {
+  try {
+    const items = await prisma.personnel.findMany({
+      orderBy: { id: 'asc' }
+    });
+    res.json(items);
+  } catch (error) {
+    console.error('Error fetching personnel:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+// --- COMPANIES LIST ---
+app.get('/api/companies', async (_req, res) => {
+  try {
+    const items = await prisma.companies.findMany({
+      orderBy: { id: 'asc' }
+    });
+    res.json(items);
+  } catch (error) {
+    console.error('Error fetching companies:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// --- ADD COMPANY ---
+app.post('/api/companies', async (req, res) => {
+  try {
+    const { name, tax_no, contact_name, address, phone, email } = req.body;
+    if (!name || !tax_no || !contact_name || !address || !phone || !email) {
+      return res.status(400).json({ error: 'Eksik bilgi' });
+    }
+    const newCompany = await prisma.companies.create({
+      data: {
+        name,
+        tax_no,
+        contact_name,
+        address,
+        phone,
+        email
+      }
+    });
+    res.status(201).json(newCompany);
+  } catch (error) {
+    console.error('Error creating company:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`);
 });

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import DeneyEkleView from './DeneyEkleView.tsx';
-import { FIRMALAR } from '../../models/Firma.tsx';
-import { PERSONELLER } from '../../models/Personel.tsx';
-import { DENEY_TURLERI } from '../../models/DeneyTurleri.tsx';
+// import kaldırıldı, firma listesi API'den gelecek
+// import kaldırıldı, personel listesi API'den gelecek
+// import kaldırıldı, deney türleri API'den gelecek
 import type { Deney, DeneyKaydi } from '../../models/Deney.tsx';
 import { kayitEkle, kayitGuncelle, kayitSil, tumKayitlariGetir, kayitBul } from '../../data/DeneyListesi.tsx';
 
@@ -14,14 +14,44 @@ function DeneyEkle() {
   const [basvuruTarihi, setBasvuruTarihi] = useState('');
   const [deneyler, setDeneyler] = useState<Deney[]>([]);
   const [kayitlariListesi, setKayitlariListesi] = useState<DeneyKaydi[]>([]);
-  
+  // Deney türleri, personel ve firma listesi API'den gelecek
+  const [deneyTurleri, setDeneyTurleri] = useState([]);
+  const [personeller, setPersoneller] = useState([]);
+  const [firmalar, setFirmalar] = useState([]);
+
   // Düzenleme modu state'leri
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [duzenlenecekKayitId, setDuzenlenecekKayitId] = useState<string | null>(null);
 
-  // Sayfa yüklendiğinde kayıtları getir
+  // Sayfa yüklendiğinde kayıtları ve deney türlerini getir
   useEffect(() => {
     setKayitlariListesi(tumKayitlariGetir());
+    // Deney türlerini API'den çek
+    fetch('/api/experiment-types')
+      .then((res) => res.json())
+      .then((data) => setDeneyTurleri(data))
+      .catch((err) => {
+        console.error('Deney türleri alınamadı:', err);
+        setDeneyTurleri([]);
+      });
+      
+    // Personel listesini API'den çek
+    fetch('/api/personnel')
+      .then((res) => res.json())
+      .then((data) => setPersoneller(data))
+      .catch((err) => {
+        console.error('Personel listesi alınamadı:', err);
+        setPersoneller([]);
+      });
+
+    // Firma listesini API'den çek
+    fetch('/api/companies')
+      .then((res) => res.json())
+      .then((data) => setFirmalar(data))
+      .catch((err) => {
+        console.error('Firma listesi alınamadı:', err);
+        setFirmalar([]);
+      });
   }, []);
 
   // Deney sayısı değiştiğinde deney listesini güncelle
@@ -169,25 +199,25 @@ function DeneyEkle() {
       deneyler={deneyler}
       kayitlariListesi={kayitlariListesi}
       duzenlemeModu={duzenlemeModu}
-      
+
       // Setterlar
       setDeneySeayisi={setDeneySeayisi}
       setBelgelendirmeTuru={setBelgelendirmeTuru}
       setFirmaAdi={setFirmaAdi}
       setBasvuruNo={setBasvuruNo}
       setBasvuruTarihi={setBasvuruTarihi}
-      
+
       // Fonksiyonlar
       deneyGuncelle={deneyGuncelle}
       kaydet={kaydet}
       kayitDuzenle={kayitDuzenle}
       kayitSilmeOnayi={kayitSilmeOnayi}
       duzenlemeyiIptalEt={duzenlemeyiIptalEt}
-      
+
       // Sabit veriler
-      firmalar={FIRMALAR}
-      personeller={PERSONELLER}
-      deneyTurleri={DENEY_TURLERI}
+  firmalar={firmalar}
+  personeller={personeller}
+  deneyTurleri={deneyTurleri}
     />
   );
 }
