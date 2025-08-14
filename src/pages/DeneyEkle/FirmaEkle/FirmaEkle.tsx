@@ -92,35 +92,39 @@ const FirmaEkle: React.FC = () => {
             }
 
             try {
-              if (duzenlemeModu && duzenlenecekFirmaId) {
-                // Güncelleme işlemi (isteğe bağlı, şimdilik sadece ekleme var)
-                alert('Firma güncelleme özelliği henüz aktif değil.');
+              // Add or update company in DB
+              const method = duzenlemeModu && duzenlenecekFirmaId ? 'PUT' : 'POST';
+              const url = duzenlemeModu && duzenlenecekFirmaId
+                ? `/api/companies/${duzenlenecekFirmaId}`
+                : '/api/companies';
+              const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: formData.ad.trim(),
+                  tax_no: formData.vergiNo.trim(),
+                  contact_name: formData.yetkili.trim(),
+                  address: formData.adres.trim(),
+                  phone: formData.telefon.trim(),
+                  email: formData.email.trim()
+                })
+              });
+              if (!response.ok) {
+                const err = await response.json();
+                alert((method === 'POST' ? 'Error adding company: ' : 'Error updating company: ') + (err.error || 'Unknown error'));
+                return;
+              }
+              const resultFirma = await response.json();
+              if (method === 'POST') {
+                setFirmaListesi(prev => [...prev, resultFirma]);
+                alert(`${resultFirma.name} added successfully!`);
               } else {
-                // Yeni firma ekle
-                const response = await fetch('/api/companies', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    name: formData.ad.trim(),
-                    tax_no: formData.vergiNo.trim(),
-                    contact_name: formData.yetkili.trim(),
-                    address: formData.adres.trim(),
-                    phone: formData.telefon.trim(),
-                    email: formData.email.trim()
-                  })
-                });
-                if (!response.ok) {
-                  const err = await response.json();
-                  alert('Firma eklenirken hata oluştu: ' + (err.error || 'Bilinmeyen hata'));
-                  return;
-                }
-                const yeniFirma = await response.json();
-                setFirmaListesi(prev => [...prev, yeniFirma]);
-                alert(`${yeniFirma.name} başarıyla eklendi!`);
+                setFirmaListesi(prev => prev.map(f => f.id === resultFirma.id ? resultFirma : f));
+                alert(`${resultFirma.name} updated successfully!`);
               }
               formTemizle();
             } catch (error) {
-              alert('Firma eklenirken hata oluştu!');
+              alert('Error saving company!');
               console.error(error);
             }
           };
@@ -145,16 +149,28 @@ const FirmaEkle: React.FC = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
 
-          const firmaSilmeOnayi = (id: number) => {
+          const firmaSilmeOnayi = async (id: number) => {
             const firma = firmaListesi.find(f => f.id === id);
             if (!firma) {
-              alert('Firma bulunamadı!');
+              alert('Company not found!');
               return;
             }
-            const onayMesaji = `"${firma.name}" firmasını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`;
-            if (confirm(onayMesaji)) {
-              // Silme özelliği henüz aktif değil
-              alert('Firma silme özelliği henüz aktif değil.');
+            const confirmMsg = `Are you sure you want to delete "${firma.name}"?\n\nThis action cannot be undone!`;
+            if (confirm(confirmMsg)) {
+              try {
+                const response = await fetch(`/api/companies/${id}`, { method: 'DELETE' });
+                if (!response.ok) {
+                  const err = await response.json();
+                  alert('Error deleting company: ' + (err.error || 'Unknown error'));
+                  return;
+                }
+                setFirmaListesi(prev => prev.filter(f => f.id !== id));
+                alert(`${firma.name} deleted successfully!`);
+                formTemizle();
+              } catch (error) {
+                alert('Error deleting company!');
+                console.error(error);
+              }
             }
           };
 

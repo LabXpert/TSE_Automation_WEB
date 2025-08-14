@@ -67,11 +67,13 @@ app.get('/api/companies', async (_req, res) => {
 });
 
 // --- ADD COMPANY ---
+
+// --- ADD COMPANY ---
 app.post('/api/companies', async (req, res) => {
   try {
     const { name, tax_no, contact_name, address, phone, email } = req.body;
     if (!name || !tax_no || !contact_name || !address || !phone || !email) {
-      return res.status(400).json({ error: 'Eksik bilgi' });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
     const newCompany = await prisma.companies.create({
       data: {
@@ -86,6 +88,45 @@ app.post('/api/companies', async (req, res) => {
     res.status(201).json(newCompany);
   } catch (error) {
     console.error('Error creating company:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// --- DELETE COMPANY ---
+app.delete('/api/companies/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!id) return res.status(400).json({ error: 'Invalid company id' });
+    await prisma.companies.delete({ where: { id } });
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Error deleting company:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// --- UPDATE COMPANY ---
+app.put('/api/companies/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name, tax_no, contact_name, address, phone, email } = req.body;
+    if (!id || !name || !tax_no || !contact_name || !address || !phone || !email) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const updatedCompany = await prisma.companies.update({
+      where: { id },
+      data: {
+        name,
+        tax_no,
+        contact_name,
+        address,
+        phone,
+        email
+      }
+    });
+    res.json(updatedCompany);
+  } catch (error) {
+    console.error('Error updating company:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
