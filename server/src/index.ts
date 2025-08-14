@@ -217,6 +217,55 @@ app.get('/api/applications/all', async (_req, res) => {
   }
 });
 
+// --- DELETE APPLICATION ---
+app.delete('/api/applications/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!id) return res.status(400).json({ error: 'Invalid application id' });
+    await prisma.applications.delete({ where: { id } });
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Error deleting application:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// --- UPDATE APPLICATION ---
+app.put('/api/applications/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { company_id, application_no, application_date, certification_type, tests } = req.body;
+    if (!id || !company_id || !application_no || !application_date || !certification_type || !Array.isArray(tests) || tests.length === 0) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    // Güncelleme: önce eski testleri sil, sonra yenilerini ekle
+    await prisma.tests.deleteMany({ where: { application_id: id } });
+    const updatedApp = await prisma.applications.update({
+      where: { id },
+      data: {
+        company_id,
+        application_no,
+        application_date: new Date(application_date),
+        certification_type,
+        test_count: tests.length,
+        tests: {
+          create: tests.map(test => ({
+            experiment_type_id: test.experiment_type_id,
+            responsible_personnel_id: test.responsible_personnel_id,
+            unit_price: test.unit_price || 0,
+            is_accredited: !!test.is_accredited
+          }))
+        }
+      },
+      include: { tests: true }
+    });
+    res.json(updatedApp);
+  } catch (error) {
+    console.error('Error updating application:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`);

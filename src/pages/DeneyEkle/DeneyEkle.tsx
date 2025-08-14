@@ -193,50 +193,71 @@ function DeneyEkle() {
     }
   };
 
-  const kayitDuzenle = (id: string) => {
-    const kayit = kayitBul(id);
-    if (!kayit) {
-      alert('Kayıt bulunamadı!');
-      return;
-    }
-
-    // Formu kayıt verileriyle doldur
-    setFirmaAdi(kayit.firmaAdi);
-    setBasvuruNo(kayit.basvuruNo);
-    setBasvuruTarihi(kayit.basvuruTarihi);
-    setBelgelendirmeTuru(kayit.belgelendirmeTuru);
-    setDeneySeayisi(kayit.deneySayisi);
-    setDeneyler([...kayit.deneyler]);
-    
-    // Düzenleme modunu aç
+  const kayitDuzenle = async (id: string) => {
+    try {
+      const response = await fetch(`/api/applications/all`);
+      const allApps = await response.json();
+      const app = allApps.find((a: any) => a.id === id);
+      if (!app) {
+        alert('Kayıt bulunamadı!');
+        return;
+      }
+      setFirmaAdi(app.companies?.name || '');
+      setBasvuruNo(app.application_no);
+      // Başvuru tarihini ISO formatından yyyy-MM-dd formatına çevirerek doldur
+      setBasvuruTarihi(app.application_date ? new Date(app.application_date).toISOString().slice(0, 10) : '');
+      setBelgelendirmeTuru(app.certification_type);
+      setDeneySeayisi(app.test_count);
+      setDeneyler((app.tests || []).map((test: any) => ({
+        id: test.id,
+        deneyTuru: test.experiment_types?.name || '',
+        sorumluPersonel: test.personnel ? `${test.personnel.first_name} ${test.personnel.last_name}` : '',
+        akredite: !!test.is_accredited,
+        unit_price: test.unit_price
+      })));
     setDuzenlemeModu(true);
     setDuzenlenecekKayitId(id);
-    
-    // Sayfanın üstüne scroll yap
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      alert('Kayıt bulunamadı!');
+      console.error(error);
+    }
   };
 
-  const kayitSilmeOnayi = (id: string) => {
-    const kayit = kayitBul(id);
+  const kayitSilmeOnayi = async (id: string) => {
+    const kayit = kayitlariListesi.find(k => k.id === id);
     if (!kayit) {
       alert('Kayıt bulunamadı!');
       return;
     }
-
-    const onayMesaji = `"${kayit.firmaAdi}" firmasının "${kayit.basvuruNo}" numaralı kaydını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`;
-    
+    const onayMesaji = `Kaydı silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`;
     if (confirm(onayMesaji)) {
       try {
-        kayitSil(id);
-        setKayitlariListesi(tumKayitlariGetir());
+        const response = await fetch(`/api/applications/${id}`, { method: 'DELETE' });
+        if (!response.ok) {
+          alert('Kayıt silinirken hata oluştu!');
+          return;
+        }
         alert('Kayıt başarıyla silindi!');
-        
-        // Eğer silinen kayıt düzenlenmekteyse formu temizle
+        fetch('/api/applications/recent')
+          .then(res => res.json())
+          .then(data => {
+            const mapped = data.map((app: any) => ({
+              id: app.id,
+              firmaAdi: app.companies?.name || '',
+              basvuruNo: app.application_no,
+              basvuruTarihi: app.application_date,
+              belgelendirmeTuru: app.certification_type,
+              deneySayisi: app.test_count,
+              deneyler: app.tests || []
+            }));
+            setKayitlariListesi(mapped);
+          });
         if (duzenlemeModu && duzenlenecekKayitId === id) {
           formTemizle();
         }
       } catch (error) {
-       alert('Kayıt silinirken hata oluştu!');
+        alert('Kayıt silinirken hata oluştu!');
         console.error(error);
       }
     }
@@ -263,7 +284,71 @@ function DeneyEkle() {
 
       // Fonksiyonlar
       deneyGuncelle={deneyGuncelle}
-      kaydet={kaydet}
+      kaydet={duzenlemeModu ? async () => {
+        if (!firmaAdi || !basvuruNo || !basvuruTarihi) {
+          alert('Lütfen tüm zorunlu alanları doldurun!');
+          return;
+        }
+        for (let i = 0; i < deneyler.length; i++) {
+          if (!deneyler[i].deneyTuru || !deneyler[i].sorumluPersonel) {
+            alert(`Lütfen ${i + 1}. deney için tüm alanları doldurun!`);
+            return;
+          }
+        }
+        const selectedCompany = firmalar.find(f => f.name === firmaAdi);
+        if (!selectedCompany) {
+          alert('Seçilen firma bulunamadı!');
+          return;
+        }
+        const testsPayload = deneyler.map((d) => {
+          const experimentType = deneyTurleri.find(t => t.name === d.deneyTuru);
+          const personnel = personeller.find(p => `${p.first_name} ${p.last_name}` === d.sorumluPersonel);
+          return {
+            experiment_type_id: experimentType?.id,
+            responsible_personnel_id: personnel?.id,
+            unit_price: experimentType?.base_price || 0,
+            is_accredited: d.akredite || false
+          };
+        });
+        const payload = {
+          company_id: selectedCompany.id,
+          application_no: basvuruNo,
+          application_date: basvuruTarihi,
+          certification_type: belgelendirmeTuru,
+          tests: testsPayload
+        };
+        try {
+          const response = await fetch(`/api/applications/${duzenlenecekKayitId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) {
+            const err = await response.json();
+            alert('Başvuru güncellenirken hata oluştu: ' + (err.error || 'Bilinmeyen hata'));
+            return;
+          }
+          alert('Başvuru başarıyla güncellendi!');
+          formTemizle();
+          fetch('/api/applications/recent')
+            .then(res => res.json())
+            .then(data => {
+              const mapped = data.map((app: any) => ({
+                id: app.id,
+                firmaAdi: app.companies?.name || '',
+                basvuruNo: app.application_no,
+                basvuruTarihi: app.application_date,
+                belgelendirmeTuru: app.certification_type,
+                deneySayisi: app.test_count,
+                deneyler: app.tests || []
+              }));
+              setKayitlariListesi(mapped);
+            });
+        } catch (error) {
+          alert('Başvuru güncellenirken hata oluştu!');
+          console.error(error);
+        }
+      } : kaydet}
       kayitDuzenle={kayitDuzenle}
       kayitSilmeOnayi={kayitSilmeOnayi}
       duzenlemeyiIptalEt={duzenlemeyiIptalEt}
