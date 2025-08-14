@@ -1,9 +1,24 @@
 // src/pages/DeneyEkle/DeneyEkleView.tsx
 import { useNavigate } from 'react-router-dom';
-import type { Firma } from '../../models/Firma.tsx';
-import type { Personel } from '../../models/Personel.tsx';
-import type { DeneyTuru } from '../../models/DeneyTurleri.tsx';
-import type { Deney, DeneyKaydi } from '../../models/Deney.tsx';
+import type { Company, Personnel, ExperimentType } from '../../../backend/services/apiService';
+
+interface Deney {
+  id: string;
+  deneyTuru: string;
+  sorumluPersonel: string;
+  akredite: boolean;
+}
+
+interface DeneyKaydi {
+  id: string;
+  firmaAdi: string;
+  basvuruNo: string;
+  basvuruTarihi: string;
+  belgelendirmeTuru: 'özel' | 'belgelendirme';
+  deneySayisi: number;
+  deneyler: Deney[];
+  olusturulma?: string;
+}
 
 interface DeneyEkleViewProps {
   // State'ler
@@ -15,6 +30,7 @@ interface DeneyEkleViewProps {
   deneyler: Deney[];
   kayitlariListesi: DeneyKaydi[];
   duzenlemeModu: boolean;
+  loading: boolean;
   
   // Setterlar
   setDeneySeayisi: (value: number) => void;
@@ -30,10 +46,10 @@ interface DeneyEkleViewProps {
   kayitSilmeOnayi: (id: string) => void;
   duzenlemeyiIptalEt: () => void;
   
-  // Sabit veriler
-  firmalar: Firma[];
-  personeller: Personel[];
-  deneyTurleri: DeneyTuru[];
+  // API verileri
+  firmalar: Company[];
+  personeller: Personnel[];
+  deneyTurleri: ExperimentType[];
 }
 
 function DeneyEkleView({
@@ -45,6 +61,7 @@ function DeneyEkleView({
   deneyler,
   kayitlariListesi,
   duzenlemeModu,
+  loading,
   setDeneySeayisi,
   setBelgelendirmeTuru,
   setFirmaAdi,
@@ -114,11 +131,12 @@ function DeneyEkleView({
               <select 
                 value={deneyler[i]?.deneyTuru || ''}
                 onChange={(e) => deneyGuncelle(i, 'deneyTuru', e.target.value)}
+                disabled={loading}
                 style={{ width: '100%', boxSizing: 'border-box' }}
               >
                 <option value="">Deney türü seçiniz...</option>
                 {deneyTurleri.map((tur) => (
-                  <option key={tur.id} value={tur.ad}>{tur.ad}</option>
+                  <option key={tur.id} value={tur.name}>{tur.name}</option>
                 ))}
               </select>
             </div>
@@ -128,11 +146,14 @@ function DeneyEkleView({
               <select 
                 value={deneyler[i]?.sorumluPersonel || ''}
                 onChange={(e) => deneyGuncelle(i, 'sorumluPersonel', e.target.value)}
+                disabled={loading}
                 style={{ width: '100%', boxSizing: 'border-box' }}
               >
                 <option value="">Personel seçiniz...</option>
                 {personeller.map((personel) => (
-                  <option key={personel.id} value={personel.tamAd}>{personel.tamAd}</option>
+                  <option key={personel.id} value={`${personel.name} ${personel.surname}`}>
+                    {personel.name} {personel.surname}
+                  </option>
                 ))}
               </select>
             </div>
@@ -150,6 +171,7 @@ function DeneyEkleView({
                   type="checkbox" 
                   checked={deneyler[i]?.akredite || false}
                   onChange={(e) => deneyGuncelle(i, 'akredite', e.target.checked)}
+                  disabled={loading}
                   style={{ 
                     width: '16px',
                     height: '16px',
@@ -202,6 +224,25 @@ function DeneyEkleView({
         }}>
           {duzenlemeModu ? 'Mevcut deney bilgilerini güncelleyin' : 'Deney bilgilerini ekleyin ve kaydedin'}
         </p>
+        
+        {/* Loading Indicator */}
+        {loading && (
+          <div style={{
+            marginTop: '16px',
+            padding: '12px 16px',
+            backgroundColor: '#dbeafe',
+            border: '1px solid #3b82f6',
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#1d4ed8',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span>⏳</span>
+            <span>İşlem yapılıyor...</span>
+          </div>
+        )}
         
         {/* Düzenleme modu uyarısı */}
         {duzenlemeModu && (
@@ -295,22 +336,25 @@ function DeneyEkleView({
     <select
       value={firmaAdi}
       onChange={(e) => setFirmaAdi(e.target.value)}
+      disabled={loading}
       style={{
         flex: 1,
         padding: '12px',
         border: '2px solid #e5e7eb',
         borderRadius: '8px',
         fontSize: '14px',
-        backgroundColor: '#ffffff',
+        backgroundColor: loading ? '#f9fafb' : '#ffffff',
         color: '#374151',
-        cursor: 'pointer',
+        cursor: loading ? 'not-allowed' : 'pointer',
         transition: 'all 0.2s ease',
         outline: 'none',
         boxSizing: 'border-box'
       }}
       onFocus={(e) => {
-        e.target.style.borderColor = '#dc2626';
-        e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+        if (!loading) {
+          e.target.style.borderColor = '#dc2626';
+          e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+        }
       }}
       onBlur={(e) => {
         e.target.style.borderColor = '#e5e7eb';
@@ -319,8 +363,8 @@ function DeneyEkleView({
     >
       <option value="">Firma Seçin</option>
       {firmalar.map((firma) => (
-        <option key={firma.id} value={firma.ad}>
-          {firma.ad}
+        <option key={firma.id} value={firma.name}>
+          {firma.name}
         </option>
       ))}
     </select>
@@ -328,17 +372,18 @@ function DeneyEkleView({
     <button
       type="button"
       onClick={() => navigate('/firma-ekle')}
+      disabled={loading}
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         width: '48px',
         height: '48px',
-        background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+        background: loading ? '#9ca3af' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
         color: '#ffffff',
         border: 'none',
         borderRadius: '8px',
-        cursor: 'pointer',
+        cursor: loading ? 'not-allowed' : 'pointer',
         transition: 'all 0.3s ease',
         boxShadow: '0 2px 8px rgba(220, 38, 38, 0.2)',
         fontSize: '32px',
@@ -347,18 +392,26 @@ function DeneyEkleView({
         paddingTop: '3px'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-1px)';
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(-1px)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+        }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+        }
       }}
       onMouseDown={(e) => {
-        e.currentTarget.style.transform = 'translateY(0) scale(0.95)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(0) scale(0.95)';
+        }
       }}
       onMouseUp={(e) => {
-        e.currentTarget.style.transform = 'translateY(-1px) scale(1)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(-1px) scale(1)';
+        }
       }}
       title="Yeni Firma Ekle"
     >
@@ -374,6 +427,7 @@ function DeneyEkleView({
                 value={basvuruNo}
                 onChange={(e) => setBasvuruNo(e.target.value)}
                 placeholder="Başvuru numarası giriniz..."
+                disabled={loading}
                 style={{ width: '100%', boxSizing: 'border-box' }}
               />
             </div>
@@ -384,6 +438,7 @@ function DeneyEkleView({
                 type="date" 
                 value={basvuruTarihi}
                 onChange={(e) => setBasvuruTarihi(e.target.value)}
+                disabled={loading}
                 style={{ width: '100%', boxSizing: 'border-box' }}
               />
             </div>
@@ -393,6 +448,7 @@ function DeneyEkleView({
               <select 
                 value={belgelendirmeTuru}
                 onChange={(e) => setBelgelendirmeTuru(e.target.value as 'özel' | 'belgelendirme')}
+                disabled={loading}
                 style={{ width: '100%', boxSizing: 'border-box' }}
               >
                 <option value="özel">Özel</option>
@@ -425,6 +481,7 @@ function DeneyEkleView({
                       setDeneySeayisi(value);
                     }
                   }}
+                  disabled={loading}
                   style={{ 
                     flex: 1,
                     textAlign: 'center',
@@ -441,15 +498,16 @@ function DeneyEkleView({
                         setDeneySeayisi(deneySayisi + 1);
                       }
                     }}
+                    disabled={loading}
                     style={{
                       padding: '4px 8px',
                       fontSize: '12px',
                       fontWeight: '600',
-                      backgroundColor: '#dc2626',
+                      backgroundColor: loading ? '#9ca3af' : '#dc2626',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
-                      cursor: 'pointer',
+                      cursor: loading ? 'not-allowed' : 'pointer',
                       minWidth: '32px',
                       height: '24px',
                       display: 'flex',
@@ -457,10 +515,14 @@ function DeneyEkleView({
                       justifyContent: 'center'
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = '#b91c1c';
+                      if (!loading) {
+                        e.currentTarget.style.backgroundColor = '#b91c1c';
+                      }
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = '#dc2626';
+                      if (!loading) {
+                        e.currentTarget.style.backgroundColor = '#dc2626';
+                      }
                     }}
                   >
                     ▲
@@ -472,15 +534,16 @@ function DeneyEkleView({
                         setDeneySeayisi(deneySayisi - 1);
                       }
                     }}
+                    disabled={loading}
                     style={{
                       padding: '4px 8px',
                       fontSize: '12px',
                       fontWeight: '600',
-                      backgroundColor: '#dc2626',
+                      backgroundColor: loading ? '#9ca3af' : '#dc2626',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
-                      cursor: 'pointer',
+                      cursor: loading ? 'not-allowed' : 'pointer',
                       minWidth: '32px',
                       height: '24px',
                       display: 'flex',
@@ -488,10 +551,14 @@ function DeneyEkleView({
                       justifyContent: 'center'
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = '#b91c1c';
+                      if (!loading) {
+                        e.currentTarget.style.backgroundColor = '#b91c1c';
+                      }
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = '#dc2626';
+                      if (!loading) {
+                        e.currentTarget.style.backgroundColor = '#dc2626';
+                      }
                     }}
                   >
                     ▼
@@ -505,17 +572,16 @@ function DeneyEkleView({
 
         {/* Sağ Panel - Deney Detayları (Scroll) */}
         <div style={{
-          height: '600px', // Sabit yükseklik
+          height: '600px',
           overflowY: 'auto',
           overflowX: 'hidden',
           paddingRight: '8px',
           border: '1px solid #e2e8f0',
           borderRadius: '12px',
           background: 'white',
-          minWidth: '0', // Flexbox overflow fix
+          minWidth: '0',
           display: 'flex',
           flexDirection: 'column',
-          // Custom scrollbar styles
           scrollbarWidth: 'thin',
           scrollbarColor: '#cbd5e1 #f1f5f9'
         }}
@@ -586,18 +652,19 @@ function DeneyEkleView({
 }}>
   <button
     onClick={kaydet}
+    disabled={loading}
     style={{
       display: 'flex',
       alignItems: 'center',
       gap: '12px',
       padding: '16px 32px',
-      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+      background: loading ? '#9ca3af' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
       color: '#ffffff',
       border: 'none',
       borderRadius: '12px',
       fontSize: '16px',
       fontWeight: '600',
-      cursor: 'pointer',
+      cursor: loading ? 'not-allowed' : 'pointer',
       transition: 'all 0.3s ease',
       boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)',
       minWidth: '180px',
@@ -606,18 +673,26 @@ function DeneyEkleView({
       overflow: 'hidden'
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.4)';
+      if (!loading) {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.4)';
+      }
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.3)';
+      if (!loading) {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.3)';
+      }
     }}
     onMouseDown={(e) => {
-      e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+      if (!loading) {
+        e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+      }
     }}
     onMouseUp={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+      if (!loading) {
+        e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+      }
     }}
   >
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -625,42 +700,51 @@ function DeneyEkleView({
       <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
-    {duzenlemeModu ? 'Güncelle' : 'Kaydet'}
+    {loading ? 'Kaydediliyor...' : (duzenlemeModu ? 'Güncelle' : 'Kaydet')}
   </button>
 
   {duzenlemeModu && (
     <button
       onClick={duzenlemeyiIptalEt}
+      disabled={loading}
       style={{
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
         padding: '16px 32px',
-        background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+        background: loading ? '#9ca3af' : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
         color: '#ffffff',
         border: 'none',
         borderRadius: '12px',
         fontSize: '16px',
         fontWeight: '600',
-        cursor: 'pointer',
+        cursor: loading ? 'not-allowed' : 'pointer',
         transition: 'all 0.3s ease',
         boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)',
         minWidth: '140px',
         justifyContent: 'center'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
+        }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
+        }
       }}
       onMouseDown={(e) => {
-        e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+        }
       }}
       onMouseUp={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+        if (!loading) {
+          e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+        }
       }}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -764,22 +848,27 @@ function DeneyEkleView({
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button 
                       onClick={() => kayitDuzenle(kayit.id)}
+                      disabled={loading}
                       style={{
                         padding: '8px 12px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        backgroundColor: '#dc2626',
+                        backgroundColor: loading ? '#9ca3af' : '#dc2626',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
-                        cursor: 'pointer',
+                        cursor: loading ? 'not-allowed' : 'pointer',
                         transition: 'all 0.2s ease'
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#b91c1c';
+                        if (!loading) {
+                          e.currentTarget.style.backgroundColor = '#b91c1c';
+                        }
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = '#dc2626';
+                        if (!loading) {
+                          e.currentTarget.style.backgroundColor = '#dc2626';
+                        }
                       }}
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
@@ -789,22 +878,27 @@ function DeneyEkleView({
                     </button>
                     <button 
                       onClick={() => kayitSilmeOnayi(kayit.id)}
+                      disabled={loading}
                       style={{
                         padding: '8px 12px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        backgroundColor: '#ef4444',
+                        backgroundColor: loading ? '#9ca3af' : '#ef4444',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
-                        cursor: 'pointer',
+                        cursor: loading ? 'not-allowed' : 'pointer',
                         transition: 'all 0.2s ease'
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#dc2626';
+                        if (!loading) {
+                          e.currentTarget.style.backgroundColor = '#dc2626';
+                        }
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = '#ef4444';
+                        if (!loading) {
+                          e.currentTarget.style.backgroundColor = '#ef4444';
+                        }
                       }}
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
