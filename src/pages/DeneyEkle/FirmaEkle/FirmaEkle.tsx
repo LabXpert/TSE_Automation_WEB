@@ -1,24 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FirmaEkleView from './FirmaEkleView';
-import { FIRMALAR } from '../../../models/Firma';
+import { api } from '../../../services/apiService';
+
+interface Firma {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  contact_name?: string;
+  tax_no?: string;
+}
 
 const FirmaEkle: React.FC = () => {
   // Form state'leri
   const [formData, setFormData] = useState({
-    ad: '',
-    vergiNo: '',
-    yetkili: '',
-    telefon: '',
-    adres: '',
+    name: '',
+    tax_no: '',
+    contact_name: '',
+    phone: '',
+    address: '',
     email: ''
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [firmaListesi, setFirmaListesi] = useState(FIRMALAR);
+  const [firmaListesi, setFirmaListesi] = useState<Firma[]>([]);
+  const [loading, setLoading] = useState(false);
   
   // Düzenleme modu state'leri
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [duzenlenecekFirmaId, setDuzenlenecekFirmaId] = useState<string | null>(null);
+
+  // Firma listesini API'dan getir
+  const firmalariYukle = async () => {
+    try {
+      setLoading(true);
+      const result = await api.companies.getAll();
+      
+      if (result.success && result.data) {
+        setFirmaListesi(result.data);
+      } else {
+        console.error('Firmalar yüklenemedi:', result.error);
+        alert('Firmalar yüklenirken hata oluştu!');
+      }
+    } catch (error) {
+      console.error('Firma yükleme hatası:', error);
+      alert('Firmalar yüklenirken hata oluştu!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sayfa yüklendiğinde firmaları getir
+  useEffect(() => {
+    firmalariYukle();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -37,11 +73,11 @@ const FirmaEkle: React.FC = () => {
 
   const formTemizle = () => {
     setFormData({
-      ad: '',
-      vergiNo: '',
-      yetkili: '',
-      telefon: '',
-      adres: '',
+      name: '',
+      tax_no: '',
+      contact_name: '',
+      phone: '',
+      address: '',
       email: ''
     });
     setErrors({});
@@ -58,22 +94,22 @@ const FirmaEkle: React.FC = () => {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
-    if (!formData.ad.trim()) {
-      newErrors.ad = 'Firma adı zorunludur';
+    if (!formData.name.trim()) {
+      newErrors.name = 'Firma adı zorunludur';
     }
 
-    if (!formData.vergiNo.trim()) {
-      newErrors.vergiNo = 'Vergi numarası zorunludur';
-    } else if (formData.vergiNo.length !== 10) {
-      newErrors.vergiNo = 'Vergi numarası 10 haneli olmalıdır';
+    if (!formData.tax_no.trim()) {
+      newErrors.tax_no = 'Vergi numarası zorunludur';
+    } else if (formData.tax_no.length !== 10) {
+      newErrors.tax_no = 'Vergi numarası 10 haneli olmalıdır';
     }
 
-    if (!formData.yetkili.trim()) {
-      newErrors.yetkili = 'Yetkili kişi zorunludur';
+    if (!formData.contact_name.trim()) {
+      newErrors.contact_name = 'Yetkili kişi zorunludur';
     }
 
-    if (!formData.telefon.trim()) {
-      newErrors.telefon = 'Telefon numarası zorunludur';
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Telefon numarası zorunludur';
     }
 
     if (!formData.email.trim()) {
@@ -85,7 +121,7 @@ const FirmaEkle: React.FC = () => {
     return newErrors;
   };
 
-  const kaydet = () => {
+  const kaydet = async () => {
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -93,48 +129,41 @@ const FirmaEkle: React.FC = () => {
     }
 
     try {
-      if (duzenlemeModu && duzenlenecekFirmaId) {
-        // Güncelleme işlemi
-        const index = FIRMALAR.findIndex(f => f.id === duzenlenecekFirmaId);
-        if (index !== -1) {
-          const guncelFirma = {
-            id: duzenlenecekFirmaId,
-            ad: formData.ad.trim(),
-            email: formData.email.trim(),
-            adres: formData.adres.trim() || undefined,
-            telefon: formData.telefon.trim() || undefined
-          };
-          
-          FIRMALAR[index] = guncelFirma;
-          setFirmaListesi([...FIRMALAR]);
-          alert('Firma başarıyla güncellendi!');
-        }
-      } else {
-        // Yeni firma oluştur
-        const yeniFirma = {
-          id: (FIRMALAR.length + 1).toString(),
-          ad: formData.ad.trim(),
-          email: formData.email.trim(),
-          adres: formData.adres.trim() || undefined,
-          telefon: formData.telefon.trim() || undefined
-        };
-
-        // Firmalar listesine ekle
-        FIRMALAR.push(yeniFirma);
-        setFirmaListesi([...FIRMALAR]);
-
-        alert(`${yeniFirma.ad} başarıyla eklendi!`);
-      }
+      setLoading(true);
       
-      formTemizle();
+      if (duzenlemeModu && duzenlenecekFirmaId) {
+        // TODO: Güncelleme API'si eklenecek
+        alert('Güncelleme özelliği henüz eklenmedi!');
+      } else {
+        // Yeni firma ekle
+        const result = await api.companies.create({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || undefined,
+          address: formData.address.trim() || undefined,
+          contact_name: formData.contact_name.trim(),
+          tax_no: formData.tax_no.trim(),
+        });
+
+        if (result.success) {
+          alert(`${formData.name} başarıyla eklendi!`);
+          formTemizle();
+          // Firma listesini yenile
+          await firmalariYukle();
+        } else {
+          alert('Firma eklenirken hata oluştu: ' + result.error);
+        }
+      }
     } catch (error) {
-      alert(duzenlemeModu ? 'Firma güncellenirken hata oluştu!' : 'Firma eklenirken hata oluştu!');
-      console.error(error);
+      console.error('Kaydetme hatası:', error);
+      alert('Firma kaydedilirken hata oluştu!');
+    } finally {
+      setLoading(false);
     }
   };
 
   const firmaDuzenle = (id: string) => {
-    const firma = FIRMALAR.find(f => f.id === id);
+    const firma = firmaListesi.find(f => f.id === id);
     if (!firma) {
       alert('Firma bulunamadı!');
       return;
@@ -142,11 +171,11 @@ const FirmaEkle: React.FC = () => {
 
     // Formu firma verileriyle doldur
     setFormData({
-      ad: firma.ad,
-      vergiNo: '',
-      yetkili: '',
-      telefon: firma.telefon || '',
-      adres: firma.adres || '',
+      name: firma.name,
+      tax_no: firma.tax_no || '',
+      contact_name: firma.contact_name || '',
+      phone: firma.phone || '',
+      address: firma.address || '',
       email: firma.email
     });
     
@@ -160,31 +189,17 @@ const FirmaEkle: React.FC = () => {
   };
 
   const firmaSilmeOnayi = (id: string) => {
-    const firma = FIRMALAR.find(f => f.id === id);
+    const firma = firmaListesi.find(f => f.id === id);
     if (!firma) {
       alert('Firma bulunamadı!');
       return;
     }
 
-    const onayMesaji = `"${firma.ad}" firmasını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`;
+    const onayMesaji = `"${firma.name}" firmasını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`;
     
     if (confirm(onayMesaji)) {
-      try {
-        const index = FIRMALAR.findIndex(f => f.id === id);
-        if (index !== -1) {
-          FIRMALAR.splice(index, 1);
-          setFirmaListesi([...FIRMALAR]);
-          alert('Firma başarıyla silindi!');
-          
-          // Eğer silinen firma düzenlenmekteyse formu temizle
-          if (duzenlemeModu && duzenlenecekFirmaId === id) {
-            formTemizle();
-          }
-        }
-      } catch (error) {
-        alert('Firma silinirken hata oluştu!');
-        console.error(error);
-      }
+      alert('Silme özelliği henüz eklenmedi!');
+      // TODO: Silme API'si eklenecek
     }
   };
 
@@ -195,6 +210,7 @@ const FirmaEkle: React.FC = () => {
       errors={errors}
       firmaListesi={firmaListesi}
       duzenlemeModu={duzenlemeModu}
+      loading={loading}
       
       // Fonksiyonlar
       handleInputChange={handleInputChange}

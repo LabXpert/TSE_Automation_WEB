@@ -1,20 +1,30 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Firma } from '../../../models/Firma';
+
+interface Firma {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  contact_name?: string;
+  tax_no?: string;
+}
 
 interface FirmaEkleViewProps {
   // State'ler
   formData: {
-    ad: string;
-    vergiNo: string;
-    yetkili: string;
-    telefon: string;
-    adres: string;
+    name: string;
+    tax_no: string;
+    contact_name: string;
+    phone: string;
+    address: string;
     email: string;
   };
   errors: {[key: string]: string};
   firmaListesi: Firma[];
   duzenlemeModu: boolean;
+  loading: boolean;
   
   // Fonksiyonlar
   handleInputChange: (field: string, value: string) => void;
@@ -29,6 +39,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
   errors,
   firmaListesi,
   duzenlemeModu,
+  loading,
   handleInputChange,
   kaydet,
   firmaDuzenle,
@@ -79,6 +90,25 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
         }}>
           {duzenlemeModu ? 'Mevcut firma bilgilerini güncelleyin' : 'Sisteme yeni firma bilgilerini ekleyin'}
         </p>
+        
+        {/* Loading Indicator */}
+        {loading && (
+          <div style={{
+            marginTop: '16px',
+            padding: '12px 16px',
+            backgroundColor: '#dbeafe',
+            border: '1px solid #3b82f6',
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#1d4ed8',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span>⏳</span>
+            <span>İşlem yapılıyor...</span>
+          </div>
+        )}
         
         {/* Düzenleme modu uyarısı */}
         {duzenlemeModu && (
@@ -195,32 +225,35 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                 <input 
                   type="text" 
                   placeholder="Örn: ABC Makina San. Tic. Ltd. Şti."
-                  value={formData.ad}
-                  onChange={(e) => handleInputChange('ad', e.target.value)}
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  disabled={loading}
                   style={{ 
                     width: '100%', 
                     padding: '12px',
-                    border: `2px solid ${errors.ad ? '#dc2626' : '#e5e7eb'}`,
+                    border: `2px solid ${errors.name ? '#dc2626' : '#e5e7eb'}`,
                     borderRadius: '8px',
                     fontSize: '14px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
                     color: '#374151',
                     outline: 'none',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#dc2626';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    if (!loading) {
+                      e.target.style.borderColor = '#dc2626';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.ad ? '#dc2626' : '#e5e7eb';
+                    e.target.style.borderColor = errors.name ? '#dc2626' : '#e5e7eb';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
-                {errors.ad && (
+                {errors.name && (
                   <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.ad}
+                    {errors.name}
                   </p>
                 )}
               </div>
@@ -239,33 +272,36 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                 <input 
                   type="text" 
                   placeholder="10 haneli vergi numarası"
-                  value={formData.vergiNo}
-                  onChange={(e) => handleInputChange('vergiNo', e.target.value)}
+                  value={formData.tax_no}
+                  onChange={(e) => handleInputChange('tax_no', e.target.value)}
+                  disabled={loading}
                   maxLength={10}
                   style={{ 
                     width: '100%', 
                     padding: '12px',
-                    border: `2px solid ${errors.vergiNo ? '#dc2626' : '#e5e7eb'}`,
+                    border: `2px solid ${errors.tax_no ? '#dc2626' : '#e5e7eb'}`,
                     borderRadius: '8px',
                     fontSize: '14px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
                     color: '#374151',
                     outline: 'none',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#dc2626';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    if (!loading) {
+                      e.target.style.borderColor = '#dc2626';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.vergiNo ? '#dc2626' : '#e5e7eb';
+                    e.target.style.borderColor = errors.tax_no ? '#dc2626' : '#e5e7eb';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
-                {errors.vergiNo && (
+                {errors.tax_no && (
                   <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.vergiNo}
+                    {errors.tax_no}
                   </p>
                 )}
               </div>
@@ -284,32 +320,35 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                 <input 
                   type="text" 
                   placeholder="Yetkili kişinin adı soyadı"
-                  value={formData.yetkili}
-                  onChange={(e) => handleInputChange('yetkili', e.target.value)}
+                  value={formData.contact_name}
+                  onChange={(e) => handleInputChange('contact_name', e.target.value)}
+                  disabled={loading}
                   style={{ 
                     width: '100%', 
                     padding: '12px',
-                    border: `2px solid ${errors.yetkili ? '#dc2626' : '#e5e7eb'}`,
+                    border: `2px solid ${errors.contact_name ? '#dc2626' : '#e5e7eb'}`,
                     borderRadius: '8px',
                     fontSize: '14px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
                     color: '#374151',
                     outline: 'none',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#dc2626';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    if (!loading) {
+                      e.target.style.borderColor = '#dc2626';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.yetkili ? '#dc2626' : '#e5e7eb';
+                    e.target.style.borderColor = errors.contact_name ? '#dc2626' : '#e5e7eb';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
-                {errors.yetkili && (
+                {errors.contact_name && (
                   <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.yetkili}
+                    {errors.contact_name}
                   </p>
                 )}
               </div>
@@ -328,32 +367,35 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                 <input 
                   type="tel" 
                   placeholder="0212 123 45 67"
-                  value={formData.telefon}
-                  onChange={(e) => handleInputChange('telefon', e.target.value)}
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  disabled={loading}
                   style={{ 
                     width: '100%', 
                     padding: '12px',
-                    border: `2px solid ${errors.telefon ? '#dc2626' : '#e5e7eb'}`,
+                    border: `2px solid ${errors.phone ? '#dc2626' : '#e5e7eb'}`,
                     borderRadius: '8px',
                     fontSize: '14px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
                     color: '#374151',
                     outline: 'none',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#dc2626';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    if (!loading) {
+                      e.target.style.borderColor = '#dc2626';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.telefon ? '#dc2626' : '#e5e7eb';
+                    e.target.style.borderColor = errors.phone ? '#dc2626' : '#e5e7eb';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
-                {errors.telefon && (
+                {errors.phone && (
                   <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
-                    {errors.telefon}
+                    {errors.phone}
                   </p>
                 )}
               </div>
@@ -374,21 +416,24 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                   placeholder="info@firma.com"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
+                  disabled={loading}
                   style={{ 
                     width: '100%', 
                     padding: '12px',
                     border: errors.email ? '2px solid #dc2626' : '2px solid #e5e7eb',
                     borderRadius: '8px',
                     fontSize: '14px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
                     color: '#374151',
                     outline: 'none',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#dc2626';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    if (!loading) {
+                      e.target.style.borderColor = '#dc2626';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    }
                   }}
                   onBlur={(e) => {
                     e.target.style.borderColor = errors.email ? '#dc2626' : '#e5e7eb';
@@ -416,15 +461,16 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                 <textarea 
                   placeholder="Firma adresi"
                   rows={2}
-                  value={formData.adres}
-                  onChange={(e) => handleInputChange('adres', e.target.value)}
+                  value={formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  disabled={loading}
                   style={{ 
                     width: '100%', 
                     padding: '12px',
                     border: '2px solid #e5e7eb',
                     borderRadius: '8px',
                     fontSize: '14px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
                     color: '#374151',
                     outline: 'none',
                     transition: 'all 0.2s ease',
@@ -434,8 +480,10 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                     height: '60px'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#dc2626';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    if (!loading) {
+                      e.target.style.borderColor = '#dc2626';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                    }
                   }}
                   onBlur={(e) => {
                     e.target.style.borderColor = '#e5e7eb';
@@ -460,28 +508,21 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                 <button
                   type="button"
                   onClick={duzenlemeyiIptalEt}
+                  disabled={loading}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
                     padding: '12px 24px',
-                    background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                    background: loading ? '#9ca3af' : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '14px',
                     fontWeight: '600',
-                    cursor: 'pointer',
+                    cursor: loading ? 'not-allowed' : 'pointer',
                     transition: 'all 0.3s ease',
                     boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -495,27 +536,20 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
               <button
                 type="button"
                 onClick={handleCancel}
+                disabled={loading}
                 style={{
                   display: duzenlemeModu ? 'none' : 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   padding: '12px 24px',
-                  background: '#f8fafc',
-                  color: '#374151',
+                  background: loading ? '#f3f4f6' : '#f8fafc',
+                  color: loading ? '#9ca3af' : '#374151',
                   border: '2px solid #e2e8f0',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: 'pointer',
+                  cursor: loading ? 'not-allowed' : 'pointer',
                   transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#f1f5f9';
-                  e.currentTarget.style.borderColor = '#cbd5e1';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
                 }}
               >
                 İptal
@@ -523,28 +557,33 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
 
               <button
                 type="submit"
+                disabled={loading}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   padding: '12px 24px',
-                  background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                  background: loading ? '#9ca3af' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: 'pointer',
+                  cursor: loading ? 'not-allowed' : 'pointer',
                   transition: 'all 0.3s ease',
                   boxShadow: '0 2px 8px rgba(220, 38, 38, 0.2)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+                  }
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -552,7 +591,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                   <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                {duzenlemeModu ? 'Güncelle' : 'Firma Ekle'}
+                {loading ? 'Kaydediliyor...' : (duzenlemeModu ? 'Güncelle' : 'Firma Ekle')}
               </button>
             </div>
           </form>
@@ -610,7 +649,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
               <path d="M2 17L12 22L22 17"/>
               <path d="M2 12L12 17L22 12"/>
             </svg>
-            Son Eklenen Firmalar
+            Sistemdeki Firmalar
             <span style={{ 
               fontSize: '14px',
               color: '#64748b',
@@ -625,7 +664,24 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
             flex: 1,
             overflowY: 'auto'
           }}>
-            {firmaListesi.length === 0 ? (
+            {loading ? (
+              <div style={{
+                padding: '40px',
+                textAlign: 'center',
+                color: '#64748b',
+                fontSize: '16px'
+              }}>
+                <div style={{ 
+                  fontSize: '48px', 
+                  marginBottom: '16px',
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}>
+                  ⏳
+                </div>
+                <div>Firmalar yükleniyor...</div>
+              </div>
+            ) : firmaListesi.length === 0 ? (
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
@@ -706,7 +762,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap'
                           }}>
-                            {firma.ad}
+                            {firma.name}
                           </h4>
                           <div style={{ 
                             fontSize: '12px',
@@ -718,16 +774,16 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                           }}>
                             {firma.email}
                           </div>
-                          {firma.telefon && (
+                          {firma.phone && (
                             <div style={{ 
                               fontSize: '12px',
                               color: '#64748b',
                               marginBottom: '4px'
                             }}>
-                              📞 {firma.telefon}
+                              📞 {firma.phone}
                             </div>
                           )}
-                          {firma.adres && (
+                          {firma.address && (
                             <div style={{ 
                               fontSize: '12px',
                               color: '#64748b',
@@ -735,7 +791,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
                             }}>
-                              📍 {firma.adres}
+                              📍 {firma.address}
                             </div>
                           )}
                         </div>
@@ -744,22 +800,27 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button 
                           onClick={() => firmaDuzenle(firma.id)}
+                          disabled={loading}
                           style={{
                             padding: '8px 12px',
                             fontSize: '12px',
                             fontWeight: '500',
-                            backgroundColor: '#dc2626',
+                            backgroundColor: loading ? '#9ca3af' : '#dc2626',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
-                            cursor: 'pointer',
+                            cursor: loading ? 'not-allowed' : 'pointer',
                             transition: 'all 0.2s ease'
                           }}
                           onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = '#b91c1c';
+                            if (!loading) {
+                              e.currentTarget.style.backgroundColor = '#b91c1c';
+                            }
                           }}
                           onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = '#dc2626';
+                            if (!loading) {
+                              e.currentTarget.style.backgroundColor = '#dc2626';
+                            }
                           }}
                         >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
@@ -769,22 +830,27 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                         </button>
                         <button 
                           onClick={() => firmaSilmeOnayi(firma.id)}
+                          disabled={loading}
                           style={{
                             padding: '8px 12px',
                             fontSize: '12px',
                             fontWeight: '500',
-                            backgroundColor: '#ef4444',
+                            backgroundColor: loading ? '#9ca3af' : '#ef4444',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
-                            cursor: 'pointer',
+                            cursor: loading ? 'not-allowed' : 'pointer',
                             transition: 'all 0.2s ease'
                           }}
                           onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = '#dc2626';
+                            if (!loading) {
+                              e.currentTarget.style.backgroundColor = '#dc2626';
+                            }
                           }}
                           onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = '#ef4444';
+                            if (!loading) {
+                              e.currentTarget.style.backgroundColor = '#ef4444';
+                            }
                           }}
                         >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
