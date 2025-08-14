@@ -1,5 +1,5 @@
 import { BrowserRouter } from 'react-router-dom';
-import Rotalar from './routes/Rotalar';
+import Rotalar from './rotalar/Rotalar';
 import SidebarComponent from './components/Sidebar';
 import './styles/App.css';
 
