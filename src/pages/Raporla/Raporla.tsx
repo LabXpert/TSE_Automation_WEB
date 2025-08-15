@@ -21,8 +21,9 @@ function Raporla() {
             kayitTarihi: app.created_at,
             deneyler: (app.tests || []).map((test: any) => ({
               id: test.id,
-              deneyTuru: test.experiment_types?.name || '',
-              sorumluPersonel: test.personnel ? `${test.personnel.first_name} ${test.personnel.last_name}` : '',
+              deneyTuru: test.experiment_type_name || '',
+              sorumluPersonel: test.personnel_first_name && test.personnel_last_name ? 
+                `${test.personnel_first_name} ${test.personnel_last_name}` : '',
               akredite: !!test.is_accredited,
               unit_price: test.unit_price
             }))

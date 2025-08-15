@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS applications (
   application_date DATE NOT NULL,
   certification_type VARCHAR(50) DEFAULT 'özel',
   test_count INTEGER DEFAULT 0,
-  created_at TIMESTAMP(6) DEFAULT NOW()
 );
 
 -- Tests table
