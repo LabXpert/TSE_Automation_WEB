@@ -1,9 +1,9 @@
+// ...existing imports...
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Firma } from '../../../models/Firma';
 
 interface FirmaEkleViewProps {
-  // State'ler
   formData: {
     ad: string;
     vergiNo: string;
@@ -12,15 +12,13 @@ interface FirmaEkleViewProps {
     adres: string;
     email: string;
   };
-  errors: {[key: string]: string};
+  errors: { [key: string]: string };
   firmaListesi: Firma[];
   duzenlemeModu: boolean;
-  
-  // Fonksiyonlar
   handleInputChange: (field: string, value: string) => void;
   kaydet: () => void;
-  firmaDuzenle: (id: string) => void;
-  firmaSilmeOnayi: (id: string) => void;
+  firmaDuzenle: (id: number) => void;
+  firmaSilmeOnayi: (id: number) => void;
   duzenlemeyiIptalEt: () => void;
 }
 
@@ -706,7 +704,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap'
                           }}>
-                            {firma.ad}
+                            {firma.name}
                           </h4>
                           <div style={{ 
                             fontSize: '12px',
@@ -718,16 +716,16 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                           }}>
                             {firma.email}
                           </div>
-                          {firma.telefon && (
+                          {firma.phone && (
                             <div style={{ 
                               fontSize: '12px',
                               color: '#64748b',
                               marginBottom: '4px'
                             }}>
-                              📞 {firma.telefon}
+                              📞 {firma.phone}
                             </div>
                           )}
-                          {firma.adres && (
+                          {firma.address && (
                             <div style={{ 
                               fontSize: '12px',
                               color: '#64748b',
@@ -735,7 +733,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
                             }}>
-                              📍 {firma.adres}
+                              📍 {firma.address}
                             </div>
                           )}
                         </div>
