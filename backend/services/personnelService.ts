@@ -129,6 +129,13 @@ export const personnelService = {
         [name, surname, title, department, email, phone, id]
       );
       
+      if (result.rowCount === 0) {
+        return {
+          success: false,
+          error: 'Güncellenecek personel bulunamadı'
+        };
+      }
+      
       // Frontend'in beklediği formata çevir
       const row = result.rows[0];
       const transformedData = {

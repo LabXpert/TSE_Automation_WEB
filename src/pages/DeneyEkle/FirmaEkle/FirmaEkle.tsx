@@ -92,8 +92,8 @@ const FirmaEkle: React.FC = () => {
 
     if (!formData.tax_no.trim()) {
       newErrors.tax_no = 'Vergi numarası zorunludur';
-    } else if (formData.tax_no.length !== 10) {
-      newErrors.tax_no = 'Vergi numarası 10 haneli olmalıdır';
+    } else if (formData.tax_no.length < 8 || formData.tax_no.length > 11) {
+      newErrors.tax_no = 'Vergi numarası 8-11 haneli olmalıdır';
     }
 
     if (!formData.contact_name.trim()) {
@@ -115,6 +115,7 @@ const FirmaEkle: React.FC = () => {
 
   const kaydet = async () => {
     const newErrors = validateForm();
+    
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -155,7 +156,6 @@ const FirmaEkle: React.FC = () => {
         if (result.success) {
           alert(`${formData.name} başarıyla eklendi!`);
           formTemizle();
-          // Firma listesini yenile
           await firmalariYukle();
         } else {
           alert('Firma eklenirken hata oluştu: ' + result.error);

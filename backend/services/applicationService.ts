@@ -116,5 +116,86 @@ export const applicationService = {
     } finally {
       client.release();
     }
+  },
+
+  // Başvuru güncelle
+  async update(id: string, applicationData: {
+    company_id?: number;
+    application_no?: string;
+    application_date?: string;
+    certification_type?: string;
+    test_count?: number;
+  }) {
+    try {
+      const { 
+        company_id, 
+        application_no, 
+        application_date, 
+        certification_type, 
+        test_count 
+      } = applicationData;
+      
+      const result = await pool.query(
+        'UPDATE applications SET company_id = COALESCE($1, company_id), application_no = COALESCE($2, application_no), application_date = COALESCE($3, application_date), certification_type = COALESCE($4, certification_type), test_count = COALESCE($5, test_count) WHERE id = $6 RETURNING *',
+        [company_id, application_no, application_date, certification_type, test_count, id]
+      );
+      
+      if (result.rowCount === 0) {
+        return {
+          success: false,
+          error: 'Güncellenecek başvuru bulunamadı'
+        };
+      }
+      
+      return {
+        success: true,
+        data: result.rows[0]
+      };
+    } catch (error) {
+      console.error('Application update error:', error);
+      return {
+        success: false,
+        error: 'Başvuru güncellenirken hata oluştu'
+      };
+    }
+  },
+
+  // Başvuru sil (testleri de siler)
+  async delete(id: string) {
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+      
+      // Önce testleri sil
+      await client.query('DELETE FROM tests WHERE application_id = $1', [id]);
+      
+      // Sonra başvuruyu sil
+      const result = await client.query('DELETE FROM applications WHERE id = $1', [id]);
+      
+      if (result.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return {
+          success: false,
+          error: 'Silinecek başvuru bulunamadı'
+        };
+      }
+      
+      await client.query('COMMIT');
+      
+      return {
+        success: true,
+        data: null
+      };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('Application delete error:', error);
+      return {
+        success: false,
+        error: 'Başvuru silinirken hata oluştu'
+      };
+    } finally {
+      client.release();
+    }
   }
 };

@@ -25,4 +25,27 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Başvuru güncelle
+router.put('/:id', async (req, res) => {
+  console.log('PUT route çağrıldı:', req.params.id, req.body);
+  const result = await applicationService.update(req.params.id, req.body);
+  
+  if (result.success) {
+    res.json(result.data);
+  } else {
+    res.status(500).json({ error: result.error });
+  }
+});
+
+// Başvuru sil
+router.delete('/:id', async (req, res) => {
+  const result = await applicationService.delete(req.params.id);
+  
+  if (result.success) {
+    res.json({ success: true, message: 'Başvuru başarıyla silindi' });
+  } else {
+    res.status(500).json({ error: result.error });
+  }
+});
+
 export default router;
