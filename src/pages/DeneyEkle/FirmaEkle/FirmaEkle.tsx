@@ -155,7 +155,7 @@ const FirmaEkle: React.FC = () => {
               alert('Firma bulunamadı!');
               return;
             }
-            const confirmMsg = `Are you sure you want to delete "${firma.name}"?\n\nThis action cannot be undone!`;
+            const confirmMsg = `Bu "${firma.name}" silinsin mi?\n\nBu işlem geri alınamaz!`;
             if (confirm(confirmMsg)) {
               try {
                 const response = await fetch(`/api/companies/${id}`, { method: 'DELETE' });

@@ -7,7 +7,6 @@ import type { Deney, DeneyKaydi } from '../../models/Deney.tsx';
 import type { Firma } from '../../models/Firma.tsx';
 import type { Personel } from '../../models/Personel.tsx';
 import type { DeneyTuru } from '../../models/DeneyTurleri.tsx';
-import { kayitSil, tumKayitlariGetir, kayitBul } from '../../data/DeneyListesi.tsx';
 
 function DeneyEkle() {
   const [deneySayisi, setDeneySeayisi] = useState(1);
