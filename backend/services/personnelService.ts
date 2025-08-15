@@ -6,9 +6,21 @@ export const personnelService = {
   async getAll() {
     try {
       const result = await pool.query('SELECT * FROM personnel ORDER BY id');
+      // Frontend'in beklediği formata çevir
+      const transformedData = result.rows.map(row => ({
+        id: row.id,
+        name: row.first_name,
+        surname: row.last_name,
+        title: row.title,
+        department: row.department,
+        email: row.email,
+        phone: row.phone,
+        created_at: row.created_at,
+        updated_at: row.updated_at
+      }));
       return {
         success: true,
-        data: result.rows
+        data: transformedData
       };
     } catch (error) {
       console.error('Personnel getAll error:', error);
@@ -23,10 +35,30 @@ export const personnelService = {
   async getById(id: string) {
     try {
       const result = await pool.query('SELECT * FROM personnel WHERE id = $1', [id]);
-      return {
-        success: true,
-        data: result.rows[0] || null
-      };
+      const row = result.rows[0];
+      if (row) {
+        // Frontend'in beklediği formata çevir
+        const transformedData = {
+          id: row.id,
+          name: row.first_name,
+          surname: row.last_name,
+          title: row.title,
+          department: row.department,
+          email: row.email,
+          phone: row.phone,
+          created_at: row.created_at,
+          updated_at: row.updated_at
+        };
+        return {
+          success: true,
+          data: transformedData
+        };
+      } else {
+        return {
+          success: true,
+          data: null
+        };
+      }
     } catch (error) {
       console.error('Personnel getById error:', error);
       return {
@@ -49,13 +81,27 @@ export const personnelService = {
       const { name, surname, title, department, email, phone } = personnelData;
       
       const result = await pool.query(
-        'INSERT INTO personnel (name, surname, title, department, email, phone) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        'INSERT INTO personnel (first_name, last_name, title, department, email, phone) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
         [name, surname, title, department, email, phone]
       );
       
+      // Frontend'in beklediği formata çevir
+      const row = result.rows[0];
+      const transformedData = {
+        id: row.id,
+        name: row.first_name,
+        surname: row.last_name,
+        title: row.title,
+        department: row.department,
+        email: row.email,
+        phone: row.phone,
+        created_at: row.created_at,
+        updated_at: row.updated_at
+      };
+      
       return {
         success: true,
-        data: result.rows[0]
+        data: transformedData
       };
     } catch (error) {
       console.error('Personnel create error:', error);
@@ -79,13 +125,27 @@ export const personnelService = {
       const { name, surname, title, department, email, phone } = personnelData;
       
       const result = await pool.query(
-        'UPDATE personnel SET name = COALESCE($1, name), surname = COALESCE($2, surname), title = COALESCE($3, title), department = COALESCE($4, department), email = COALESCE($5, email), phone = COALESCE($6, phone), updated_at = CURRENT_TIMESTAMP WHERE id = $7 RETURNING *',
+        'UPDATE personnel SET first_name = COALESCE($1, first_name), last_name = COALESCE($2, last_name), title = COALESCE($3, title), department = COALESCE($4, department), email = COALESCE($5, email), phone = COALESCE($6, phone), updated_at = CURRENT_TIMESTAMP WHERE id = $7 RETURNING *',
         [name, surname, title, department, email, phone, id]
       );
       
+      // Frontend'in beklediği formata çevir
+      const row = result.rows[0];
+      const transformedData = {
+        id: row.id,
+        name: row.first_name,
+        surname: row.last_name,
+        title: row.title,
+        department: row.department,
+        email: row.email,
+        phone: row.phone,
+        created_at: row.created_at,
+        updated_at: row.updated_at
+      };
+      
       return {
         success: true,
-        data: result.rows[0]
+        data: transformedData
       };
     } catch (error) {
       console.error('Personnel update error:', error);

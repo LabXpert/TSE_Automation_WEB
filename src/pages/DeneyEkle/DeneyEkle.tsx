@@ -45,29 +45,42 @@ function DeneyEkle() {
     try {
       setLoading(true);
       
-      // Paralel olarak tüm verileri getir - RAW API calls kullan
-      const [firmaResult, personnelResult, deneyTuruResult, applicationResult] = await Promise.all([
+      // Önce referans verilerini getir
+      const [firmaResult, personnelResult, deneyTuruResult] = await Promise.all([
         api.companies.getAll(),
-        api.personnel.getAllRaw(), // RAW veriyi kullan
-        api.experimentTypes.getAllRaw(), // RAW veriyi kullan
-        api.applications.getAllRaw() // RAW veriyi kullan
+        api.personnel.getAllRaw(),
+        api.experimentTypes.getAllRaw()
       ]);
 
+      // Referans verilerini state'e kaydet
+      let firmaListesi: Company[] = [];
+      let personnelListesi: Personnel[] = [];
+      let deneyTuruListesi: ExperimentType[] = [];
+
       if (firmaResult.success && firmaResult.data) {
+        firmaListesi = firmaResult.data;
         setFirmalar(firmaResult.data);
       }
       
       if (personnelResult.success && personnelResult.data) {
-        setPersoneller(personnelResult.data); // Artık Personnel[] tipinde
+        personnelListesi = personnelResult.data;
+        setPersoneller(personnelResult.data);
       }
       
       if (deneyTuruResult.success && deneyTuruResult.data) {
-        setDeneyTurleri(deneyTuruResult.data); // Artık ExperimentType[] tipinde
+        deneyTuruListesi = deneyTuruResult.data;
+        setDeneyTurleri(deneyTuruResult.data);
       }
       
+      // Şimdi applications'ı getir ve işle
+      const applicationResult = await api.applications.getAllRaw();
       if (applicationResult.success && applicationResult.data) {
-        // Applications'ı frontend formatına çevir
-        const frontendKayitlar = await convertApplicationsToFrontend(applicationResult.data);
+        const frontendKayitlar = await convertApplicationsToFrontendWithData(
+          applicationResult.data,
+          firmaListesi,
+          personnelListesi,
+          deneyTuruListesi
+        );
         setKayitlariListesi(frontendKayitlar);
       }
       
@@ -79,33 +92,40 @@ function DeneyEkle() {
     }
   };
 
-  // Applications'ı frontend formatına çevir
-  const convertApplicationsToFrontend = async (applications: Application[]): Promise<DeneyKaydi[]> => {
+  // Applications'ı frontend formatına çevir - parametre olarak referans veriler alan versiyon
+  const convertApplicationsToFrontendWithData = (
+    applications: Application[], 
+    firmaListesi: Company[], 
+    personnelListesi: Personnel[], 
+    deneyTuruListesi: ExperimentType[]
+  ): DeneyKaydi[] => {
     const frontendKayitlar: DeneyKaydi[] = [];
     
     for (const app of applications) {
       // Company bilgisini getir
-      const firma = firmalar.find(f => f.id === app.company_id) || 
-                   { name: 'Bilinmeyen Firma' };
+      const firma = firmaListesi.find(f => f.id === app.company_id);
+      const firmaAdi = firma ? firma.name : 'Bilinmeyen Firma';
 
       // Tests varsa frontend formatına çevir
       const deneyler: Deney[] = app.tests ? app.tests.map(test => {
-        // Experiment type ve personnel bilgilerini bul
-        const deneyTuru = deneyTurleri.find(dt => dt.id === test.experiment_type_id)?.name || 'Bilinmeyen Deney';
-        const personel = personeller.find(p => p.id === test.responsible_personnel_id);
+        // Experiment type ve personnel bilgilerini bul (ID'leri string'e çevir)
+        const deneyTuru = deneyTuruListesi.find(dt => String(dt.id) === String(test.experiment_type_id));
+        const deneyTuruAdi = deneyTuru ? deneyTuru.name : 'Bilinmeyen Deney';
+        
+        const personel = personnelListesi.find(p => String(p.id) === String(test.responsible_personnel_id));
         const personelAdi = personel ? `${personel.name} ${personel.surname}` : 'Bilinmeyen Personel';
 
         return {
           id: test.id,
-          deneyTuru: deneyTuru,
+          deneyTuru: deneyTuruAdi,
           sorumluPersonel: personelAdi,
-          akredite: false // Varsayılan değer, gerekirse test tablosuna eklenebilir
+          akredite: false
         };
       }) : [];
 
       frontendKayitlar.push({
         id: app.id,
-        firmaAdi: firma.name,
+        firmaAdi: firmaAdi,
         basvuruNo: app.application_no,
         basvuruTarihi: app.application_date,
         belgelendirmeTuru: app.certification_type as 'özel' | 'belgelendirme',
@@ -122,21 +142,6 @@ function DeneyEkle() {
   useEffect(() => {
     verilerYukle();
   }, []);
-
-  // Firmalar, personeller ve deney türleri değiştiğinde kayıtları yeniden işle
-  useEffect(() => {
-    if (firmalar.length > 0 && personeller.length > 0 && deneyTurleri.length > 0) {
-      // Applications'ı yeniden yükle
-      const applicationlariYukle = async () => {
-        const result = await api.applications.getAllRaw(); // RAW veriyi kullan
-        if (result.success && result.data) {
-          const frontendKayitlar = await convertApplicationsToFrontend(result.data);
-          setKayitlariListesi(frontendKayitlar);
-        }
-      };
-      applicationlariYukle();
-    }
-  }, [firmalar, personeller, deneyTurleri]);
 
   // Deney sayısı değiştiğinde deney listesini güncelle
   useEffect(() => {

@@ -24,28 +24,28 @@ interface DeneyKaydi {
 function Raporla() {
   const [kayitlariListesi, setKayitlariListesi] = useState<DeneyKaydi[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  // API verilerini cache'lemek için
-  const [firmalar, setFirmalar] = useState<Company[]>([]);
-  const [personeller, setPersoneller] = useState<Personnel[]>([]);
-  const [deneyTurleri, setDeneyTurleri] = useState<ExperimentType[]>([]);
 
-  // Applications'ı frontend formatına çevir
-  const convertApplicationsToFrontend = (applications: Application[]): DeneyKaydi[] => {
+  // Applications'ı frontend formatına çevir - parametre olarak referans veriler alan versiyon
+  const convertApplicationsToFrontendWithData = (
+    applications: Application[], 
+    firmaListesi: Company[], 
+    personnelListesi: Personnel[], 
+    deneyTuruListesi: ExperimentType[]
+  ): DeneyKaydi[] => {
     const frontendKayitlar: DeneyKaydi[] = [];
     
     for (const app of applications) {
       // Company bilgisini getir
-      const firma = firmalar.find(f => f.id === app.company_id);
+      const firma = firmaListesi.find(f => f.id === app.company_id);
       const firmaAdi = firma ? firma.name : 'Bilinmeyen Firma';
 
       // Tests varsa frontend formatına çevir
       const deneyler: Deney[] = app.tests ? app.tests.map(test => {
-        // Experiment type ve personnel bilgilerini bul
-        const deneyTuru = deneyTurleri.find(dt => dt.id === test.experiment_type_id);
+        // Experiment type ve personnel bilgilerini bul (ID'leri string'e çevir)
+        const deneyTuru = deneyTuruListesi.find(dt => String(dt.id) === String(test.experiment_type_id));
         const deneyTuruAdi = deneyTuru ? deneyTuru.name : 'Bilinmeyen Deney';
         
-        const personel = personeller.find(p => p.id === test.responsible_personnel_id);
+        const personel = personnelListesi.find(p => String(p.id) === String(test.responsible_personnel_id));
         const personelAdi = personel ? `${personel.name} ${personel.surname}` : 'Bilinmeyen Personel';
 
         return {
@@ -76,34 +76,40 @@ function Raporla() {
     try {
       setLoading(true);
       
-      // Paralel olarak tüm verileri getir
-      const [firmaResult, personnelResult, deneyTuruResult, applicationResult] = await Promise.all([
+      // Önce referans verilerini getir
+      const [firmaResult, personnelResult, deneyTuruResult] = await Promise.all([
         api.companies.getAll(),
         api.personnel.getAllRaw(),
-        api.experimentTypes.getAllRaw(),
-        api.applications.getAllRaw()
+        api.experimentTypes.getAllRaw()
       ]);
 
-      // Önce referans verilerini set et
+      // Referans verilerini state'e kaydet
+      let firmaListesi: Company[] = [];
+      let personnelListesi: Personnel[] = [];
+      let deneyTuruListesi: ExperimentType[] = [];
+
       if (firmaResult.success && firmaResult.data) {
-        setFirmalar(firmaResult.data);
+        firmaListesi = firmaResult.data;
       }
       
       if (personnelResult.success && personnelResult.data) {
-        setPersoneller(personnelResult.data);
+        personnelListesi = personnelResult.data;
       }
       
       if (deneyTuruResult.success && deneyTuruResult.data) {
-        setDeneyTurleri(deneyTuruResult.data);
+        deneyTuruListesi = deneyTuruResult.data;
       }
 
-      // Sonra applications'ı işle (referans veriler hazır olduğunda)
+      // Şimdi applications'ı getir ve işle
+      const applicationResult = await api.applications.getAllRaw();
       if (applicationResult.success && applicationResult.data) {
-        // Biraz bekle ki state'ler güncellensin
-        setTimeout(() => {
-          const frontendKayitlar = convertApplicationsToFrontend(applicationResult.data!);
-          setKayitlariListesi(frontendKayitlar);
-        }, 100);
+        const frontendKayitlar = convertApplicationsToFrontendWithData(
+          applicationResult.data, 
+          firmaListesi, 
+          personnelListesi, 
+          deneyTuruListesi
+        );
+        setKayitlariListesi(frontendKayitlar);
       }
       
     } catch (error) {
@@ -118,24 +124,6 @@ function Raporla() {
   useEffect(() => {
     verilerYukle();
   }, []);
-
-  // Referans veriler değiştiğinde applications'ı yeniden işle
-  useEffect(() => {
-    if (firmalar.length > 0 && personeller.length > 0 && deneyTurleri.length > 0) {
-      const applicationlariYukle = async () => {
-        try {
-          const result = await api.applications.getAllRaw();
-          if (result.success && result.data) {
-            const frontendKayitlar = convertApplicationsToFrontend(result.data);
-            setKayitlariListesi(frontendKayitlar);
-          }
-        } catch (error) {
-          console.error('Applications yüklenirken hata:', error);
-        }
-      };
-      applicationlariYukle();
-    }
-  }, [firmalar, personeller, deneyTurleri]);
 
   return (
     <RaporlaView 
