@@ -35,6 +35,14 @@ export async function testConnection() {
     const result4 = await client.query('SELECT COUNT(*) FROM experiment_types');
     console.log(`📊 Experiment-types tablosunda ${result4.rows[0].count} kayıt var`);
 
+    // Tests tablosuna is_accredited kolonu ekle (eğer yoksa)
+    try {
+      await client.query('ALTER TABLE tests ADD COLUMN IF NOT EXISTS is_accredited BOOLEAN DEFAULT FALSE');
+      console.log('✅ Tests tablosuna is_accredited kolonu eklendi/kontrol edildi');
+    } catch (error) {
+      console.log('ℹ️  Tests tablosunda is_accredited kolonu zaten mevcut');
+    }
+
 
     
     client.release();

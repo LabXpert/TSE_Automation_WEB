@@ -14,7 +14,8 @@ export const applicationService = {
                 'id', t.id,
                 'experiment_type_id', t.experiment_type_id,
                 'responsible_personnel_id', t.responsible_personnel_id,
-                'unit_price', t.unit_price
+                'unit_price', t.unit_price,
+                'is_accredited', COALESCE(t.is_accredited, false)
               )
             ) FILTER (WHERE t.id IS NOT NULL), 
             '[]'
@@ -49,6 +50,7 @@ export const applicationService = {
       experiment_type_id: number;
       responsible_personnel_id: number;
       unit_price: number;
+      is_accredited?: boolean;
     }>;
   }) {
     const client = await pool.connect();
@@ -75,10 +77,19 @@ export const applicationService = {
       
       // Testleri ekle
       for (const test of tests) {
-        await client.query(
-          'INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price) VALUES ($1, $2, $3, $4)',
-          [applicationId, test.experiment_type_id, test.responsible_personnel_id, test.unit_price]
-        );
+        try {
+          // is_accredited alanını test et, yoksa normal insert yap
+          await client.query(
+            'INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, is_accredited) VALUES ($1, $2, $3, $4, $5)',
+            [applicationId, test.experiment_type_id, test.responsible_personnel_id, test.unit_price, test.is_accredited || false]
+          );
+        } catch (error) {
+          // is_accredited kolonu yoksa eski şekilde insert yap
+          await client.query(
+            'INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price) VALUES ($1, $2, $3, $4)',
+            [applicationId, test.experiment_type_id, test.responsible_personnel_id, test.unit_price]
+          );
+        }
       }
       
       await client.query('COMMIT');

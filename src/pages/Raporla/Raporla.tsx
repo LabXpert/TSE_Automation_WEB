@@ -52,7 +52,7 @@ function Raporla() {
           id: test.id,
           deneyTuru: deneyTuruAdi,
           sorumluPersonel: personelAdi,
-          akredite: false // Varsayılan değer, gerekirse test tablosuna eklenebilir
+          akredite: test.is_accredited || false // Veritabanından gelen değeri kullan
         };
       }) : [];
 

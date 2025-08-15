@@ -119,7 +119,7 @@ function DeneyEkle() {
           id: test.id,
           deneyTuru: deneyTuruAdi,
           sorumluPersonel: personelAdi,
-          akredite: false
+          akredite: test.is_accredited || false
         };
       }) : [];
 
@@ -221,7 +221,8 @@ function DeneyEkle() {
         return {
           experiment_type_id: deneyTuru.id,
           responsible_personnel_id: personel.id,
-          unit_price: deneyTuru.price || 0
+          unit_price: deneyTuru.price || 0,
+          is_accredited: deney.akredite
         };
       });
 

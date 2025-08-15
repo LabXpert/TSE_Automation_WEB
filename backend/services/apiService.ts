@@ -50,6 +50,7 @@ export interface Test {
   experiment_type_id: string;
   responsible_personnel_id: string;
   unit_price: number;
+  is_accredited?: boolean;
   status?: string;
   start_date?: string;
   end_date?: string;
