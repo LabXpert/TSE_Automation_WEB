@@ -24,7 +24,7 @@ export class CompanyService {
 
     const result = await this.repo.update(id, data);
     if (!result) {
-      throw new Error('Company not found');
+      throw new Error('Firma bulunamadı');
     }
     return result;
   }
@@ -32,35 +32,35 @@ export class CompanyService {
   async deleteCompany(id: number) {
     const deleted = await this.repo.delete(id);
     if (!deleted) {
-      throw new Error('Company not found');
+      throw new Error('Firma bulunamadı');
     }
     return { success: true };
   }
 
   private validateCompanyData(data: CompanyData) {
     if (!data.name?.trim()) {
-      throw new Error('Company name is required');
+      throw new Error('Firma adı gereklidir');
     }
     if (!data.tax_no?.trim()) {
-      throw new Error('Tax number is required');
+      throw new Error('Vergi numarası gereklidir');
     }
     if (!data.contact_name?.trim()) {
-      throw new Error('Contact name is required');
+      throw new Error('İletişim adı gereklidir');
     }
     if (!data.address?.trim()) {
-      throw new Error('Address is required');
+      throw new Error('Adres gereklidir');
     }
     if (!data.phone?.trim()) {
-      throw new Error('Phone is required');
+      throw new Error('Telefon gereklidir');
     }
     if (!data.email?.trim()) {
-      throw new Error('Email is required');
+      throw new Error('Email gereklidir');
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.email)) {
-      throw new Error('Invalid email format');
+      throw new Error('Geçersiz email formatı');
     }
   }
 }

@@ -14,13 +14,13 @@ export class PersonnelService {
   async createPersonnel(data: { first_name: string; last_name: string; title: string }) {
     // Business logic validations
     if (!data.first_name?.trim()) {
-      throw new Error('First name is required');
+      throw new Error('Ad gereklidir');
     }
     if (!data.last_name?.trim()) {
-      throw new Error('Last name is required');
+      throw new Error('Soyad gereklidir');
     }
     if (!data.title?.trim()) {
-      throw new Error('Title is required');
+      throw new Error('Unvan gereklidir');
     }
 
     return await this.repo.create(data);
@@ -29,18 +29,18 @@ export class PersonnelService {
   async updatePersonnel(id: number, data: { first_name: string; last_name: string; title: string }) {
     // Business logic validations
     if (!data.first_name?.trim()) {
-      throw new Error('First name is required');
+      throw new Error('Ad gereklidir');
     }
     if (!data.last_name?.trim()) {
-      throw new Error('Last name is required');
+      throw new Error('Soyad gereklidir');
     }
     if (!data.title?.trim()) {
-      throw new Error('Title is required');
+      throw new Error('Unvan gereklidir');
     }
 
     const result = await this.repo.update(id, data);
     if (!result) {
-      throw new Error('Personnel not found');
+      throw new Error('Personel bulunamadı');
     }
     return result;
   }
@@ -48,7 +48,7 @@ export class PersonnelService {
   async deletePersonnel(id: number) {
     const deleted = await this.repo.delete(id);
     if (!deleted) {
-      throw new Error('Personnel not found');
+      throw new Error('Personel bulunamadı');
     }
     return { success: true };
   }

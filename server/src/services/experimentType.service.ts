@@ -14,13 +14,13 @@ export class ExperimentTypeService {
   async createExperimentType(data: { name: string; base_price: number; accredited_multiplier: number }) {
     // Business logic validations
     if (!data.name?.trim()) {
-      throw new Error('Experiment type name is required');
+      throw new Error('Deney türü adı gereklidir');
     }
     if (data.base_price < 0) {
-      throw new Error('Base price cannot be negative');
+      throw new Error('Temel fiyat negatif olamaz');
     }
     if (data.accredited_multiplier < 0) {
-      throw new Error('Accredited multiplier cannot be negative');
+      throw new Error('Akredite çarpanı negatif olamaz');
     }
 
     return await this.repo.create(data);
@@ -29,18 +29,18 @@ export class ExperimentTypeService {
   async updateExperimentType(id: number, data: { name: string; base_price: number; accredited_multiplier: number }) {
     // Business logic validations
     if (!data.name?.trim()) {
-      throw new Error('Experiment type name is required');
+      throw new Error('Deney türü adı gereklidir');
     }
     if (data.base_price < 0) {
-      throw new Error('Base price cannot be negative');
+      throw new Error('Temel fiyat negatif olamaz');
     }
     if (data.accredited_multiplier < 0) {
-      throw new Error('Accredited multiplier cannot be negative');
+      throw new Error('Akredite çarpanı negatif olamaz');
     }
 
     const result = await this.repo.update(id, data);
     if (!result) {
-      throw new Error('Experiment type not found');
+      throw new Error('Deney türü bulunamadı');
     }
     return result;
   }
@@ -48,7 +48,7 @@ export class ExperimentTypeService {
   async deleteExperimentType(id: number) {
     const deleted = await this.repo.delete(id);
     if (!deleted) {
-      throw new Error('Experiment type not found');
+      throw new Error('Deney türü bulunamadı');
     }
     return { success: true };
   }

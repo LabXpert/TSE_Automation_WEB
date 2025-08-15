@@ -11,7 +11,7 @@ router.get('/', async (_req, res) => {
     res.json(experimentTypes);
   } catch (error) {
     console.error('Error fetching experiment types:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Sunucu hatası' });
   }
 });
 
@@ -31,7 +31,7 @@ router.get('/:id', async (req, res) => {
     res.json(experimentType);
   } catch (error) {
     console.error('Error fetching experiment type:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Sunucu hatas�' });
   }
 });
 
@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
     if (error.message.includes('required') || error.message.includes('cannot be negative')) {
       res.status(400).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Sunucu hatas�' });
     }
   }
 });
@@ -81,7 +81,7 @@ router.put('/:id', async (req, res) => {
     } else if (error.message.includes('required') || error.message.includes('cannot be negative')) {
       res.status(400).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Sunucu hatas�' });
     }
   }
 });
@@ -101,7 +101,7 @@ router.delete('/:id', async (req, res) => {
     if (error.message.includes('not found')) {
       res.status(404).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Sunucu hatas�' });
     }
   }
 });

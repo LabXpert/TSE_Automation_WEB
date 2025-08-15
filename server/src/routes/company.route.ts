@@ -11,7 +11,7 @@ router.get('/', async (_req, res) => {
     res.json(companies);
   } catch (error) {
     console.error('Error fetching companies:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Sunucu hatasý' });
   }
 });
 
@@ -31,7 +31,7 @@ router.get('/:id', async (req, res) => {
     res.json(company);
   } catch (error) {
     console.error('Error fetching company:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Sunucu hatasý' });
   }
 });
 
@@ -55,7 +55,7 @@ router.post('/', async (req, res) => {
     if (error.message.includes('required') || error.message.includes('Invalid email')) {
       res.status(400).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Sunucu hatasý' });
     }
   }
 });
@@ -87,7 +87,7 @@ router.put('/:id', async (req, res) => {
     } else if (error.message.includes('required') || error.message.includes('Invalid email')) {
       res.status(400).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Sunucu hatasý' });
     }
   }
 });
@@ -107,7 +107,7 @@ router.delete('/:id', async (req, res) => {
     if (error.message.includes('not found')) {
       res.status(404).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Sunucu hatasý' });
     }
   }
 });
