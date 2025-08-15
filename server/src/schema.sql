@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS applications (
   application_date DATE NOT NULL,
   certification_type VARCHAR(50) DEFAULT 'özel',
   test_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP(6) DEFAULT NOW()
 );
 
 -- Tests table
@@ -49,6 +50,7 @@ CREATE TABLE IF NOT EXISTS tests (
   responsible_personnel_id INTEGER REFERENCES personnel(id),
   unit_price DECIMAL(10,2) DEFAULT 0,
   is_accredited BOOLEAN DEFAULT FALSE,
+  uygunluk BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP(6) DEFAULT NOW()
 );
 

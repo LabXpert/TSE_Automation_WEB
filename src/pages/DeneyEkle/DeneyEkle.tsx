@@ -88,7 +88,8 @@ function DeneyEkle() {
           id: `deney_${i}`,
           deneyTuru: '',
           sorumluPersonel: '',
-          akredite: false
+          akredite: false,
+          uygunluk: false
         });
       }
     }
@@ -145,8 +146,9 @@ function DeneyEkle() {
       return {
         experiment_type_id: experimentType?.id,
         responsible_personnel_id: personnel?.id,
-        unit_price: experimentType?.base_price || 0,
-        is_accredited: d.akredite || false
+        unit_price: experimentType?.base_price || 0, // Client'tan gönderilse de server hesaplayacak
+        is_accredited: d.akredite || false,
+        uygunluk: d.uygunluk || false
       };
     });
 
@@ -305,8 +307,9 @@ function DeneyEkle() {
           return {
             experiment_type_id: experimentType?.id,
             responsible_personnel_id: personnel?.id,
-            unit_price: experimentType?.base_price || 0,
-            is_accredited: d.akredite || false
+            unit_price: experimentType?.base_price || 0, // Client'tan gönderilse de server hesaplayacak
+            is_accredited: d.akredite || false,
+            uygunluk: d.uygunluk || false
           };
         });
         const payload = {

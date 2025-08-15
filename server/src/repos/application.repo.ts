@@ -13,6 +13,7 @@ export interface TestData {
   responsible_personnel_id: number;
   unit_price: number;
   is_accredited: boolean;
+  uygunluk: boolean;
 }
 
 export class ApplicationRepository {
@@ -29,10 +30,10 @@ export class ApplicationRepository {
               'responsible_personnel_id', t.responsible_personnel_id,
               'unit_price', t.unit_price,
               'is_accredited', t.is_accredited,
+              'uygunluk', t.uygunluk,
               'created_at', t.created_at,
               'experiment_type_name', et.name,
               'experiment_type_base_price', et.base_price,
-              'experiment_type_accredited_multiplier', et.accredited_multiplier,
               'personnel_first_name', p.first_name,
               'personnel_last_name', p.last_name,
               'personnel_title', p.title
@@ -76,10 +77,10 @@ export class ApplicationRepository {
               'responsible_personnel_id', t.responsible_personnel_id,
               'unit_price', t.unit_price,
               'is_accredited', t.is_accredited,
+              'uygunluk', t.uygunluk,
               'created_at', t.created_at,
               'experiment_type_name', et.name,
               'experiment_type_base_price', et.base_price,
-              'experiment_type_accredited_multiplier', et.accredited_multiplier,
               'personnel_first_name', p.first_name,
               'personnel_last_name', p.last_name,
               'personnel_title', p.title
@@ -124,14 +125,15 @@ export class ApplicationRepository {
       
       const newApp = appResult.rows[0];
       
-      // Create tests
+      // Create tests with server-calculated prices
       const createdTests = [];
       for (const test of data.tests) {
         const testResult = await client.query(
-          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, is_accredited, created_at)
-           VALUES ($1, $2, $3, $4, $5, NOW())
+          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, is_accredited, uygunluk, created_at)
+           SELECT $1, $2, $3, et.base_price + (CASE WHEN $6 THEN 750 ELSE 0 END), $4, $5, NOW()
+           FROM experiment_types et WHERE et.id = $2
            RETURNING *`,
-          [newApp.id, test.experiment_type_id, test.responsible_personnel_id, test.unit_price, test.is_accredited]
+          [newApp.id, test.experiment_type_id, test.responsible_personnel_id, test.is_accredited, test.uygunluk, test.uygunluk]
         );
         createdTests.push(testResult.rows[0]);
       }
@@ -172,14 +174,15 @@ export class ApplicationRepository {
       // Delete old tests
       await client.query('DELETE FROM tests WHERE application_id = $1', [id]);
       
-      // Create new tests
+      // Create new tests with server-calculated prices
       const createdTests = [];
       for (const test of data.tests) {
         const testResult = await client.query(
-          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, is_accredited, created_at)
-           VALUES ($1, $2, $3, $4, $5, NOW())
+          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, is_accredited, uygunluk, created_at)
+           SELECT $1, $2, $3, et.base_price + (CASE WHEN $6 THEN 750 ELSE 0 END), $4, $5, NOW()
+           FROM experiment_types et WHERE et.id = $2
            RETURNING *`,
-          [id, test.experiment_type_id, test.responsible_personnel_id, test.unit_price, test.is_accredited]
+          [id, test.experiment_type_id, test.responsible_personnel_id, test.is_accredited, test.uygunluk, test.uygunluk]
         );
         createdTests.push(testResult.rows[0]);
       }

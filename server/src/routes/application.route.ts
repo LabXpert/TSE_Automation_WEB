@@ -26,6 +26,13 @@ router.get('/all', async (_req, res) => {
   }
 });
 
+// Helper function to normalize booleans
+const toBool = (value: any): boolean => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') return value.toLowerCase() === 'true';
+  return Boolean(value);
+};
+
 // POST /api/applications
 router.post('/', async (req, res) => {
   try {
@@ -39,8 +46,9 @@ router.post('/', async (req, res) => {
       tests: tests.map((test: any) => ({
         experiment_type_id: Number(test.experiment_type_id),
         responsible_personnel_id: Number(test.responsible_personnel_id),
-        unit_price: Number(test.unit_price) || 0,
-        is_accredited: Boolean(test.is_accredited)
+        unit_price: Number(test.unit_price) || 0, // Client'tan gelse de server hesaplayacak
+        is_accredited: toBool(test.is_accredited),
+        uygunluk: toBool(test.uygunluk)
       }))
     });
     
@@ -73,8 +81,9 @@ router.put('/:id', async (req, res) => {
       tests: tests.map((test: any) => ({
         experiment_type_id: Number(test.experiment_type_id),
         responsible_personnel_id: Number(test.responsible_personnel_id),
-        unit_price: Number(test.unit_price) || 0,
-        is_accredited: Boolean(test.is_accredited)
+        unit_price: Number(test.unit_price) || 0, // Client'tan gelse de server hesaplayacak
+        is_accredited: toBool(test.is_accredited),
+        uygunluk: toBool(test.uygunluk)
       }))
     });
     

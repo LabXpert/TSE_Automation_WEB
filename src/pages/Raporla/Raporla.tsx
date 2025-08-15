@@ -25,6 +25,7 @@ function Raporla() {
               sorumluPersonel: test.personnel_first_name && test.personnel_last_name ? 
                 `${test.personnel_first_name} ${test.personnel_last_name}` : '',
               akredite: !!test.is_accredited,
+              uygunluk: !!test.uygunluk,
               unit_price: test.unit_price
             }))
           }));

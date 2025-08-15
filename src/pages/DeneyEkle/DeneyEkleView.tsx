@@ -167,6 +167,36 @@ function DeneyEkleView({
                   (Bu deney akredite mi?)
                 </div>
               </label>
+
+              {/* Uygunluk Checkbox */}
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                marginTop: '8px'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={deneyler[i]?.uygunluk || false}
+                  onChange={(e) => deneyGuncelle(i, 'uygunluk', e.target.checked)}
+                  style={{ 
+                    width: '16px',
+                    height: '16px',
+                    margin: 0
+                  }}
+                />
+                <span>Uygunluk</span>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#64748b',
+                  fontWeight: '400'
+                }}>
+                  (+750₺ ek ücret)
+                </div>
+              </label>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ export interface Deney {
   deneyTuru: string;
   sorumluPersonel: string;
   akredite: boolean;
+  uygunluk: boolean;
   unit_price?: number;
 }
 
