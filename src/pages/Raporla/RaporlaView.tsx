@@ -1,10 +1,11 @@
+import React from 'react';
 import type { DeneyKaydi } from '../../models/Deney.tsx';
 
 interface RaporlaViewProps {
   kayitlariListesi: DeneyKaydi[];
 }
 
-function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
+const RaporlaView: React.FC<RaporlaViewProps> = ({ kayitlariListesi }) => {
   return (
     <div style={{ padding: '32px', fontFamily: 'inherit', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
       <div style={{ marginBottom: '32px', textAlign: 'left', borderBottom: '2px solid #dc2626', paddingBottom: '16px' }}>
@@ -78,6 +79,6 @@ function RaporlaView({ kayitlariListesi }: RaporlaViewProps) {
       </div>
     </div>
   );
-}
+};
 
 export default RaporlaView;
