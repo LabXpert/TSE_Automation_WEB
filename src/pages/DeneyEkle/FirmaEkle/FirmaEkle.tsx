@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import FirmaEkleView from './FirmaEkleView';
 
+interface ApiCompany {
+  id: number;
+  name: string;
+  vat_number: string;
+  contact_person: string;
+  phone: string;
+  address: string;
+  email: string;
+  created_at: string;
+}
+
 const FirmaEkle: React.FC = () => {
   // Form state'leri
   const [formData, setFormData] = useState({
@@ -13,7 +24,7 @@ const FirmaEkle: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [firmaListesi, setFirmaListesi] = useState<any[]>([]);
+  const [firmaListesi, setFirmaListesi] = useState<ApiCompany[]>([]);
 
   // Düzenleme modu state'leri
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
@@ -137,8 +148,8 @@ const FirmaEkle: React.FC = () => {
             }
             setFormData({
               ad: firma.name,
-              vergiNo: firma.tax_no || '',
-              yetkili: firma.contact_name || '',
+              vergiNo: firma.vat_number || '',
+              yetkili: firma.contact_person || '',
               telefon: firma.phone || '',
               adres: firma.address || '',
               email: firma.email || ''

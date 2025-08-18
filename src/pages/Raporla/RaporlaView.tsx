@@ -7,16 +7,35 @@ interface RaporlaViewProps {
   aramaMetni: string;
   aramaYap: (metin: string) => void;
   aramayiTemizle: () => void;
+  // Tarih filtreleme props
+  baslangicTarihi: string;
+  bitisTarihi: string;
+  tarihPaneliAcik: boolean;
+  setBaslangicTarihi: (tarih: string) => void;
+  setBitisTarihi: (tarih: string) => void;
+  setTarihPaneliAcik: (acik: boolean) => void;
+  hizliTarihSec: (gun: number) => void;
+  tarihFiltreleriniTemizle: () => void;
 }
 
 const RaporlaView: React.FC<RaporlaViewProps> = ({ 
   kayitlariListesi, 
   aramaMetni, 
   aramaYap, 
-  aramayiTemizle 
+  aramayiTemizle,
+  // Tarih filtreleme props
+  baslangicTarihi,
+  bitisTarihi,
+  tarihPaneliAcik,
+  setBaslangicTarihi,
+  setBitisTarihi,
+  setTarihPaneliAcik,
+  hizliTarihSec,
+  tarihFiltreleriniTemizle
 }) => {
   return (
     <div style={{ padding: '32px', fontFamily: 'inherit', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
+      {/* Page Header */}
       <div style={{ marginBottom: '32px', textAlign: 'left', borderBottom: '2px solid #dc2626', paddingBottom: '16px' }}>
         <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.025em' }}>Deney Raporları</h1>
         <p style={{ color: '#64748b', fontSize: '16px', margin: 0 }}>Kayıtlı tüm deney verilerini görüntüleyin</p>
@@ -37,6 +56,7 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
           gap: '16px',
           flexWrap: 'wrap'
         }}>
+          {/* Arama Kutusu */}
           <div style={{ 
             flex: '1',
             minWidth: '300px',
@@ -116,6 +136,265 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
               </button>
             )}
           </div>
+
+          {/* Tarih Filtreleme Butonu */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setTarihPaneliAcik(!tarihPaneliAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: (baslangicTarihi || bitisTarihi) ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${(baslangicTarihi || bitisTarihi) ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: (baslangicTarihi || bitisTarihi) ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                if (!baslangicTarihi && !bitisTarihi) {
+                  e.currentTarget.style.borderColor = '#dc2626';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!baslangicTarihi && !bitisTarihi) {
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
+              </svg>
+              {(baslangicTarihi || bitisTarihi) ? 'Tarih Filtresi Aktif' : 'Tarih Filtresi'}
+              <svg 
+                width="12" 
+                height="12" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                style={{ 
+                  transition: 'transform 0.2s ease',
+                  transform: tarihPaneliAcik ? 'rotate(180deg)' : 'rotate(0deg)'
+                }}
+              >
+                <path d="M7 10L12 15L17 10H7Z"/>
+              </svg>
+            </button>
+
+            {/* Tarih Filtreleme Paneli */}
+            {tarihPaneliAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: '0',
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                zIndex: 1000,
+                minWidth: '350px'
+              }}>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#0f172a',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
+                  </svg>
+                  Tarih Aralığı Seçin
+                </div>
+
+                {/* Hızlı Seçim Butonları */}
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  marginBottom: '16px',
+                  flexWrap: 'wrap'
+                }}>
+                  {[
+                    { label: 'Son 7 Gün', gun: 7 },
+                    { label: 'Son 15 Gün', gun: 15 },
+                    { label: 'Son 30 Gün', gun: 30 },
+                    { label: 'Son 90 Gün', gun: 90 }
+                  ].map(({ label, gun }) => (
+                    <button
+                      key={gun}
+                      onClick={() => hizliTarihSec(gun)}
+                      style={{
+                        padding: '6px 12px',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        color: '#374151',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#dc2626';
+                        e.currentTarget.style.color = '#ffffff';
+                        e.currentTarget.style.borderColor = '#dc2626';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#f8fafc';
+                        e.currentTarget.style.color = '#374151';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Manuel Tarih Seçimi */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '12px',
+                  marginBottom: '16px'
+                }}>
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '4px'
+                    }}>
+                      Başlangıç Tarihi
+                    </label>
+                    <input
+                      type="date"
+                      value={baslangicTarihi}
+                      onChange={(e) => setBaslangicTarihi(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        backgroundColor: '#ffffff',
+                        color: '#374151',
+                        outline: 'none',
+                        transition: 'border-color 0.2s ease',
+                        boxSizing: 'border-box'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#dc2626';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#e2e8f0';
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '4px'
+                    }}>
+                      Bitiş Tarihi
+                    </label>
+                    <input
+                      type="date"
+                      value={bitisTarihi}
+                      onChange={(e) => setBitisTarihi(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        backgroundColor: '#ffffff',
+                        color: '#374151',
+                        outline: 'none',
+                        transition: 'border-color 0.2s ease',
+                        boxSizing: 'border-box'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#dc2626';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#e2e8f0';
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Panel Butonları */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <button
+                    onClick={tarihFiltreleriniTemizle}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  
+                  <button
+                    onClick={() => setTarihPaneliAcik(false)}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Arama önerileri */}
@@ -138,7 +417,15 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
           </div>
         )}
       </div>
-      <div className="card">
+
+      {/* Veri Tablosu */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e2e8f0'
+      }}>
         <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
             <path d="M3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5ZM5 5H19V19H5V5ZM7 7V9H17V7H7ZM7 11V13H17V11H7ZM7 15V17H14V15H7Z"/>

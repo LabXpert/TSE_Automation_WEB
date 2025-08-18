@@ -15,7 +15,7 @@ const KullaniciEkle: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [kullaniciListesi, setKullaniciListesi] = useState<any[]>([]);
+  const [kullaniciListesi, setKullaniciListesi] = useState<{id: number; username: string; first_name: string; last_name: string; email: string; role: 'admin' | 'user'; created_at: string; unvan?: string; phone?: string}[]>([]);
 
   // Düzenleme modu state'leri
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
@@ -110,7 +110,7 @@ const KullaniciEkle: React.FC = () => {
         ? `/api/users/${duzenlenecekKullaniciId}`
         : '/api/users';
         
-      const body: any = {
+      const body: Record<string, unknown> = {
         username: formData.username.trim(),
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim(),
@@ -164,7 +164,7 @@ const KullaniciEkle: React.FC = () => {
       last_name: kullanici.last_name || '',
       email: kullanici.email || '',
       password: '', // Don't populate password for security
-      role: kullanici.role || 'user',
+      role: (kullanici.role as 'admin' | 'user') || 'user',
       unvan: kullanici.unvan || '',
       phone: kullanici.phone || ''
     });

@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import PersonelEkleView from './PersonelEkleView.tsx';
 
+interface ApiPersonnel {
+  id: number;
+  first_name: string;
+  last_name: string;
+  title: string;
+  created_at: string;
+}
+
 const PersonelEkle: React.FC = () => {
   // Form state'leri
   const [formData, setFormData] = useState({
@@ -10,7 +18,7 @@ const PersonelEkle: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [personelListesi, setPersonelListesi] = useState<any[]>([]);
+  const [personelListesi, setPersonelListesi] = useState<ApiPersonnel[]>([]);
 
   // Düzenleme modu state'leri
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);

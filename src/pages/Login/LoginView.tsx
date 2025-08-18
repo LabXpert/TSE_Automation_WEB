@@ -1,12 +1,11 @@
 import React from 'react';
 
 interface LoginViewProps {
-  // props interface'i buraya
+  // Login sayfası props'ları gelecek
+  className?: string;
 }
 
-const LoginView: React.FC<LoginViewProps> = ({
-  // destructure props buraya
-}) => {
+const LoginView: React.FC<LoginViewProps> = () => {
   return (
     <div style={{ 
       padding: '32px', 

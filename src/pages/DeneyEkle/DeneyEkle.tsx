@@ -8,6 +8,28 @@ import type { Firma } from '../../models/Firma.tsx';
 import type { Personel } from '../../models/Personel.tsx';
 import type { DeneyTuru } from '../../models/DeneyTurleri.tsx';
 
+// API response tip tanımları
+interface ApiApplication {
+  id: number;
+  companies?: { name: string };
+  application_no: string;
+  application_date: string;
+  certification_type: string;
+  test_count: number;
+  created_at: string;
+  tests?: ApiTest[];
+}
+
+interface ApiTest {
+  id: number;
+  experiment_type_name?: string;
+  personnel_first_name?: string;
+  personnel_last_name?: string;
+  is_accredited: boolean;
+  uygunluk: boolean;
+  unit_price?: number;
+}
+
 function DeneyEkle() {
   const [deneySayisi, setDeneySeayisi] = useState(1);
   const [belgelendirmeTuru, setBelgelendirmeTuru] = useState<'özel' | 'belgelendirme'>('özel');
@@ -32,7 +54,7 @@ function DeneyEkle() {
       .then((res) => res.json())
       .then((data) => {
         // API'den gelen veriyi arayüzde beklenen formata dönüştür
-  const mapped = data.map((app: any) => ({
+  const mapped = data.map((app: ApiApplication) => ({
           id: app.id,
           firmaAdi: app.companies?.name || '',
           basvuruNo: app.application_no,
@@ -94,7 +116,7 @@ function DeneyEkle() {
       }
     }
     setDeneyler(yeniDeneyler);
-  }, [deneySayisi, duzenlemeModu]);
+  }, [deneySayisi]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const deneyGuncelle = (index: number, field: keyof Deney, value: string | boolean) => {
     const guncelDeneyler = [...deneyler];
@@ -177,7 +199,7 @@ function DeneyEkle() {
       fetch('/api/applications/recent')
         .then(res => res.json())
         .then(data => {
-          const mapped = data.map((app: any) => ({
+          const mapped = data.map((app: ApiApplication) => ({
             id: app.id,
             firmaAdi: app.companies?.name || '',
             basvuruNo: app.application_no,
@@ -198,7 +220,7 @@ function DeneyEkle() {
     try {
       const response = await fetch(`/api/applications/all`);
       const allApps = await response.json();
-      const app = allApps.find((a: any) => a.id === id);
+      const app = allApps.find((a: ApiApplication) => a.id === Number(id));
       if (!app) {
         alert('Kayıt bulunamadı!');
         return;
@@ -209,7 +231,7 @@ function DeneyEkle() {
       setBasvuruTarihi(app.application_date ? new Date(app.application_date).toISOString().slice(0, 10) : '');
       setBelgelendirmeTuru(app.certification_type);
       setDeneySeayisi(app.test_count);
-      setDeneyler((app.tests || []).map((test: any) => ({
+      setDeneyler((app.tests || []).map((test: ApiTest) => ({
         id: test.id,
         deneyTuru: test.experiment_type_name || '',
         sorumluPersonel: test.personnel_first_name && test.personnel_last_name ? 
@@ -245,7 +267,7 @@ function DeneyEkle() {
         fetch('/api/applications/recent')
           .then(res => res.json())
           .then(data => {
-            const mapped = data.map((app: any) => ({
+            const mapped = data.map((app: ApiApplication) => ({
               id: app.id,
               firmaAdi: app.companies?.name || '',
               basvuruNo: app.application_no,
@@ -337,7 +359,7 @@ function DeneyEkle() {
           fetch('/api/applications/recent')
             .then(res => res.json())
             .then(data => {
-              const mapped = data.map((app: any) => ({
+              const mapped = data.map((app: ApiApplication) => ({
                 id: app.id,
                 firmaAdi: app.companies?.name || '',
                 basvuruNo: app.application_no,
