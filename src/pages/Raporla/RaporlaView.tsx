@@ -41,6 +41,15 @@ interface RaporlaViewProps {
   durumFiltreleriniTemizle: () => void;
   // Excel çıktısı props
   exceleCikart: () => void;
+  // Pagination props
+  aktifSayfa: number;
+  toplamSayfaSayisi: number;
+  tumTestSayisi: number;
+  sayfaBasiKayit: number;
+  sayfayaDegistir: (sayfa: number) => void;
+  oncekiSayfa: () => void;
+  sonrakiSayfa: () => void;
+  setSayfaBasiKayit: (miktar: number) => void;
 }
 
 const RaporlaView: React.FC<RaporlaViewProps> = ({ 
@@ -81,7 +90,16 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
   tumDurumlarıSec,
   durumFiltreleriniTemizle,
   // Excel çıktısı props
-  exceleCikart
+  exceleCikart,
+  // Pagination props
+  aktifSayfa,
+  toplamSayfaSayisi,
+  tumTestSayisi,
+  sayfaBasiKayit,
+  sayfayaDegistir,
+  oncekiSayfa,
+  sonrakiSayfa,
+  setSayfaBasiKayit
 }) => {
   return (
     <div style={{ padding: '32px', fontFamily: 'inherit', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
@@ -1246,8 +1264,10 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '8px' }}>
             <path d="M3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5ZM5 5H19V19H5V5ZM7 7V9H17V7H7ZM7 11V13H17V11H7ZM7 15V17H14V15H7Z"/>
           </svg>
-          Tüm Kayıtlar
-          <span style={{ fontSize: '14px', color: '#64748b', fontWeight: '400' }}>({kayitlariListesi.length} kayıt)</span>
+          Test Kayıtları
+          <span style={{ fontSize: '14px', color: '#64748b', fontWeight: '400' }}>
+            ({tumTestSayisi} toplam test • Sayfa {aktifSayfa}/{toplamSayfaSayisi} • {sayfaBasiKayit}'li gösterim)
+          </span>
         </h2>
         {kayitlariListesi.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#64748b', fontSize: '16px' }}>
@@ -1306,14 +1326,247 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
           </div>
         )}
 
-        {/* Excel Çıktısı Butonu */}
+        {/* Pagination ve Excel Butonları */}
         {kayitlariListesi.length > 0 && (
           <div style={{
             display: 'flex',
-            justifyContent: 'flex-end',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             marginTop: '20px',
-            paddingRight: '20px'
+            paddingTop: '20px',
+            borderTop: '1px solid #e2e8f0',
+            flexWrap: 'wrap',
+            gap: '16px'
           }}>
+            {/* Pagination Kontrolleri */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              flex: '1'
+            }}>
+              {/* Sayfa başı kayıt seçimi */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span style={{
+                  fontSize: '14px',
+                  color: '#64748b',
+                  fontWeight: '500'
+                }}>
+                  Göster:
+                </span>
+                <select
+                  value={sayfaBasiKayit}
+                  onChange={(e) => setSayfaBasiKayit(Number(e.target.value))}
+                  style={{
+                    padding: '6px 12px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#ffffff',
+                    color: '#374151',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+
+              {/* Sayfa navigasyon butonları */}
+              {toplamSayfaSayisi > 1 && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  {/* İlk sayfa butonu */}
+                  <button
+                    onClick={() => sayfayaDegistir(1)}
+                    disabled={aktifSayfa === 1}
+                    style={{
+                      padding: '8px 12px',
+                      background: aktifSayfa === 1 ? '#f1f5f9' : '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: aktifSayfa === 1 ? '#94a3b8' : '#374151',
+                      cursor: aktifSayfa === 1 ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (aktifSayfa !== 1) {
+                        e.currentTarget.style.borderColor = '#dc2626';
+                        e.currentTarget.style.color = '#dc2626';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (aktifSayfa !== 1) {
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                        e.currentTarget.style.color = '#374151';
+                      }
+                    }}
+                  >
+                    ⇤ İlk
+                  </button>
+
+                  {/* Önceki sayfa butonu */}
+                  <button
+                    onClick={oncekiSayfa}
+                    disabled={aktifSayfa === 1}
+                    style={{
+                      padding: '8px 12px',
+                      background: aktifSayfa === 1 ? '#f1f5f9' : '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: aktifSayfa === 1 ? '#94a3b8' : '#374151',
+                      cursor: aktifSayfa === 1 ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (aktifSayfa !== 1) {
+                        e.currentTarget.style.borderColor = '#dc2626';
+                        e.currentTarget.style.color = '#dc2626';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (aktifSayfa !== 1) {
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                        e.currentTarget.style.color = '#374151';
+                      }
+                    }}
+                  >
+                    ← Önceki
+                  </button>
+
+                  {/* Sayfa numaraları */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    {Array.from({ length: Math.min(5, toplamSayfaSayisi) }, (_, i) => {
+                      let sayfaNo;
+                      if (toplamSayfaSayisi <= 5) {
+                        sayfaNo = i + 1;
+                      } else if (aktifSayfa <= 3) {
+                        sayfaNo = i + 1;
+                      } else if (aktifSayfa >= toplamSayfaSayisi - 2) {
+                        sayfaNo = toplamSayfaSayisi - 4 + i;
+                      } else {
+                        sayfaNo = aktifSayfa - 2 + i;
+                      }
+
+                      return (
+                        <button
+                          key={sayfaNo}
+                          onClick={() => sayfayaDegistir(sayfaNo)}
+                          style={{
+                            padding: '8px 12px',
+                            background: aktifSayfa === sayfaNo ? '#dc2626' : '#ffffff',
+                            border: `1px solid ${aktifSayfa === sayfaNo ? '#dc2626' : '#e2e8f0'}`,
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: aktifSayfa === sayfaNo ? '#ffffff' : '#374151',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            minWidth: '36px'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (aktifSayfa !== sayfaNo) {
+                              e.currentTarget.style.borderColor = '#dc2626';
+                              e.currentTarget.style.color = '#dc2626';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (aktifSayfa !== sayfaNo) {
+                              e.currentTarget.style.borderColor = '#e2e8f0';
+                              e.currentTarget.style.color = '#374151';
+                            }
+                          }}
+                        >
+                          {sayfaNo}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Sonraki sayfa butonu */}
+                  <button
+                    onClick={sonrakiSayfa}
+                    disabled={aktifSayfa === toplamSayfaSayisi}
+                    style={{
+                      padding: '8px 12px',
+                      background: aktifSayfa === toplamSayfaSayisi ? '#f1f5f9' : '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: aktifSayfa === toplamSayfaSayisi ? '#94a3b8' : '#374151',
+                      cursor: aktifSayfa === toplamSayfaSayisi ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (aktifSayfa !== toplamSayfaSayisi) {
+                        e.currentTarget.style.borderColor = '#dc2626';
+                        e.currentTarget.style.color = '#dc2626';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (aktifSayfa !== toplamSayfaSayisi) {
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                        e.currentTarget.style.color = '#374151';
+                      }
+                    }}
+                  >
+                    Sonraki →
+                  </button>
+
+                  {/* Son sayfa butonu */}
+                  <button
+                    onClick={() => sayfayaDegistir(toplamSayfaSayisi)}
+                    disabled={aktifSayfa === toplamSayfaSayisi}
+                    style={{
+                      padding: '8px 12px',
+                      background: aktifSayfa === toplamSayfaSayisi ? '#f1f5f9' : '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: aktifSayfa === toplamSayfaSayisi ? '#94a3b8' : '#374151',
+                      cursor: aktifSayfa === toplamSayfaSayisi ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (aktifSayfa !== toplamSayfaSayisi) {
+                        e.currentTarget.style.borderColor = '#dc2626';
+                        e.currentTarget.style.color = '#dc2626';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (aktifSayfa !== toplamSayfaSayisi) {
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                        e.currentTarget.style.color = '#374151';
+                      }
+                    }}
+                  >
+                    Son ⇥
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Excel Çıktısı Butonu */}
             <button
               onClick={exceleCikart}
               style={{
@@ -1346,7 +1599,7 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                 <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                 <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
               </svg>
-              Excel'e Çıkart ({kayitlariListesi.reduce((toplam, kayit) => toplam + kayit.deneyler.length, 0)} kayıt)
+              Excel'e Çıkart ({tumTestSayisi} test)
             </button>
           </div>
         )}

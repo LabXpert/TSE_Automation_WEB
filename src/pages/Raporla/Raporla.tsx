@@ -49,6 +49,10 @@ const Raporla: React.FC = () => {
   const [secilenDurumlar, setSecilenDurumlar] = useState<string[]>([]);
   const [durumPaneliAcik, setDurumPaneliAcik] = useState<boolean>(false);
 
+  // Pagination state'leri
+  const [sayfaBasiKayit, setSayfaBasiKayit] = useState<number>(25);
+  const [aktifSayfa, setAktifSayfa] = useState<number>(1);
+
   // Sayfa yüklendiğinde veritabanından kayıtları getir
   useEffect(() => {
     fetch('/api/applications/all')
@@ -389,7 +393,66 @@ const Raporla: React.FC = () => {
     }
 
     setFiltrelenmisKayitlar(sonuc);
+    // Filtre değiştiğinde ilk sayfaya dön
+    setAktifSayfa(1);
   }, [aramaMetni, baslangicTarihi, bitisTarihi, kayitlariListesi, secilenPersoneller, secilenDeneyTurleri, secilenDurumlar]);
+
+  // Pagination hesaplamaları
+  const tumTestSayisi = filtrelenmisKayitlar.reduce((toplam, kayit) => toplam + kayit.deneyler.length, 0);
+  const toplamSayfaSayisi = Math.ceil(tumTestSayisi / sayfaBasiKayit);
+  
+  // Mevcut sayfadaki test kayıtlarını hesapla
+  const sayfaliKayitlar = () => {
+    const baslangicIndeksi = (aktifSayfa - 1) * sayfaBasiKayit;
+    const bitisIndeksi = baslangicIndeksi + sayfaBasiKayit;
+    
+    let testSayaci = 0;
+    const sonuc: DeneyKaydi[] = [];
+    
+    for (const kayit of filtrelenmisKayitlar) {
+      const yeniKayit: DeneyKaydi = {
+        ...kayit,
+        deneyler: []
+      };
+      
+      for (const deney of kayit.deneyler) {
+        if (testSayaci >= baslangicIndeksi && testSayaci < bitisIndeksi) {
+          yeniKayit.deneyler.push(deney);
+        }
+        testSayaci++;
+        
+        if (testSayaci >= bitisIndeksi) break;
+      }
+      
+      if (yeniKayit.deneyler.length > 0) {
+        yeniKayit.deneySayisi = yeniKayit.deneyler.length;
+        sonuc.push(yeniKayit);
+      }
+      
+      if (testSayaci >= bitisIndeksi) break;
+    }
+    
+    return sonuc;
+  };
+
+  // Sayfa değiştirme fonksiyonları
+  const sayfayaDegistir = (yeniSayfa: number) => {
+    if (yeniSayfa >= 1 && yeniSayfa <= toplamSayfaSayisi) {
+      setAktifSayfa(yeniSayfa);
+    }
+  };
+
+  const oncekiSayfa = () => {
+    if (aktifSayfa > 1) {
+      setAktifSayfa(aktifSayfa - 1);
+    }
+  };
+
+  const sonrakiSayfa = () => {
+    if (aktifSayfa < toplamSayfaSayisi) {
+      setAktifSayfa(aktifSayfa + 1);
+    }
+  };
 
   // Filtreler değiştiğinde otomatik uygula
   useEffect(() => {
@@ -398,7 +461,7 @@ const Raporla: React.FC = () => {
 
   return (
     <RaporlaView 
-      kayitlariListesi={filtrelenmisKayitlar}
+      kayitlariListesi={sayfaliKayitlar()}
       tumKayitSayisi={kayitlariListesi.length}
       aramaMetni={aramaMetni}
       aramaYap={aramaYap}
@@ -437,6 +500,15 @@ const Raporla: React.FC = () => {
       durumFiltreleriniTemizle={durumFiltreleriniTemizle}
       // Excel çıktısı props
       exceleCikart={exceleCikart}
+      // Pagination props
+      aktifSayfa={aktifSayfa}
+      toplamSayfaSayisi={toplamSayfaSayisi}
+      tumTestSayisi={tumTestSayisi}
+      sayfaBasiKayit={sayfaBasiKayit}
+      sayfayaDegistir={sayfayaDegistir}
+      oncekiSayfa={oncekiSayfa}
+      sonrakiSayfa={sonrakiSayfa}
+      setSayfaBasiKayit={setSayfaBasiKayit}
     />
   );
 };
