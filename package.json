@@ -8,15 +8,14 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-
     "server": "npm --prefix server run dev",
     "server:build": "npm --prefix server run build",
     "server:start": "npm --prefix server run start",
-
     "dev": "concurrently -n WEB,API -c auto \"npm:web\" \"npm:server\"",
     "start:full": "concurrently -n WEB,API -c auto \"npm:preview\" \"npm:server:start\""
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-pro-sidebar": "^1.1.0",
