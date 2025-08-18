@@ -327,6 +327,38 @@ function SidebarComponent() {
             </MenuItem>
 
             <MenuItem 
+              active={location.pathname === '/personel-ekle'}
+              component={<Link to="/personel-ekle" />}
+            >
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: collapsed ? '0' : '12px' 
+              }}>
+                <span style={{ 
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '20px',
+                  height: '20px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </span>
+                {!collapsed && (
+                  <span style={{ 
+                    letterSpacing: '-0.01em',
+                    lineHeight: '1.4'
+                  }}>
+                    Personel Yönetimi
+                  </span>
+                )}
+              </div>
+            </MenuItem>
+
+            <MenuItem 
               active={location.pathname === '/raporla'}
               component={<Link to="/raporla" />}
             >
