@@ -652,7 +652,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                 display: 'grid',
                 gap: '12px'
               }}>
-                {firmaListesi.slice().reverse().map((firma) => (
+                {firmaListesi.slice().reverse().map((firma, index) => (
                   <div key={firma.id} style={{
                     marginBottom: '16px',
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -687,11 +687,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                           fontWeight: '600',
                           flexShrink: 0
                         }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
-                            <path d="M2 17L12 22L22 17"/>
-                            <path d="M2 12L12 17L22 12"/>
-                          </svg>
+                          {index + 1}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <h4 style={{ 
