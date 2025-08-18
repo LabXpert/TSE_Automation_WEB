@@ -34,6 +34,20 @@ const Raporla: React.FC = () => {
   const [bitisTarihi, setBitisTarihi] = useState<string>('');
   const [tarihPaneliAcik, setTarihPaneliAcik] = useState<boolean>(false);
 
+  // Personel filtreleme state'leri
+  const [secilenPersoneller, setSecilenPersoneller] = useState<string[]>([]);
+  const [personelPaneliAcik, setPersonelPaneliAcik] = useState<boolean>(false);
+  const [tumPersoneller, setTumPersoneller] = useState<string[]>([]);
+
+  // Deney türü filtreleme state'leri
+  const [secilenDeneyTurleri, setSecilenDeneyTurleri] = useState<string[]>([]);
+  const [deneyTuruPaneliAcik, setDeneyTuruPaneliAcik] = useState<boolean>(false);
+  const [tumDeneyTurleri, setTumDeneyTurleri] = useState<string[]>([]);
+
+  // Durum filtreleme state'leri (Uygunluk + Akredite)
+  const [secilenDurumlar, setSecilenDurumlar] = useState<string[]>([]);
+  const [durumPaneliAcik, setDurumPaneliAcik] = useState<boolean>(false);
+
   // Sayfa yüklendiğinde veritabanından kayıtları getir
   useEffect(() => {
     fetch('/api/applications/all')
@@ -60,6 +74,24 @@ const Raporla: React.FC = () => {
         }));
         setKayitlariListesi(mapped);
         setFiltrelenmisKayitlar(mapped); // İlk başta tüm kayıtları göster
+        
+        // Benzersiz personel ve deney türlerini topla
+        const personelSet = new Set<string>();
+        const deneyTuruSet = new Set<string>();
+        
+        mapped.forEach((kayit: DeneyKaydi) => {
+          kayit.deneyler.forEach((deney) => {
+            if (deney.sorumluPersonel) {
+              personelSet.add(deney.sorumluPersonel);
+            }
+            if (deney.deneyTuru) {
+              deneyTuruSet.add(deney.deneyTuru);
+            }
+          });
+        });
+        
+        setTumPersoneller(Array.from(personelSet).sort());
+        setTumDeneyTurleri(Array.from(deneyTuruSet).sort());
       })
       .catch((err) => {
         console.error('Kayıtlar çekilirken hata:', err);
@@ -96,7 +128,61 @@ const Raporla: React.FC = () => {
     setTarihPaneliAcik(false);
   };
 
-  // Birleşik filtreleme fonksiyonu (arama + tarih)
+  // Personel filtreleme fonksiyonları
+  const personelSec = (personel: string) => {
+    setSecilenPersoneller(prev => 
+      prev.includes(personel) 
+        ? prev.filter(p => p !== personel)
+        : [...prev, personel]
+    );
+  };
+
+  const tumPersonelleriSec = () => {
+    setSecilenPersoneller(tumPersoneller);
+  };
+
+  const personelFiltreleriniTemizle = () => {
+    setSecilenPersoneller([]);
+    setPersonelPaneliAcik(false);
+  };
+
+  // Deney türü filtreleme fonksiyonları
+  const deneyTuruSec = (deneyTuru: string) => {
+    setSecilenDeneyTurleri(prev => 
+      prev.includes(deneyTuru) 
+        ? prev.filter(d => d !== deneyTuru)
+        : [...prev, deneyTuru]
+    );
+  };
+
+  const tumDeneyTurleriniSec = () => {
+    setSecilenDeneyTurleri(tumDeneyTurleri);
+  };
+
+  const deneyTuruFiltreleriniTemizle = () => {
+    setSecilenDeneyTurleri([]);
+    setDeneyTuruPaneliAcik(false);
+  };
+
+  // Durum filtreleme fonksiyonları (Uygunluk + Akredite birleşik)
+  const durumSec = (durum: string) => {
+    setSecilenDurumlar(prev => 
+      prev.includes(durum) 
+        ? prev.filter(d => d !== durum)
+        : [...prev, durum]
+    );
+  };
+
+  const tumDurumlarıSec = () => {
+    setSecilenDurumlar(['Uygun', 'Uygun Değil', 'Akredite', 'Akredite Değil']);
+  };
+
+  const durumFiltreleriniTemizle = () => {
+    setSecilenDurumlar([]);
+    setDurumPaneliAcik(false);
+  };
+
+  // Birleşik filtreleme fonksiyonu (arama + tarih + personel + deney türü + durum)
   const filtreleriUygula = useCallback(() => {
     let sonuc = kayitlariListesi;
 
@@ -112,6 +198,38 @@ const Raporla: React.FC = () => {
         
         return true;
       });
+    }
+
+    // Personel filtresi uygula
+    if (secilenPersoneller.length > 0) {
+      sonuc = sonuc.map(kayit => ({
+        ...kayit,
+        deneyler: kayit.deneyler.filter(deney => 
+          secilenPersoneller.includes(deney.sorumluPersonel)
+        )
+      })).filter(kayit => kayit.deneyler.length > 0);
+    }
+
+    // Deney türü filtresi uygula
+    if (secilenDeneyTurleri.length > 0) {
+      sonuc = sonuc.map(kayit => ({
+        ...kayit,
+        deneyler: kayit.deneyler.filter(deney => 
+          secilenDeneyTurleri.includes(deney.deneyTuru)
+        )
+      })).filter(kayit => kayit.deneyler.length > 0);
+    }
+
+    // Durum filtresi uygula (Uygunluk + Akredite birleşik)
+    if (secilenDurumlar.length > 0) {
+      sonuc = sonuc.map(kayit => ({
+        ...kayit,
+        deneyler: kayit.deneyler.filter(deney => {
+          const uygunlukDurumu = deney.uygunluk ? 'Uygun' : 'Uygun Değil';
+          const akrediteDurumu = deney.akredite ? 'Akredite' : 'Akredite Değil';
+          return secilenDurumlar.includes(uygunlukDurumu) || secilenDurumlar.includes(akrediteDurumu);
+        })
+      })).filter(kayit => kayit.deneyler.length > 0);
     }
 
     // Sonra arama filtresi uygula
@@ -147,7 +265,7 @@ const Raporla: React.FC = () => {
     }
 
     setFiltrelenmisKayitlar(sonuc);
-  }, [aramaMetni, baslangicTarihi, bitisTarihi, kayitlariListesi]);
+  }, [aramaMetni, baslangicTarihi, bitisTarihi, kayitlariListesi, secilenPersoneller, secilenDeneyTurleri, secilenDurumlar]);
 
   // Filtreler değiştiğinde otomatik uygula
   useEffect(() => {
@@ -170,6 +288,29 @@ const Raporla: React.FC = () => {
       setTarihPaneliAcik={setTarihPaneliAcik}
       hizliTarihSec={hizliTarihSec}
       tarihFiltreleriniTemizle={tarihFiltreleriniTemizle}
+      // Personel filtreleme props
+      secilenPersoneller={secilenPersoneller}
+      personelPaneliAcik={personelPaneliAcik}
+      tumPersoneller={tumPersoneller}
+      setPersonelPaneliAcik={setPersonelPaneliAcik}
+      personelSec={personelSec}
+      tumPersonelleriSec={tumPersonelleriSec}
+      personelFiltreleriniTemizle={personelFiltreleriniTemizle}
+      // Deney türü filtreleme props
+      secilenDeneyTurleri={secilenDeneyTurleri}
+      deneyTuruPaneliAcik={deneyTuruPaneliAcik}
+      tumDeneyTurleri={tumDeneyTurleri}
+      setDeneyTuruPaneliAcik={setDeneyTuruPaneliAcik}
+      deneyTuruSec={deneyTuruSec}
+      tumDeneyTurleriniSec={tumDeneyTurleriniSec}
+      deneyTuruFiltreleriniTemizle={deneyTuruFiltreleriniTemizle}
+      // Durum filtreleme props (Uygunluk + Akredite birleşik)
+      secilenDurumlar={secilenDurumlar}
+      durumPaneliAcik={durumPaneliAcik}
+      setDurumPaneliAcik={setDurumPaneliAcik}
+      durumSec={durumSec}
+      tumDurumlarıSec={tumDurumlarıSec}
+      durumFiltreleriniTemizle={durumFiltreleriniTemizle}
     />
   );
 };

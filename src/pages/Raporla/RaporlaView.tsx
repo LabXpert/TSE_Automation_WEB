@@ -16,6 +16,29 @@ interface RaporlaViewProps {
   setTarihPaneliAcik: (acik: boolean) => void;
   hizliTarihSec: (gun: number) => void;
   tarihFiltreleriniTemizle: () => void;
+  // Personel filtreleme props
+  secilenPersoneller: string[];
+  personelPaneliAcik: boolean;
+  tumPersoneller: string[];
+  setPersonelPaneliAcik: (acik: boolean) => void;
+  personelSec: (personel: string) => void;
+  tumPersonelleriSec: () => void;
+  personelFiltreleriniTemizle: () => void;
+  // Deney türü filtreleme props
+  secilenDeneyTurleri: string[];
+  deneyTuruPaneliAcik: boolean;
+  tumDeneyTurleri: string[];
+  setDeneyTuruPaneliAcik: (acik: boolean) => void;
+  deneyTuruSec: (deneyTuru: string) => void;
+  tumDeneyTurleriniSec: () => void;
+  deneyTuruFiltreleriniTemizle: () => void;
+  // Durum filtreleme props (Uygunluk + Akredite birleşik)
+  secilenDurumlar: string[];
+  durumPaneliAcik: boolean;
+  setDurumPaneliAcik: (acik: boolean) => void;
+  durumSec: (durum: string) => void;
+  tumDurumlarıSec: () => void;
+  durumFiltreleriniTemizle: () => void;
 }
 
 const RaporlaView: React.FC<RaporlaViewProps> = ({ 
@@ -31,7 +54,30 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
   setBitisTarihi,
   setTarihPaneliAcik,
   hizliTarihSec,
-  tarihFiltreleriniTemizle
+  tarihFiltreleriniTemizle,
+  // Personel filtreleme props
+  secilenPersoneller,
+  personelPaneliAcik,
+  tumPersoneller,
+  setPersonelPaneliAcik,
+  personelSec,
+  tumPersonelleriSec,
+  personelFiltreleriniTemizle,
+  // Deney türü filtreleme props
+  secilenDeneyTurleri,
+  deneyTuruPaneliAcik,
+  tumDeneyTurleri,
+  setDeneyTuruPaneliAcik,
+  deneyTuruSec,
+  tumDeneyTurleriniSec,
+  deneyTuruFiltreleriniTemizle,
+  // Durum filtreleme props (Uygunluk + Akredite birleşik)
+  secilenDurumlar,
+  durumPaneliAcik,
+  setDurumPaneliAcik,
+  durumSec,
+  tumDurumlarıSec,
+  durumFiltreleriniTemizle
 }) => {
   return (
     <div style={{ padding: '32px', fontFamily: 'inherit', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
@@ -371,6 +417,772 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                   
                   <button
                     onClick={() => setTarihPaneliAcik(false)}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Personel Filtreleme Butonu */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setPersonelPaneliAcik(!personelPaneliAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenPersoneller.length > 0 ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${secilenPersoneller.length > 0 ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenPersoneller.length > 0 ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                if (secilenPersoneller.length === 0) {
+                  e.currentTarget.style.borderColor = '#dc2626';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (secilenPersoneller.length === 0) {
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 6L13 7H9L7 6L1 7V9L7 8V18H9V12H15V18H17V8L21 9Z"/>
+              </svg>
+              {secilenPersoneller.length > 0 ? `Personel (${secilenPersoneller.length})` : 'Personel Filtresi'}
+              <svg 
+                width="12" 
+                height="12" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                style={{ 
+                  transition: 'transform 0.2s ease',
+                  transform: personelPaneliAcik ? 'rotate(180deg)' : 'rotate(0deg)'
+                }}
+              >
+                <path d="M7 10L12 15L17 10H7Z"/>
+              </svg>
+            </button>
+
+            {/* Personel Filtreleme Paneli */}
+            {personelPaneliAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: '0',
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                zIndex: 1000,
+                minWidth: '300px',
+                maxHeight: '400px',
+                overflow: 'auto'
+              }}>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#0f172a',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 6L13 7H9L7 6L1 7V9L7 8V18H9V12H15V18H17V8L21 9Z"/>
+                  </svg>
+                  Sorumlu Personel Seçin
+                </div>
+
+                {/* Hızlı Seçim Butonları */}
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  marginBottom: '16px',
+                  flexWrap: 'wrap'
+                }}>
+                  <button
+                    onClick={tumPersonelleriSec}
+                    style={{
+                      padding: '6px 12px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.color = '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    Tümünü Seç
+                  </button>
+                </div>
+
+                {/* Personel Listesi */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginBottom: '16px'
+                }}>
+                  {tumPersoneller.map((personel) => (
+                    <label
+                      key={personel}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s ease',
+                        backgroundColor: secilenPersoneller.includes(personel) ? '#fef3c7' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!secilenPersoneller.includes(personel)) {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!secilenPersoneller.includes(personel)) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={secilenPersoneller.includes(personel)}
+                        onChange={() => personelSec(personel)}
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          accentColor: '#dc2626'
+                        }}
+                      />
+                      <span style={{
+                        fontSize: '14px',
+                        color: '#374151',
+                        fontWeight: secilenPersoneller.includes(personel) ? '600' : '400'
+                      }}>
+                        {personel}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Panel Butonları */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <button
+                    onClick={personelFiltreleriniTemizle}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  
+                  <button
+                    onClick={() => setPersonelPaneliAcik(false)}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Deney Türü Filtreleme Butonu */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setDeneyTuruPaneliAcik(!deneyTuruPaneliAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenDeneyTurleri.length > 0 ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${secilenDeneyTurleri.length > 0 ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenDeneyTurleri.length > 0 ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                if (secilenDeneyTurleri.length === 0) {
+                  e.currentTarget.style.borderColor = '#dc2626';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (secilenDeneyTurleri.length === 0) {
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11ZM19 3H18V1H16V3H8V1H6V3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
+              </svg>
+              {secilenDeneyTurleri.length > 0 ? `Deney Türü (${secilenDeneyTurleri.length})` : 'Deney Türü Filtresi'}
+              <svg 
+                width="12" 
+                height="12" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                style={{ 
+                  transition: 'transform 0.2s ease',
+                  transform: deneyTuruPaneliAcik ? 'rotate(180deg)' : 'rotate(0deg)'
+                }}
+              >
+                <path d="M7 10L12 15L17 10H7Z"/>
+              </svg>
+            </button>
+
+            {/* Deney Türü Filtreleme Paneli */}
+            {deneyTuruPaneliAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: '0',
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                zIndex: 1000,
+                minWidth: '300px',
+                maxHeight: '400px',
+                overflow: 'auto'
+              }}>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#0f172a',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11ZM19 3H18V1H16V3H8V1H6V3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
+                  </svg>
+                  Deney Türü Seçin
+                </div>
+
+                {/* Hızlı Seçim Butonları */}
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  marginBottom: '16px',
+                  flexWrap: 'wrap'
+                }}>
+                  <button
+                    onClick={tumDeneyTurleriniSec}
+                    style={{
+                      padding: '6px 12px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.color = '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    Tümünü Seç
+                  </button>
+                </div>
+
+                {/* Deney Türü Listesi */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginBottom: '16px'
+                }}>
+                  {tumDeneyTurleri.map((deneyTuru) => (
+                    <label
+                      key={deneyTuru}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s ease',
+                        backgroundColor: secilenDeneyTurleri.includes(deneyTuru) ? '#fef3c7' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!secilenDeneyTurleri.includes(deneyTuru)) {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!secilenDeneyTurleri.includes(deneyTuru)) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={secilenDeneyTurleri.includes(deneyTuru)}
+                        onChange={() => deneyTuruSec(deneyTuru)}
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          accentColor: '#dc2626'
+                        }}
+                      />
+                      <span style={{
+                        fontSize: '14px',
+                        color: '#374151',
+                        fontWeight: secilenDeneyTurleri.includes(deneyTuru) ? '600' : '400'
+                      }}>
+                        {deneyTuru}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Panel Butonları */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <button
+                    onClick={deneyTuruFiltreleriniTemizle}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  
+                  <button
+                    onClick={() => setDeneyTuruPaneliAcik(false)}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Durum Filtreleme Butonu (Uygunluk + Akredite Birleşik) */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setDurumPaneliAcik(!durumPaneliAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenDurumlar.length > 0 ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${secilenDurumlar.length > 0 ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenDurumlar.length > 0 ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                if (secilenDurumlar.length === 0) {
+                  e.currentTarget.style.borderColor = '#dc2626';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (secilenDurumlar.length === 0) {
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.82L5.82 21L7 14L2 9L8.91 8.26L12 2ZM9 20L7 22L2 17L3.5 15.5L7 19L20.5 5.5L22 7L9 20Z"/>
+              </svg>
+              {secilenDurumlar.length > 0 ? `Durum Filtresi (${secilenDurumlar.length})` : 'Durum Filtresi'}
+              <svg 
+                width="12" 
+                height="12" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+                style={{ 
+                  transition: 'transform 0.2s ease',
+                  transform: durumPaneliAcik ? 'rotate(180deg)' : 'rotate(0deg)'
+                }}
+              >
+                <path d="M7 10L12 15L17 10H7Z"/>
+              </svg>
+            </button>
+
+            {/* Durum Filtreleme Paneli */}
+            {durumPaneliAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: '0',
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                zIndex: 1000,
+                minWidth: '320px',
+                maxHeight: '400px',
+                overflow: 'auto'
+              }}>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#0f172a',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.82L5.82 21L7 14L2 9L8.91 8.26L12 2ZM9 20L7 22L2 17L3.5 15.5L7 19L20.5 5.5L22 7L9 20Z"/>
+                  </svg>
+                  Test Durumu Seçin
+                </div>
+
+                {/* Hızlı Seçim Butonları */}
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  marginBottom: '16px',
+                  flexWrap: 'wrap'
+                }}>
+                  <button
+                    onClick={tumDurumlarıSec}
+                    style={{
+                      padding: '6px 12px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.color = '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    Tümünü Seç
+                  </button>
+                </div>
+
+                {/* Uygunluk Bölümü */}
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#475569',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9 20L7 22L2 17L3.5 15.5L7 19L20.5 5.5L22 7L9 20Z"/>
+                    </svg>
+                    Uygunluk Durumu
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px'
+                  }}>
+                    {['Uygun', 'Uygun Değil'].map((uygunluk) => (
+                      <label
+                        key={uygunluk}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s ease',
+                          backgroundColor: secilenDurumlar.includes(uygunluk) ? '#fef3c7' : 'transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!secilenDurumlar.includes(uygunluk)) {
+                            e.currentTarget.style.backgroundColor = '#f8fafc';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!secilenDurumlar.includes(uygunluk)) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={secilenDurumlar.includes(uygunluk)}
+                          onChange={() => durumSec(uygunluk)}
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            accentColor: '#dc2626'
+                          }}
+                        />
+                        <span style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenDurumlar.includes(uygunluk) ? '600' : '400'
+                        }}>
+                          {uygunluk}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Akredite Bölümü */}
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#475569',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.82L5.82 21L7 14L2 9L8.91 8.26L12 2Z"/>
+                    </svg>
+                    Akreditasyon Durumu
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px'
+                  }}>
+                    {['Akredite', 'Akredite Değil'].map((akredite) => (
+                      <label
+                        key={akredite}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s ease',
+                          backgroundColor: secilenDurumlar.includes(akredite) ? '#fef3c7' : 'transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!secilenDurumlar.includes(akredite)) {
+                            e.currentTarget.style.backgroundColor = '#f8fafc';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!secilenDurumlar.includes(akredite)) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={secilenDurumlar.includes(akredite)}
+                          onChange={() => durumSec(akredite)}
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            accentColor: '#dc2626'
+                          }}
+                        />
+                        <span style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenDurumlar.includes(akredite) ? '600' : '400'
+                        }}>
+                          {akredite}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Panel Butonları */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <button
+                    onClick={durumFiltreleriniTemizle}
+                    style={{
+                      padding: '8px 16px',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  
+                  <button
+                    onClick={() => setDurumPaneliAcik(false)}
                     style={{
                       padding: '8px 16px',
                       background: '#dc2626',
