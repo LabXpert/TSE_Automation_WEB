@@ -1,8 +1,7 @@
 export interface DeneyTuru {
   id: number;
   name: string;
-  base_price: string;
-  accredited_multiplier: string;
+  base_price: number;
   created_at: string;
 }
 

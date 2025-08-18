@@ -11,31 +11,25 @@ export class ExperimentTypeService {
     return await this.repo.findById(id);
   }
 
-  async createExperimentType(data: { name: string; base_price: number; accredited_multiplier: number }) {
+  async createExperimentType(data: { name: string; base_price: number }) {
     // Business logic validations
     if (!data.name?.trim()) {
       throw new Error('Deney türü adı gereklidir');
     }
     if (data.base_price < 0) {
       throw new Error('Temel fiyat negatif olamaz');
-    }
-    if (data.accredited_multiplier < 0) {
-      throw new Error('Akredite çarpanı negatif olamaz');
     }
 
     return await this.repo.create(data);
   }
 
-  async updateExperimentType(id: number, data: { name: string; base_price: number; accredited_multiplier: number }) {
+  async updateExperimentType(id: number, data: { name: string; base_price: number }) {
     // Business logic validations
     if (!data.name?.trim()) {
       throw new Error('Deney türü adı gereklidir');
     }
     if (data.base_price < 0) {
       throw new Error('Temel fiyat negatif olamaz');
-    }
-    if (data.accredited_multiplier < 0) {
-      throw new Error('Akredite çarpanı negatif olamaz');
     }
 
     const result = await this.repo.update(id, data);

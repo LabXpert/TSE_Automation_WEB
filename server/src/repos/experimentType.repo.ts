@@ -16,23 +16,23 @@ export class ExperimentTypeRepository {
     return result.rows[0] || null;
   }
 
-  async create(data: { name: string; base_price: number; accredited_multiplier: number }) {
+  async create(data: { name: string; base_price: number }) {
     const result = await pool.query(
-      `INSERT INTO experiment_types (name, base_price, accredited_multiplier, created_at)
-       VALUES ($1, $2, $3, NOW())
+      `INSERT INTO experiment_types (name, base_price, created_at)
+       VALUES ($1, $2, NOW())
        RETURNING *`,
-      [data.name, data.base_price, data.accredited_multiplier]
+      [data.name, data.base_price]
     );
     return result.rows[0];
   }
 
-  async update(id: number, data: { name: string; base_price: number; accredited_multiplier: number }) {
+  async update(id: number, data: { name: string; base_price: number }) {
     const result = await pool.query(
       `UPDATE experiment_types 
-       SET name = $1, base_price = $2, accredited_multiplier = $3
-       WHERE id = $4
+       SET name = $1, base_price = $2
+       WHERE id = $3
        RETURNING *`,
-      [data.name, data.base_price, data.accredited_multiplier, id]
+      [data.name, data.base_price, id]
     );
     return result.rows[0] || null;
   }

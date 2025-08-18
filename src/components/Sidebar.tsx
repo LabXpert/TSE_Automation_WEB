@@ -391,6 +391,38 @@ function SidebarComponent() {
             </MenuItem>
 
             <MenuItem 
+              active={location.pathname === '/deney-turu-ekle'}
+              component={<Link to="/deney-turu-ekle" />}
+            >
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: collapsed ? '0' : '12px' 
+              }}>
+                <span style={{ 
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '20px',
+                  height: '20px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11ZM19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
+                  </svg>
+                </span>
+                {!collapsed && (
+                  <span style={{ 
+                    letterSpacing: '-0.01em',
+                    lineHeight: '1.4'
+                  }}>
+                    Deney Türü Yönetimi
+                  </span>
+                )}
+              </div>
+            </MenuItem>
+
+            <MenuItem 
               active={location.pathname === '/login'}
               component={<Link to="/login" />}
             >

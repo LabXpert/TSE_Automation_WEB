@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS experiment_types (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   base_price DECIMAL(10,2) DEFAULT 0,
-  accredited_multiplier DECIMAL(3,2) DEFAULT 1.0,
   created_at TIMESTAMP(6) DEFAULT NOW()
 );
 

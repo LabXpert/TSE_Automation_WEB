@@ -20,12 +20,12 @@ router.get('/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ error: 'Invalid experiment type ID' });
+      return res.status(400).json({ error: 'Geçersiz deney türü ID' });
     }
     
     const experimentType = await experimentTypeService.getExperimentTypeById(id);
     if (!experimentType) {
-      return res.status(404).json({ error: 'Experiment type not found' });
+      return res.status(404).json({ error: 'Deney türü bulunamadı' });
     }
     
     res.json(experimentType);
@@ -38,21 +38,33 @@ router.get('/:id', async (req, res) => {
 // POST /api/experiment-types
 router.post('/', async (req, res) => {
   try {
-    const { name, base_price, accredited_multiplier } = req.body;
+    const { name, base_price } = req.body;
+    
+    console.log('Creating experiment type with data:', { name, base_price });
     
     const experimentType = await experimentTypeService.createExperimentType({
       name,
-      base_price: Number(base_price) || 0,
-      accredited_multiplier: Number(accredited_multiplier) || 1.0
+      base_price: Number(base_price) || 0
     });
     
+    console.log('Experiment type created successfully:', experimentType);
     res.status(201).json(experimentType);
   } catch (error: any) {
     console.error('Error creating experiment type:', error);
-    if (error.message.includes('required') || error.message.includes('cannot be negative')) {
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      constraint: error.constraint,
+      detail: error.detail
+    });
+    
+    if (error.message.includes('gerekli') || 
+        error.message.includes('required') || 
+        error.message.includes('negatif') || 
+        error.message.includes('negative')) {
       res.status(400).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Sunucu hatası' });
+      res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
     }
   }
 });
@@ -62,23 +74,25 @@ router.put('/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ error: 'Invalid experiment type ID' });
+      return res.status(400).json({ error: 'Geçersiz deney türü ID' });
     }
     
-    const { name, base_price, accredited_multiplier } = req.body;
+    const { name, base_price } = req.body;
     
     const experimentType = await experimentTypeService.updateExperimentType(id, {
       name,
-      base_price: Number(base_price) || 0,
-      accredited_multiplier: Number(accredited_multiplier) || 1.0
+      base_price: Number(base_price) || 0
     });
     
     res.json(experimentType);
   } catch (error: any) {
     console.error('Error updating experiment type:', error);
-    if (error.message.includes('not found')) {
+    if (error.message.includes('bulunamadı') || error.message.includes('not found')) {
       res.status(404).json({ error: error.message });
-    } else if (error.message.includes('required') || error.message.includes('cannot be negative')) {
+    } else if (error.message.includes('gerekli') || 
+               error.message.includes('required') || 
+               error.message.includes('negatif') || 
+               error.message.includes('negative')) {
       res.status(400).json({ error: error.message });
     } else {
       res.status(500).json({ error: 'Sunucu hatası' });
@@ -91,14 +105,14 @@ router.delete('/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ error: 'Invalid experiment type ID' });
+      return res.status(400).json({ error: 'Geçersiz deney türü ID' });
     }
     
     await experimentTypeService.deleteExperimentType(id);
     res.json({ success: true });
   } catch (error: any) {
     console.error('Error deleting experiment type:', error);
-    if (error.message.includes('not found')) {
+    if (error.message.includes('bulunamadı') || error.message.includes('not found')) {
       res.status(404).json({ error: error.message });
     } else {
       res.status(500).json({ error: 'Sunucu hatası' });

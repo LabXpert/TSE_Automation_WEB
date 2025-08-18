@@ -4,6 +4,7 @@ import Raporla from '../pages/Raporla/Raporla';
 import FirmaEkle from '../pages/DeneyEkle/FirmaEkle/FirmaEkle';
 import PersonelEkle from '../pages/PersonelEkle/PersonelEkle';
 import KullaniciEkle from '../pages/KullaniciEkle/KullaniciEkle';
+import DeneyTuruEkle from '../pages/DeneyTuruEkle/DeneyTuruEkle';
 import Login from '../pages/Login/Login';
 
 function Rotalar() {
@@ -14,6 +15,7 @@ function Rotalar() {
       <Route path="/firma-ekle" element={<FirmaEkle />} />
       <Route path="/personel-ekle" element={<PersonelEkle />} />
       <Route path="/kullanici-ekle" element={<KullaniciEkle />} />
+      <Route path="/deney-turu-ekle" element={<DeneyTuruEkle />} />
       <Route path="/raporla" element={<Raporla />} />
       <Route path="/login" element={<Login />} />
     </Routes>
