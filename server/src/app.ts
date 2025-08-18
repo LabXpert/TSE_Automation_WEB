@@ -7,6 +7,7 @@ import experimentTypeRoutes from './routes/experimentType.route';
 import personnelRoutes from './routes/personnel.route';
 import companyRoutes from './routes/company.route';
 import applicationRoutes from './routes/application.route';
+import userRoutes from './routes/user.route';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get('/api', (_req, res) => {
       'GET /api/experiment-types',
       'GET /api/personnel', 
       'GET /api/companies',
+      'GET /api/users',
       'GET /api/applications/recent',
       'GET /api/applications/all',
       'POST /api/applications'
@@ -44,6 +46,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/experiment-types', experimentTypeRoutes);
 app.use('/api/personnel', personnelRoutes);
 app.use('/api/companies', companyRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 
 // 404 handler
