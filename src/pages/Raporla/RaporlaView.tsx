@@ -3,14 +3,140 @@ import type { DeneyKaydi } from '../../models/Deney.tsx';
 
 interface RaporlaViewProps {
   kayitlariListesi: DeneyKaydi[];
+  tumKayitSayisi: number;
+  aramaMetni: string;
+  aramaYap: (metin: string) => void;
+  aramayiTemizle: () => void;
 }
 
-const RaporlaView: React.FC<RaporlaViewProps> = ({ kayitlariListesi }) => {
+const RaporlaView: React.FC<RaporlaViewProps> = ({ 
+  kayitlariListesi, 
+  aramaMetni, 
+  aramaYap, 
+  aramayiTemizle 
+}) => {
   return (
     <div style={{ padding: '32px', fontFamily: 'inherit', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
       <div style={{ marginBottom: '32px', textAlign: 'left', borderBottom: '2px solid #dc2626', paddingBottom: '16px' }}>
         <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.025em' }}>Deney Raporları</h1>
         <p style={{ color: '#64748b', fontSize: '16px', margin: 0 }}>Kayıtlı tüm deney verilerini görüntüleyin</p>
+      </div>
+
+      {/* Arama Bölümü */}
+      <div style={{
+        background: '#ffffff',
+        padding: '24px',
+        borderRadius: '12px',
+        border: '1px solid #e2e8f0',
+        marginBottom: '24px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ 
+            flex: '1',
+            minWidth: '300px',
+            position: 'relative',
+            maxWidth: '500px'
+          }}>
+            <input
+              type="text"
+              placeholder="Firma adı, başvuru no, deney türü veya personel adı ile arayın..."
+              value={aramaMetni}
+              onChange={(e) => aramaYap(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 16px 12px 48px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '14px',
+                backgroundColor: '#ffffff',
+                color: '#374151',
+                outline: 'none',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#dc2626';
+                e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e5e7eb';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+            
+            {/* Arama iconu */}
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="#6b7280"
+              style={{
+                position: 'absolute',
+                left: '16px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none'
+              }}
+            >
+              <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3S3 5.91 3 9.5S5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14Z"/>
+            </svg>
+
+            {/* Temizle butonu */}
+            {aramaMetni && (
+              <button
+                onClick={aramayiTemizle}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#6b7280">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Arama önerileri */}
+        {aramaMetni && kayitlariListesi.length === 0 && (
+          <div style={{
+            marginTop: '16px',
+            padding: '12px 16px',
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#991b1b'
+          }}>
+            <strong>Sonuç bulunamadı!</strong> Arama kriterlerinizi değiştirmeyi deneyin:
+            <ul style={{ marginTop: '8px', marginBottom: 0, paddingLeft: '20px' }}>
+              <li>Yazım hatası olup olmadığını kontrol edin</li>
+              <li>Daha genel terimler kullanın</li>
+              <li>Firma adı, başvuru numarası, deney türü veya personel adı ile aramayı deneyin</li>
+            </ul>
+          </div>
+        )}
       </div>
       <div className="card">
         <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>

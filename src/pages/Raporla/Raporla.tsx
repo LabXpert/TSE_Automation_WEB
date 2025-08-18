@@ -4,6 +4,8 @@ import type { DeneyKaydi } from '../../models/Deney.tsx';
 
 const Raporla: React.FC = () => {
   const [kayitlariListesi, setKayitlariListesi] = useState<DeneyKaydi[]>([]);
+  const [aramaMetni, setAramaMetni] = useState<string>('');
+  const [filtrelenmisKayitlar, setFiltrelenmisKayitlar] = useState<DeneyKaydi[]>([]);
 
   // Sayfa yüklendiğinde veritabanından kayıtları getir
   useEffect(() => {
@@ -30,15 +32,68 @@ const Raporla: React.FC = () => {
           }))
         }));
         setKayitlariListesi(mapped);
+        setFiltrelenmisKayitlar(mapped); // İlk başta tüm kayıtları göster
       })
       .catch((err) => {
         console.error('Kayıtlar çekilirken hata:', err);
         setKayitlariListesi([]);
+        setFiltrelenmisKayitlar([]);
       });
   }, []);
 
+  // Arama fonksiyonu
+  const aramaYap = (metin: string) => {
+    setAramaMetni(metin);
+    
+    if (!metin.trim()) {
+      setFiltrelenmisKayitlar(kayitlariListesi);
+      return;
+    }
+
+    const aramaTerimi = metin.toLowerCase().trim();
+    const filtrelenmis: DeneyKaydi[] = [];
+
+    kayitlariListesi.forEach(kayit => {
+      // Firma adı veya başvuru numarası eşleşirse tüm testleri göster
+      if (kayit.firmaAdi.toLowerCase().includes(aramaTerimi) || 
+          kayit.basvuruNo.toLowerCase().includes(aramaTerimi)) {
+        filtrelenmis.push(kayit);
+        return;
+      }
+
+      // Test bazında filtrele - sadece eşleşen testleri göster
+      const eslesen_deneyler = kayit.deneyler.filter(deney => 
+        deney.deneyTuru.toLowerCase().includes(aramaTerimi) ||
+        deney.sorumluPersonel.toLowerCase().includes(aramaTerimi)
+      );
+
+      // Eğer eşleşen test varsa, yeni bir kayıt oluştur (sadece eşleşen testlerle)
+      if (eslesen_deneyler.length > 0) {
+        filtrelenmis.push({
+          ...kayit,
+          deneyler: eslesen_deneyler,
+          deneySayisi: eslesen_deneyler.length
+        });
+      }
+    });
+
+    setFiltrelenmisKayitlar(filtrelenmis);
+  };
+
+  // Aramayı temizle
+  const aramayiTemizle = () => {
+    setAramaMetni('');
+    setFiltrelenmisKayitlar(kayitlariListesi);
+  };
+
   return (
-    <RaporlaView kayitlariListesi={kayitlariListesi} />
+    <RaporlaView 
+      kayitlariListesi={filtrelenmisKayitlar}
+      tumKayitSayisi={kayitlariListesi.length}
+      aramaMetni={aramaMetni}
+      aramaYap={aramaYap}
+      aramayiTemizle={aramayiTemizle}
+    />
   );
 };
 
