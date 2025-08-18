@@ -20,12 +20,12 @@ router.get('/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ error: 'Invalid company ID' });
+      return res.status(400).json({ error: 'Geçersiz firma ID' });
     }
     
     const company = await companyService.getCompanyById(id);
     if (!company) {
-      return res.status(404).json({ error: 'Company not found' });
+      return res.status(404).json({ error: 'Firma bulunamadı' });
     }
     
     res.json(company);
@@ -40,6 +40,8 @@ router.post('/', async (req, res) => {
   try {
     const { name, tax_no, contact_name, address, phone, email } = req.body;
     
+    console.log('Creating company with data:', { name, tax_no, contact_name, address, phone, email });
+    
     const company = await companyService.createCompany({
       name,
       tax_no,
@@ -49,13 +51,21 @@ router.post('/', async (req, res) => {
       email
     });
     
+    console.log('Company created successfully:', company);
     res.status(201).json(company);
   } catch (error: any) {
     console.error('Error creating company:', error);
-    if (error.message.includes('required') || error.message.includes('Invalid email')) {
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      constraint: error.constraint,
+      detail: error.detail
+    });
+    
+    if (error.message.includes('vergi numarası') || error.message.includes('required') || error.message.includes('Invalid email')) {
       res.status(400).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Sunucu hatası' });
+      res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
     }
   }
 });
@@ -65,7 +75,7 @@ router.put('/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ error: 'Invalid company ID' });
+      return res.status(400).json({ error: 'Geçersiz firma ID' });
     }
     
     const { name, tax_no, contact_name, address, phone, email } = req.body;
@@ -82,9 +92,9 @@ router.put('/:id', async (req, res) => {
     res.json(company);
   } catch (error: any) {
     console.error('Error updating company:', error);
-    if (error.message.includes('not found')) {
+    if (error.message.includes('not found') || error.message.includes('bulunamadı')) {
       res.status(404).json({ error: error.message });
-    } else if (error.message.includes('required') || error.message.includes('Invalid email')) {
+    } else if (error.message.includes('required') || error.message.includes('gerekli') || error.message.includes('Invalid email') || error.message.includes('vergi numarası')) {
       res.status(400).json({ error: error.message });
     } else {
       res.status(500).json({ error: 'Sunucu hatası' });
@@ -97,14 +107,14 @@ router.delete('/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ error: 'Invalid company ID' });
+      return res.status(400).json({ error: 'Geçersiz firma ID' });
     }
     
     await companyService.deleteCompany(id);
     res.json({ success: true });
   } catch (error: any) {
     console.error('Error deleting company:', error);
-    if (error.message.includes('not found')) {
+    if (error.message.includes('not found') || error.message.includes('bulunamadı')) {
       res.status(404).json({ error: error.message });
     } else {
       res.status(500).json({ error: 'Sunucu hatası' });

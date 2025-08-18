@@ -15,7 +15,19 @@ export class CompanyService {
     // Business logic validations
     this.validateCompanyData(data);
 
-    return await this.repo.create(data);
+    try {
+      return await this.repo.create(data);
+    } catch (error: any) {
+      console.error('Database error in createCompany:', error);
+      
+      // PostgreSQL unique constraint violation
+      if (error.code === '23505' && error.constraint === 'companies_tax_no_key') {
+        throw new Error('Bu vergi numarası ile zaten kayıtlı bir firma bulunmaktadır');
+      }
+      
+      // Generic database error
+      throw new Error('Firma kaydedilirken veritabanı hatası oluştu: ' + error.message);
+    }
   }
 
   async updateCompany(id: number, data: CompanyData) {
@@ -44,6 +56,10 @@ export class CompanyService {
     if (!data.tax_no?.trim()) {
       throw new Error('Vergi numarası gereklidir');
     }
+    
+    // Vergi numarası benzersizlik kontrolü için boşluk karakterlerini temizle
+    data.tax_no = data.tax_no.trim();
+    
     if (!data.contact_name?.trim()) {
       throw new Error('İletişim adı gereklidir');
     }
