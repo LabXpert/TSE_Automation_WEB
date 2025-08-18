@@ -4,15 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "web": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "cd server && npm run dev",
-    "server:build": "cd server && npm run build",
-    "server:start": "cd server && npm start",
-    "dev:full": "concurrently \"npm run dev\" \"npm run server\"",
-    "start:full": "concurrently \"npm run preview\" \"npm run server:start\""
+
+    "server": "npm --prefix server run dev",
+    "server:build": "npm --prefix server run build",
+    "server:start": "npm --prefix server run start",
+
+    "dev": "concurrently -n WEB,API -c auto \"npm:web\" \"npm:server\"",
+    "start:full": "concurrently -n WEB,API -c auto \"npm:preview\" \"npm:server:start\""
   },
   "dependencies": {
     "react": "^19.1.1",

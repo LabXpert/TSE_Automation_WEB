@@ -110,6 +110,11 @@ const PersonelEkle: React.FC = () => {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    kaydet();
+  };
+
   const personelDuzenle = (id: number) => {
     const personel = personelListesi.find(p => p.id === id);
     if (!personel) {
@@ -159,7 +164,7 @@ const PersonelEkle: React.FC = () => {
       personelListesi={personelListesi}
       duzenlemeModu={duzenlemeModu}
       handleInputChange={handleInputChange}
-      kaydet={kaydet}
+      handleSubmit={handleSubmit}
       personelDuzenle={personelDuzenle}
       personelSilmeOnayi={personelSilmeOnayi}
       duzenlemeyiIptalEt={duzenlemeyiIptalEt}

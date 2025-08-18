@@ -11,7 +11,7 @@ interface PersonelEkleViewProps {
   personelListesi: Personel[];
   duzenlemeModu: boolean;
   handleInputChange: (field: string, value: string) => void;
-  kaydet: () => void;
+  handleSubmit: (e: React.FormEvent) => void;
   personelDuzenle: (id: number) => void;
   personelSilmeOnayi: (id: number) => void;
   duzenlemeyiIptalEt: () => void;
@@ -23,16 +23,11 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
   personelListesi,
   duzenlemeModu,
   handleInputChange,
-  kaydet,
+  handleSubmit,
   personelDuzenle,
   personelSilmeOnayi,
   duzenlemeyiIptalEt
 }) => {
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    kaydet();
-  };
 
   return (
     <div style={{
