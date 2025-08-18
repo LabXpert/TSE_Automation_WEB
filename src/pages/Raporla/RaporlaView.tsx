@@ -39,6 +39,8 @@ interface RaporlaViewProps {
   durumSec: (durum: string) => void;
   tumDurumlarıSec: () => void;
   durumFiltreleriniTemizle: () => void;
+  // Excel çıktısı props
+  exceleCikart: () => void;
 }
 
 const RaporlaView: React.FC<RaporlaViewProps> = ({ 
@@ -77,7 +79,9 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
   setDurumPaneliAcik,
   durumSec,
   tumDurumlarıSec,
-  durumFiltreleriniTemizle
+  durumFiltreleriniTemizle,
+  // Excel çıktısı props
+  exceleCikart
 }) => {
   return (
     <div style={{ padding: '32px', fontFamily: 'inherit', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
@@ -1299,6 +1303,51 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Excel Çıktısı Butonu */}
+        {kayitlariListesi.length > 0 && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginTop: '20px',
+            paddingRight: '20px'
+          }}>
+            <button
+              onClick={exceleCikart}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 20px',
+                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#ffffff',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.35)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.25)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
+              </svg>
+              Excel'e Çıkart ({kayitlariListesi.reduce((toplam, kayit) => toplam + kayit.deneyler.length, 0)} kayıt)
+            </button>
           </div>
         )}
       </div>

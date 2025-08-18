@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import * as ExcelJS from 'exceljs';
 import RaporlaView from './RaporlaView.tsx';
 import type { DeneyKaydi } from '../../models/Deney.tsx';
 
@@ -182,6 +183,129 @@ const Raporla: React.FC = () => {
     setDurumPaneliAcik(false);
   };
 
+  // Excel çıktısı alma fonksiyonu
+  const exceleCikart = async () => {
+    try {
+      console.log('Excel export başlıyor...');
+      
+      // Yeni workbook oluştur
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Deney Raporları');
+
+      // Başlık satırını tanımla
+      const headers = [
+        'No',
+        'Firma Adı', 
+        'Başvuru No',
+        'Başvuru Tarihi',
+        'Belgelendirme Türü',
+        'Deney Türü',
+        'Sorumlu Personel',
+        'Akredite',
+        'Uygunluk',
+        'Ücret (TL)'
+      ];
+
+      // Başlık satırını ekle
+      worksheet.addRow(headers);
+
+      // Başlık satırına stil ver
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell((cell) => {
+        cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'DC2626' } // Kırmızı tema
+        };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+
+      // Veri satırlarını ekle
+      filtrelenmisKayitlar.forEach((kayit, kayitIndex) => {
+        kayit.deneyler.forEach((deney, deneyIndex) => {
+          const rowData = [
+            `${kayitIndex + 1}.${deneyIndex + 1}`,
+            kayit.firmaAdi,
+            kayit.basvuruNo,
+            new Date(kayit.basvuruTarihi).toLocaleDateString('tr-TR'),
+            kayit.belgelendirmeTuru === 'belgelendirme' ? 'BELGELENDIRME' : 'ÖZEL',
+            deney.deneyTuru,
+            deney.sorumluPersonel,
+            deney.akredite ? 'EVET' : 'HAYIR',
+            deney.uygunluk ? 'UYGUN' : 'UYGUN DEĞİL',
+            deney.unit_price ? `₺${deney.unit_price.toLocaleString('tr-TR')}` : '-'
+          ];
+          
+          const row = worksheet.addRow(rowData);
+          
+          // Satır stilini ayarla
+          row.eachCell((cell, colNumber) => {
+            cell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+            
+            // Hizalama
+            if (colNumber === 1 || colNumber === 8 || colNumber === 9) {
+              cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            }
+            
+            // Durum renklandırması
+            if (colNumber === 8) { // Akredite kolonu
+              cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: deney.akredite ? 'DCFCE7' : 'FEE2E2' } // Yeşil/Kırmızı
+              };
+            }
+            
+            if (colNumber === 9) { // Uygunluk kolonu
+              cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: deney.uygunluk ? 'DCFCE7' : 'FEE2E2' } // Yeşil/Kırmızı
+              };
+            }
+          });
+        });
+      });
+
+      // Sütun genişliklerini ayarla
+      const columnWidths = [8, 25, 15, 12, 18, 30, 20, 10, 12, 15];
+      columnWidths.forEach((width, index) => {
+        worksheet.getColumn(index + 1).width = width;
+      });
+
+      // Dosya adını oluştur
+      const today = new Date();
+      const dosyaAdi = `Deney_Raporlari_${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}.xlsx`;
+      
+      // Excel dosyasını indir
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = dosyaAdi;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      console.log('Excel export tamamlandı!');
+    } catch (error) {
+      console.error('Excel export hatası:', error);
+      alert('Excel dosyası oluşturulurken bir hata oluştu!');
+    }
+  };
+
   // Birleşik filtreleme fonksiyonu (arama + tarih + personel + deney türü + durum)
   const filtreleriUygula = useCallback(() => {
     let sonuc = kayitlariListesi;
@@ -311,6 +435,8 @@ const Raporla: React.FC = () => {
       durumSec={durumSec}
       tumDurumlarıSec={tumDurumlarıSec}
       durumFiltreleriniTemizle={durumFiltreleriniTemizle}
+      // Excel çıktısı props
+      exceleCikart={exceleCikart}
     />
   );
 };
