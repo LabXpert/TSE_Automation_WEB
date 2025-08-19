@@ -1,5 +1,6 @@
 // src/pages/DeneyEkle/DeneyEkleView.tsx
 import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 import type { Firma } from '../../models/Firma.tsx';
 import type { Personel } from '../../models/Personel.tsx';
 import type { DeneyTuru } from '../../models/DeneyTurleri.tsx';
@@ -111,32 +112,115 @@ function DeneyEkleView({
           }}>
             <div>
               <label>Deney Türü *</label>
-              <select 
-                value={deneyler[i]?.deneyTuru || ''}
-                onChange={(e) => deneyGuncelle(i, 'deneyTuru', e.target.value)}
-                style={{ width: '100%', boxSizing: 'border-box' }}
-              >
-                <option value="">Deney türü seçiniz...</option>
-                {deneyTurleri.map((tur) => (
-                  <option key={tur.id} value={tur.name}>{tur.name}</option>
-                ))}
-              </select>
+              <Select
+                value={deneyTurleri.find(t => t.name === deneyler[i]?.deneyTuru) ? { 
+                  value: deneyler[i]?.deneyTuru, 
+                  label: deneyler[i]?.deneyTuru 
+                } : null}
+                onChange={(selected) => deneyGuncelle(i, 'deneyTuru', selected ? selected.value : '')}
+                options={deneyTurleri.map(tur => ({ value: tur.name, label: tur.name }))}
+                placeholder="Deney türü yazın veya seçin..."
+                isSearchable={true}
+                isClearable={true}
+                noOptionsMessage={() => "Deney türü bulunamadı"}
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    padding: '4px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: '#ffffff',
+                    outline: 'none !important',
+                    boxShadow: state.isFocused ? '0 0 0 3px rgba(220, 38, 38, 0.1)' : 'none',
+                    borderColor: state.isFocused ? '#dc2626' : '#e5e7eb',
+                    '&:hover': {
+                      borderColor: state.isFocused ? '#dc2626' : '#e5e7eb'
+                    }
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: '#9ca3af'
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: '#374151'
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isSelected ? '#dc2626' : state.isFocused ? '#fef2f2' : '#ffffff',
+                    color: state.isSelected ? '#ffffff' : '#374151',
+                    '&:hover': {
+                      backgroundColor: state.isSelected ? '#dc2626' : '#fef2f2'
+                    }
+                  })
+                }}
+              />
             </div>
 
             <div>
               <label>Sorumlu Personel *</label>
-              <select 
-                value={deneyler[i]?.sorumluPersonel || ''}
-                onChange={(e) => deneyGuncelle(i, 'sorumluPersonel', e.target.value)}
-                style={{ width: '100%', boxSizing: 'border-box' }}
-              >
-                <option value="">Personel seçiniz...</option>
-                {personeller.map((personel) => (
-                  <option key={personel.id} value={personel.first_name + ' ' + personel.last_name}>
-                    {personel.first_name + ' ' + personel.last_name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                value={personeller.find(p => (p.first_name + ' ' + p.last_name) === deneyler[i]?.sorumluPersonel) ? { 
+                  value: deneyler[i]?.sorumluPersonel, 
+                  label: deneyler[i]?.sorumluPersonel 
+                } : null}
+                onChange={(selected) => deneyGuncelle(i, 'sorumluPersonel', selected ? selected.value : '')}
+                options={personeller.map(personel => ({ 
+                  value: personel.first_name + ' ' + personel.last_name, 
+                  label: personel.first_name + ' ' + personel.last_name 
+                }))}
+                placeholder="Personel adı yazın veya seçin..."
+                isSearchable={true}
+                isClearable={true}
+                noOptionsMessage={() => "Personel bulunamadı"}
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    padding: '4px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: '#ffffff',
+                    outline: 'none !important',
+                    boxShadow: state.isFocused ? '0 0 0 3px rgba(220, 38, 38, 0.1)' : 'none',
+                    borderColor: state.isFocused ? '#dc2626' : '#e5e7eb',
+                    '&:hover': {
+                      borderColor: state.isFocused ? '#dc2626' : '#e5e7eb'
+                    }
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: '#9ca3af'
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: '#374151'
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    zIndex: 9999,
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isSelected ? '#dc2626' : state.isFocused ? '#fef2f2' : '#ffffff',
+                    color: state.isSelected ? '#ffffff' : '#374151',
+                    '&:hover': {
+                      backgroundColor: state.isSelected ? '#dc2626' : '#fef2f2'
+                    }
+                  })
+                }}
+              />
             </div>
 
             <div>
@@ -324,38 +408,58 @@ function DeneyEkleView({
     gap: '12px',
     alignItems: 'stretch'
   }}>
-    <select
-      value={firmaAdi}
-      onChange={(e) => setFirmaAdi(e.target.value)}
-      style={{
-        flex: 1,
-        padding: '12px',
-        border: '2px solid #e5e7eb',
-        borderRadius: '8px',
-        fontSize: '14px',
-        backgroundColor: '#ffffff',
-        color: '#374151',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        outline: 'none',
-        boxSizing: 'border-box'
+    <Select
+      value={firmalar.find(f => f.name === firmaAdi) ? { value: firmaAdi, label: firmaAdi } : null}
+      onChange={(selected) => setFirmaAdi(selected ? selected.value : '')}
+      options={firmalar.map(firma => ({ value: firma.name, label: firma.name }))}
+      placeholder="Firma adı yazın veya seçin..."
+      isSearchable={true}
+      isClearable={true}
+      noOptionsMessage={() => "Firma bulunamadı"}
+      styles={{
+        container: (provided) => ({
+          ...provided,
+          flex: 1
+        }),
+        control: (provided, state) => ({
+          ...provided,
+          padding: '4px',
+          border: '2px solid #e5e7eb',
+          borderRadius: '8px',
+          fontSize: '14px',
+          backgroundColor: '#ffffff',
+          outline: 'none !important',
+          boxShadow: state.isFocused ? '0 0 0 3px rgba(220, 38, 38, 0.1)' : 'none',
+          borderColor: state.isFocused ? '#dc2626' : '#e5e7eb',
+          '&:hover': {
+            borderColor: state.isFocused ? '#dc2626' : '#e5e7eb'
+          }
+        }),
+        placeholder: (provided) => ({
+          ...provided,
+          color: '#9ca3af'
+        }),
+        singleValue: (provided) => ({
+          ...provided,
+          color: '#374151'
+        }),
+        menu: (provided) => ({
+          ...provided,
+          zIndex: 9999,
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
+        }),
+        option: (provided, state) => ({
+          ...provided,
+          backgroundColor: state.isSelected ? '#dc2626' : state.isFocused ? '#fef2f2' : '#ffffff',
+          color: state.isSelected ? '#ffffff' : '#374151',
+          '&:hover': {
+            backgroundColor: state.isSelected ? '#dc2626' : '#fef2f2'
+          }
+        })
       }}
-      onFocus={(e) => {
-        e.target.style.borderColor = '#dc2626';
-        e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
-      }}
-      onBlur={(e) => {
-        e.target.style.borderColor = '#e5e7eb';
-        e.target.style.boxShadow = 'none';
-      }}
-    >
-      <option value="">Firma Seçin</option>
-      {firmalar.map((firma) => (
-        <option key={firma.id} value={firma.name}>
-          {firma.name}
-        </option>
-      ))}
-    </select>
+    />
     
     <button
       type="button"
