@@ -26,6 +26,7 @@ app.get('/api', (_req, res) => {
     message: 'TSE Automation API',
     endpoints: [
       'GET /api/health',
+      'POST /api/users/login',
       'GET /api/experiment-types',
       'GET /api/personnel', 
       'GET /api/companies',

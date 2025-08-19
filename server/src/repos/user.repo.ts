@@ -47,6 +47,20 @@ export class UserRepository {
     return result.rows[0] || null;
   }
 
+  // Login için şifre ile birlikte kullanıcı bulma
+  async findByUsernameWithPassword(username: string) {
+    const result = await pool.query(
+      'SELECT id, username, first_name, last_name, email, role, unvan, phone, password_hash, created_at FROM users WHERE username = $1',
+      [username]
+    );
+    return result.rows[0] || null;
+  }
+
+  // Şifre doğrulama
+  async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(plainPassword, hashedPassword);
+  }
+
   async findByEmail(email: string) {
     const result = await pool.query(
       'SELECT id, username, first_name, last_name, email, role, unvan, phone, created_at FROM users WHERE email = $1',

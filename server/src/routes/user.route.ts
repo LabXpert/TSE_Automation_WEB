@@ -1,8 +1,64 @@
 import { Router } from 'express';
 import { UserService } from '../services/user.service';
+import { UserRepository } from '../repos/user.repo';
 
 const router = Router();
 const userService = new UserService();
+const userRepo = new UserRepository();
+
+// POST /api/users/login - Basit login endpoint'i
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kullanıcı adı ve şifre gereklidir!'
+      });
+    }
+
+    // Kullanıcıyı şifresi ile birlikte bul
+    const user = await userRepo.findByUsernameWithPassword(username);
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Kullanıcı adı veya şifre hatalı!'
+      });
+    }
+
+    // Şifreyi kontrol et
+    const isPasswordValid = await userRepo.verifyPassword(password, user.password_hash);
+    
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Kullanıcı adı veya şifre hatalı!'
+      });
+    }
+
+    // Başarılı login
+    return res.json({
+      success: true,
+      message: 'Giriş başarılı!',
+      user: {
+        id: user.id,
+        username: user.username,
+        fullName: `${user.first_name} ${user.last_name}`,
+        role: user.role,
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Giriş sırasında bir hata oluştu!'
+    });
+  }
+});
 
 // GET /api/users
 router.get('/', async (_req, res) => {

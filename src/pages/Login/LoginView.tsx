@@ -7,6 +7,8 @@ interface LoginViewProps {
   rememberMe: boolean;
   username: string;
   password: string;
+  loading: boolean;
+  error: string;
   onLogin: () => void;
   onModeToggle: (mode: boolean) => void;
   onPasswordToggle: () => void;
@@ -21,6 +23,8 @@ const LoginView: React.FC<LoginViewProps> = ({
   rememberMe,
   username,
   password,
+  loading,
+  error,
   onLogin,
   onModeToggle,
   onPasswordToggle,
@@ -108,8 +112,32 @@ const LoginView: React.FC<LoginViewProps> = ({
               </span>
             </div>
             
-            <button className="login-btn" onClick={onLogin}>
-              Giriş Yap
+            {error && (
+              <div style={{
+                backgroundColor: '#fee2e2',
+                color: '#dc2626',
+                padding: '10px',
+                borderRadius: '8px',
+                marginTop: '10px',
+                marginBottom: '10px',
+                fontSize: '14px',
+                textAlign: 'center',
+                border: '1px solid #fecaca'
+              }}>
+                {error}
+              </div>
+            )}
+            
+            <button 
+              className="login-btn" 
+              onClick={onLogin}
+              disabled={loading}
+              style={{
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
             </button>
             
             <div style={{ marginTop: '30px' }} className="social-media">
