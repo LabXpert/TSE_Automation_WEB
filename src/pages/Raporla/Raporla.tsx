@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as ExcelJS from 'exceljs';
 import RaporlaView from './RaporlaView.tsx';
+import ExcelImport from './ExcelImport.tsx';
 import type { DeneyKaydi } from '../../models/Deney.tsx';
 
 // API response tip tanımları
@@ -52,6 +53,9 @@ const Raporla: React.FC = () => {
   // Pagination state'leri
   const [sayfaBasiKayit, setSayfaBasiKayit] = useState<number>(25);
   const [aktifSayfa, setAktifSayfa] = useState<number>(1);
+
+  // Excel import state'leri
+  const [excelImportAcik, setExcelImportAcik] = useState<boolean>(false);
 
   // Sayfa yüklendiğinde veritabanından kayıtları getir
   useEffect(() => {
@@ -310,6 +314,14 @@ const Raporla: React.FC = () => {
     }
   };
 
+  // Excel import fonksiyonu
+  const handleExcelImport = (data: any[]) => {
+    console.log('Excel verisi içe aktarıldı:', data);
+    // Burada Excel verisini işleyebilirsiniz
+    // Örneğin API'ye gönderebilir veya mevcut verilere ekleyebilirsiniz
+    alert(`${data.length} satır veri başarıyla içe aktarıldı!`);
+  };
+
   // Birleşik filtreleme fonksiyonu (arama + tarih + personel + deney türü + durum)
   const filtreleriUygula = useCallback(() => {
     let sonuc = kayitlariListesi;
@@ -460,56 +472,65 @@ const Raporla: React.FC = () => {
   }, [filtreleriUygula]);
 
   return (
-    <RaporlaView 
-      kayitlariListesi={sayfaliKayitlar()}
-      tumKayitSayisi={kayitlariListesi.length}
-      aramaMetni={aramaMetni}
-      aramaYap={aramaYap}
-      aramayiTemizle={aramayiTemizle}
-      // Tarih filtreleme props
-      baslangicTarihi={baslangicTarihi}
-      bitisTarihi={bitisTarihi}
-      tarihPaneliAcik={tarihPaneliAcik}
-      setBaslangicTarihi={setBaslangicTarihi}
-      setBitisTarihi={setBitisTarihi}
-      setTarihPaneliAcik={setTarihPaneliAcik}
-      hizliTarihSec={hizliTarihSec}
-      tarihFiltreleriniTemizle={tarihFiltreleriniTemizle}
-      // Personel filtreleme props
-      secilenPersoneller={secilenPersoneller}
-      personelPaneliAcik={personelPaneliAcik}
-      tumPersoneller={tumPersoneller}
-      setPersonelPaneliAcik={setPersonelPaneliAcik}
-      personelSec={personelSec}
-      tumPersonelleriSec={tumPersonelleriSec}
-      personelFiltreleriniTemizle={personelFiltreleriniTemizle}
-      // Deney türü filtreleme props
-      secilenDeneyTurleri={secilenDeneyTurleri}
-      deneyTuruPaneliAcik={deneyTuruPaneliAcik}
-      tumDeneyTurleri={tumDeneyTurleri}
-      setDeneyTuruPaneliAcik={setDeneyTuruPaneliAcik}
-      deneyTuruSec={deneyTuruSec}
-      tumDeneyTurleriniSec={tumDeneyTurleriniSec}
-      deneyTuruFiltreleriniTemizle={deneyTuruFiltreleriniTemizle}
-      // Durum filtreleme props (Uygunluk + Akredite birleşik)
-      secilenDurumlar={secilenDurumlar}
-      durumPaneliAcik={durumPaneliAcik}
-      setDurumPaneliAcik={setDurumPaneliAcik}
-      durumSec={durumSec}
-      tumDurumlarıSec={tumDurumlarıSec}
-      durumFiltreleriniTemizle={durumFiltreleriniTemizle}
-      // Excel çıktısı props
-      exceleCikart={exceleCikart}
-      // Pagination props
-      aktifSayfa={aktifSayfa}
-      toplamSayfaSayisi={toplamSayfaSayisi}
-      tumTestSayisi={tumTestSayisi}
-      sayfaBasiKayit={sayfaBasiKayit}
-      sayfayaDegistir={sayfayaDegistir}
-      oncekiSayfa={oncekiSayfa}
-      sonrakiSayfa={sonrakiSayfa}
-      setSayfaBasiKayit={setSayfaBasiKayit}
-    />
+    <>
+      <RaporlaView 
+        kayitlariListesi={sayfaliKayitlar()}
+        tumKayitSayisi={kayitlariListesi.length}
+        aramaMetni={aramaMetni}
+        aramaYap={aramaYap}
+        aramayiTemizle={aramayiTemizle}
+        // Tarih filtreleme props
+        baslangicTarihi={baslangicTarihi}
+        bitisTarihi={bitisTarihi}
+        tarihPaneliAcik={tarihPaneliAcik}
+        setBaslangicTarihi={setBaslangicTarihi}
+        setBitisTarihi={setBitisTarihi}
+        setTarihPaneliAcik={setTarihPaneliAcik}
+        hizliTarihSec={hizliTarihSec}
+        tarihFiltreleriniTemizle={tarihFiltreleriniTemizle}
+        // Personel filtreleme props
+        secilenPersoneller={secilenPersoneller}
+        personelPaneliAcik={personelPaneliAcik}
+        tumPersoneller={tumPersoneller}
+        setPersonelPaneliAcik={setPersonelPaneliAcik}
+        personelSec={personelSec}
+        tumPersonelleriSec={tumPersonelleriSec}
+        personelFiltreleriniTemizle={personelFiltreleriniTemizle}
+        // Deney türü filtreleme props
+        secilenDeneyTurleri={secilenDeneyTurleri}
+        deneyTuruPaneliAcik={deneyTuruPaneliAcik}
+        tumDeneyTurleri={tumDeneyTurleri}
+        setDeneyTuruPaneliAcik={setDeneyTuruPaneliAcik}
+        deneyTuruSec={deneyTuruSec}
+        tumDeneyTurleriniSec={tumDeneyTurleriniSec}
+        deneyTuruFiltreleriniTemizle={deneyTuruFiltreleriniTemizle}
+        // Durum filtreleme props (Uygunluk + Akredite birleşik)
+        secilenDurumlar={secilenDurumlar}
+        durumPaneliAcik={durumPaneliAcik}
+        setDurumPaneliAcik={setDurumPaneliAcik}
+        durumSec={durumSec}
+        tumDurumlarıSec={tumDurumlarıSec}
+        durumFiltreleriniTemizle={durumFiltreleriniTemizle}
+        // Excel çıktısı props
+        exceleCikart={exceleCikart}
+        setExcelImportAcik={setExcelImportAcik}
+        // Pagination props
+        aktifSayfa={aktifSayfa}
+        toplamSayfaSayisi={toplamSayfaSayisi}
+        tumTestSayisi={tumTestSayisi}
+        sayfaBasiKayit={sayfaBasiKayit}
+        sayfayaDegistir={sayfayaDegistir}
+        oncekiSayfa={oncekiSayfa}
+        sonrakiSayfa={sonrakiSayfa}
+        setSayfaBasiKayit={setSayfaBasiKayit}
+      />
+      
+      <ExcelImport
+        isOpen={excelImportAcik}
+        onClose={() => setExcelImportAcik(false)}
+        onImport={handleExcelImport}
+      />
+    </>
   );
 };
 

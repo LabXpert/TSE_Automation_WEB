@@ -41,6 +41,8 @@ interface RaporlaViewProps {
   durumFiltreleriniTemizle: () => void;
   // Excel çıktısı props
   exceleCikart: () => void;
+  // Excel import props
+  setExcelImportAcik: (acik: boolean) => void;
   // Pagination props
   aktifSayfa: number;
   toplamSayfaSayisi: number;
@@ -91,6 +93,8 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
   durumFiltreleriniTemizle,
   // Excel çıktısı props
   exceleCikart,
+  // Excel import props
+  setExcelImportAcik,
   // Pagination props
   aktifSayfa,
   toplamSayfaSayisi,
@@ -1566,41 +1570,83 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
               )}
             </div>
 
-            {/* Excel Çıktısı Butonu */}
-            <button
-              onClick={exceleCikart}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 20px',
-                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#ffffff',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.35)';
-                e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.25)';
-                e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
-              </svg>
-              Excel'e Çıkart ({tumTestSayisi} test)
-            </button>
+            {/* Excel Butonları */}
+            <div style={{
+              display: 'flex',
+              gap: '12px'
+            }}>
+              {/* Excel İçe Aktar Butonu */}
+              <button
+                onClick={() => setExcelImportAcik(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 20px',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.35)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.25)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  <path d="M12,13L8,9H10.5V5H13.5V9H16L12,13Z"/>
+                </svg>
+                Excel İçe Aktar
+              </button>
+
+              {/* Excel Çıktısı Butonu */}
+              <button
+                onClick={exceleCikart}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 20px',
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.35)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.25)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
+                </svg>
+                Excel'e Çıkart ({tumTestSayisi} test)
+              </button>
+            </div>
           </div>
         )}
       </div>
