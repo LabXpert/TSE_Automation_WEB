@@ -21,6 +21,9 @@ const KullaniciEkle: React.FC = () => {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [duzenlenecekKullaniciId, setDuzenlenecekKullaniciId] = useState<number | null>(null);
 
+  // Arama state'leri
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Kullanıcı listesini API'den çek
   useEffect(() => {
     fetch('/api/users')
@@ -199,17 +202,51 @@ const KullaniciEkle: React.FC = () => {
     }
   };
 
+  // Arama fonksiyonları
+  const handleSearch = () => {
+    // Arama terimi boşsa tüm listeyi göster
+    if (!searchTerm.trim()) {
+      fetch('/api/users')
+        .then(res => res.json())
+        .then(data => setKullaniciListesi(data))
+        .catch(() => setKullaniciListesi([]));
+      return;
+    }
+
+    // Arama terimi varsa filtreleme yap
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(data => {
+        const filteredData = data.filter((kullanici: any) => 
+          kullanici.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          kullanici.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          kullanici.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          kullanici.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (kullanici.unvan && kullanici.unvan.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+        setKullaniciListesi(filteredData);
+      })
+      .catch(() => setKullaniciListesi([]));
+  };
+
+  const handleSearchTermChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
   return (
     <KullaniciEkleView
       formData={formData}
       errors={errors}
       kullaniciListesi={kullaniciListesi}
       duzenlemeModu={duzenlemeModu}
+      searchTerm={searchTerm}
       handleInputChange={handleInputChange}
       kaydet={kaydet}
       kullaniciDuzenle={kullaniciDuzenle}
       kullaniciSilmeOnayi={kullaniciSilmeOnayi}
       duzenlemeyiIptalEt={duzenlemeyiIptalEt}
+      onSearch={handleSearch}
+      onSearchTermChange={handleSearchTermChange}
     />
   );
 };

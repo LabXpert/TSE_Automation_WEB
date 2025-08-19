@@ -16,6 +16,7 @@ interface DeneyEkleViewProps {
   deneyler: Deney[];
   kayitlariListesi: DeneyKaydi[];
   duzenlemeModu: boolean;
+  searchTerm: string;
   
   // Setterlar
   setDeneySeayisi: (value: number) => void;
@@ -30,6 +31,8 @@ interface DeneyEkleViewProps {
   kayitDuzenle: (id: string) => void;
   kayitSilmeOnayi: (id: string) => void;
   duzenlemeyiIptalEt: () => void;
+  onSearch: () => void;
+  onSearchTermChange: (term: string) => void;
   
   // Sabit veriler
   firmalar: Firma[];
@@ -46,6 +49,7 @@ function DeneyEkleView({
   deneyler,
   kayitlariListesi,
   duzenlemeModu,
+  searchTerm,
   setDeneySeayisi,
   setBelgelendirmeTuru,
   setFirmaAdi,
@@ -56,6 +60,8 @@ function DeneyEkleView({
   kayitDuzenle,
   kayitSilmeOnayi,
   duzenlemeyiIptalEt,
+  onSearch,
+  onSearchTermChange,
   firmalar,
   personeller,
   deneyTurleri
@@ -713,100 +719,84 @@ function DeneyEkleView({
       {/* Alt Kısım - Kaydet Butonu */}
       <div style={{ marginBottom: '32px' }}>
         {/* Kaydet/Güncelle ve İptal Butonları */}
-<div style={{
-  marginTop: '32px',
-  display: 'flex',
-  justifyContent: 'center',
-  gap: '16px',
-  paddingBottom: '32px'
-}}>
-  <button
-    onClick={kaydet}
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      padding: '16px 32px',
-      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-      color: '#ffffff',
-      border: 'none',
-      borderRadius: '12px',
-      fontSize: '16px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)',
-      minWidth: '180px',
-      justifyContent: 'center',
-      position: 'relative',
-      overflow: 'hidden'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.4)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.3)';
-    }}
-    onMouseDown={(e) => {
-      e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
-    }}
-    onMouseUp={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
-    }}
-  >
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M19 21H5C4.45 21 4 20.55 4 20V4C4 3.45 4.45 3 5 3H16L20 7V20C20 20.55 19.55 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-    {duzenlemeModu ? 'Güncelle' : 'Kaydet'}
-  </button>
-
-  {duzenlemeModu && (
-    <button
-      onClick={duzenlemeyiIptalEt}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '16px 32px',
-        background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-        color: '#ffffff',
-        border: 'none',
-        borderRadius: '12px',
-        fontSize: '16px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)',
-        minWidth: '140px',
-        justifyContent: 'center'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
-      }}
-      onMouseDown={(e) => {
-        e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
-      }}
-      onMouseUp={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
-      }}
-    >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-      İptal
-    </button>
-  )}
-</div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: '16px',
+          borderTop: '1px solid #e2e8f0',
+          paddingTop: '16px',
+          flexShrink: 0,
+          backgroundColor: '#ffffff',
+          marginTop: '8px'
+        }}>
+          {duzenlemeModu && (
+            <button
+              onClick={duzenlemeyiIptalEt}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              İptal
+            </button>
+          )}
+          <button
+            onClick={kaydet}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 8px rgba(220, 38, 38, 0.2)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 21H5C4.45 21 4 20.55 4 20V4C4 3.45 4.45 3 5 3H16L20 7V20C20 20.55 19.55 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            {duzenlemeModu ? 'Güncelle' : 'Kaydet'}
+          </button>
+        </div>
       </div>
 
       {/* Kayıtlar Listesi */}
@@ -832,6 +822,70 @@ function DeneyEkleView({
             ({kayitlariListesi.length} kayıt)
           </span>
         </h2>
+
+        {/* Search Box */}
+        <div style={{
+          marginBottom: '20px',
+          padding: '16px',
+          backgroundColor: '#f8fafc',
+          borderRadius: '8px',
+          border: '1px solid #e2e8f0'
+        }}>
+          <div style={{
+            position: 'relative',
+            width: '100%'
+          }}>
+            <input
+              type="text"
+              placeholder="Kayıt ara (firma adı, başvuru no, personel...)"
+              value={searchTerm}
+              onChange={(e) => {
+                onSearchTermChange(e.target.value);
+                onSearch();
+              }}
+              style={{
+                width: '100%',
+                padding: '12px 16px 12px 48px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '14px',
+                backgroundColor: '#ffffff',
+                color: '#374151',
+                outline: 'none',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#dc2626';
+                e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e5e7eb';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+            <svg
+              style={{
+                position: 'absolute',
+                left: '16px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#9ca3af'
+              }}
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </div>
+        </div>
         
         {kayitlariListesi.length === 0 ? (
           <div style={{

@@ -15,6 +15,9 @@ const DeneyTuruEkle: React.FC = () => {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [duzenlenecekDeneyTuruId, setDuzenlenecekDeneyTuruId] = useState<number | null>(null);
 
+  // Arama state'leri
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Deney türleri listesini API'den çek
   useEffect(() => {
     fetch('/api/experiment-types')
@@ -153,17 +156,48 @@ const DeneyTuruEkle: React.FC = () => {
     }
   };
 
+  // Arama fonksiyonları
+  const handleSearch = () => {
+    // Arama terimi boşsa tüm listeyi göster
+    if (!searchTerm.trim()) {
+      fetch('/api/experiment-types')
+        .then(res => res.json())
+        .then(data => setDeneyTurleriListesi(data))
+        .catch(() => setDeneyTurleriListesi([]));
+      return;
+    }
+
+    // Arama terimi varsa filtreleme yap
+    fetch('/api/experiment-types')
+      .then(res => res.json())
+      .then(data => {
+        const filteredData = data.filter((deneyTuru: any) => 
+          deneyTuru.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          deneyTuru.base_price.toString().includes(searchTerm)
+        );
+        setDeneyTurleriListesi(filteredData);
+      })
+      .catch(() => setDeneyTurleriListesi([]));
+  };
+
+  const handleSearchTermChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
   return (
     <DeneyTuruEkleView
       formData={formData}
       errors={errors}
       deneyTurleriListesi={deneyTurleriListesi}
       duzenlemeModu={duzenlemeModu}
+      searchTerm={searchTerm}
       handleInputChange={handleInputChange}
       kaydet={kaydet}
       deneyTuruDuzenle={deneyTuruDuzenle}
       deneyTuruSilmeOnayi={deneyTuruSilmeOnayi}
       duzenlemeyiIptalEt={duzenlemeyiIptalEt}
+      onSearch={handleSearch}
+      onSearchTermChange={handleSearchTermChange}
     />
   );
 };

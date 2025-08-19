@@ -47,6 +47,9 @@ function DeneyEkle() {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [duzenlenecekKayitId, setDuzenlenecekKayitId] = useState<string | null>(null);
 
+  // Arama state'leri
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Sayfa yüklendiğinde kayıtları ve deney türlerini getir
   useEffect(() => {
     // Son 5 başvuru kaydını API'den çek
@@ -288,6 +291,15 @@ function DeneyEkle() {
     }
   };
 
+  // Arama fonksiyonları
+  const handleSearch = () => {
+    // Arama işlemi component içinde yapılıyor
+  };
+
+  const handleSearchTermChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
   return (
     <DeneyEkleView
       // State'ler
@@ -299,6 +311,7 @@ function DeneyEkle() {
       deneyler={deneyler}
       kayitlariListesi={kayitlariListesi}
       duzenlemeModu={duzenlemeModu}
+      searchTerm={searchTerm}
 
       // Setterlar
       setDeneySeayisi={setDeneySeayisi}
@@ -378,6 +391,8 @@ function DeneyEkle() {
       kayitDuzenle={kayitDuzenle}
       kayitSilmeOnayi={kayitSilmeOnayi}
       duzenlemeyiIptalEt={duzenlemeyiIptalEt}
+      onSearch={handleSearch}
+      onSearchTermChange={handleSearchTermChange}
 
       // Sabit veriler
   firmalar={firmalar}

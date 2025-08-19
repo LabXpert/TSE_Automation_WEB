@@ -10,11 +10,14 @@ interface DeneyTuruEkleViewProps {
   errors: { [key: string]: string };
   deneyTurleriListesi: DeneyTuru[];
   duzenlemeModu: boolean;
+  searchTerm: string;
   handleInputChange: (field: string, value: string) => void;
   kaydet: () => void;
   deneyTuruDuzenle: (id: number) => void;
   deneyTuruSilmeOnayi: (id: number) => void;
   duzenlemeyiIptalEt: () => void;
+  onSearch: () => void;
+  onSearchTermChange: (term: string) => void;
 }
 
 const DeneyTuruEkleView: React.FC<DeneyTuruEkleViewProps> = ({
@@ -22,11 +25,14 @@ const DeneyTuruEkleView: React.FC<DeneyTuruEkleViewProps> = ({
   errors,
   deneyTurleriListesi,
   duzenlemeModu,
+  searchTerm,
   handleInputChange,
   kaydet,
   deneyTuruDuzenle,
   deneyTuruSilmeOnayi,
-  duzenlemeyiIptalEt
+  duzenlemeyiIptalEt,
+  onSearch,
+  onSearchTermChange
 }) => {
 
 
@@ -105,7 +111,7 @@ const DeneyTuruEkleView: React.FC<DeneyTuruEkleViewProps> = ({
         {/* Sol Panel - Form */}
         <div style={{
           width: '600px',
-          height: '500px',
+          height: '600px',
           background: '#ffffff',
           borderRadius: '12px',
           padding: '24px',
@@ -330,7 +336,7 @@ const DeneyTuruEkleView: React.FC<DeneyTuruEkleViewProps> = ({
 
         {/* Sağ Panel - Deney Türleri Listesi (Scroll) */}
         <div style={{
-          height: '500px',
+          height: '600px',
           overflowY: 'auto',
           overflowX: 'hidden',
           paddingRight: '8px',
@@ -387,6 +393,71 @@ const DeneyTuruEkleView: React.FC<DeneyTuruEkleViewProps> = ({
               ({deneyTurleriListesi.length} tür)
             </span>
           </h2>
+
+          {/* Search Box */}
+          <div style={{
+            margin: '0 16px 16px 16px',
+            padding: '16px',
+            backgroundColor: '#f8fafc',
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0',
+            flexShrink: 0
+          }}>
+            <div style={{
+              position: 'relative',
+              width: '100%'
+            }}>
+              <input
+                type="text"
+                placeholder="Deney türü ara (ad, fiyat...)"
+                value={searchTerm}
+                onChange={(e) => {
+                  onSearchTermChange(e.target.value);
+                  onSearch();
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px 12px 48px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  color: '#374151',
+                  outline: 'none',
+                  transition: 'all 0.2s ease',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#dc2626';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+              <svg
+                style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af'
+                }}
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+            </div>
+          </div>
           
           <div style={{ 
             padding: '16px',

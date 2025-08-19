@@ -10,11 +10,14 @@ interface PersonelEkleViewProps {
   errors: { [key: string]: string };
   personelListesi: Personel[];
   duzenlemeModu: boolean;
+  searchTerm: string;
   handleInputChange: (field: string, value: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   personelDuzenle: (id: number) => void;
   personelSilmeOnayi: (id: number) => void;
   duzenlemeyiIptalEt: () => void;
+  onSearch: () => void;
+  onSearchTermChange: (term: string) => void;
 }
 
 const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
@@ -22,11 +25,14 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
   errors,
   personelListesi,
   duzenlemeModu,
+  searchTerm,
   handleInputChange,
   handleSubmit,
   personelDuzenle,
   personelSilmeOnayi,
-  duzenlemeyiIptalEt
+  duzenlemeyiIptalEt,
+  onSearch,
+  onSearchTermChange
 }) => {
 
   return (
@@ -91,6 +97,7 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
         {/* Sol Panel - Form */}
         <div style={{
           width: '600px',
+          height: '600px',
           background: '#ffffff',
           borderRadius: '12px',
           padding: '24px',
@@ -117,8 +124,19 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
             </p>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gap: '20px' }}>
+          <form id="personelForm" onSubmit={handleSubmit} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: 'calc(100% - 160px)'
+          }}>
+            <div style={{ 
+              display: 'grid', 
+              gap: '20px',
+              flex: 1,
+              overflowY: 'auto',
+              maxHeight: '400px',
+              paddingRight: '8px'
+            }}>
               
               {/* Ad */}
               <div>
@@ -274,21 +292,59 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
               </div>
 
             </div>
+          </form>
 
-            {/* Butonlar */}
-            <div style={{
-              marginTop: '32px',
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '16px'
-            }}>
+          {/* Butonlar - Sabit Alt Konum */}
+          <div style={{
+            borderTop: '1px solid #e0e0e0',
+            padding: '16px',
+            backgroundColor: '#fafafa',
+            marginTop: 'auto'
+          }}>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              {duzenlemeModu && (
+                <button
+                  type="button"
+                  onClick={duzenlemeyiIptalEt}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 24px',
+                    background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  İptal
+                </button>
+              )}
               <button
                 type="submit"
+                form="personelForm"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  padding: '14px 28px',
+                  padding: '12px 24px',
                   background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
                   color: '#ffffff',
                   border: 'none',
@@ -296,62 +352,38 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
                   fontSize: '14px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)'
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.2)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 21H5C4.45 21 4 20.55 4 20V4C4 3.45 4.45 3 5 3H16L20 7V20C20 20.55 19.55 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 {duzenlemeModu ? 'Güncelle' : 'Kaydet'}
               </button>
-
-              {duzenlemeModu && (
-                <button
-                  type="button"
-                  onClick={duzenlemeyiIptalEt}
-                  style={{
-                    padding: '14px 28px',
-                    background: '#ffffff',
-                    color: '#6b7280',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = '#9ca3af';
-                    e.currentTarget.style.color = '#374151';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = '#d1d5db';
-                    e.currentTarget.style.color = '#6b7280';
-                  }}
-                >
-                  İptal
-                </button>
-              )}
             </div>
-          </form>
+          </div>
         </div>
 
         {/* Sağ Panel - Personel Listesi */}
         <div style={{
+          height: '600px',
           background: '#ffffff',
           borderRadius: '12px',
           padding: '24px',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          border: '1px solid #e2e8f0'
+          border: '1px solid #e2e8f0',
+          overflowY: 'auto'
         }}>
           <h2 style={{
             fontSize: '22px',
@@ -374,6 +406,70 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
               ({personelListesi.length} kayıt)
             </span>
           </h2>
+
+          {/* Search Box */}
+          <div style={{
+            marginBottom: '20px',
+            padding: '16px',
+            backgroundColor: '#f8fafc',
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{
+              position: 'relative',
+              width: '100%'
+            }}>
+              <input
+                type="text"
+                placeholder="Personel ara (ad, soyad, ünvan...)"
+                value={searchTerm}
+                onChange={(e) => {
+                  onSearchTermChange(e.target.value);
+                  onSearch();
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px 12px 48px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  color: '#374151',
+                  outline: 'none',
+                  transition: 'all 0.2s ease',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#dc2626';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+              <svg
+                style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af'
+                }}
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+            </div>
+          </div>
 
           {personelListesi.length === 0 ? (
             <div style={{

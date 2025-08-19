@@ -24,6 +24,9 @@ const PersonelEkle: React.FC = () => {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [duzenlenecekPersonelId, setDuzenlenecekPersonelId] = useState<number | null>(null);
 
+  // Arama state'leri
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Personel listesini API'den çek
   useEffect(() => {
     fetch('/api/personnel')
@@ -165,17 +168,49 @@ const PersonelEkle: React.FC = () => {
     }
   };
 
+  // Arama fonksiyonları
+  const handleSearch = () => {
+    // Arama terimi boşsa tüm listeyi göster
+    if (!searchTerm.trim()) {
+      fetch('/api/personnel')
+        .then(res => res.json())
+        .then(data => setPersonelListesi(data))
+        .catch(() => setPersonelListesi([]));
+      return;
+    }
+
+    // Arama terimi varsa filtreleme yap
+    fetch('/api/personnel')
+      .then(res => res.json())
+      .then(data => {
+        const filteredData = data.filter((personel: ApiPersonnel) => 
+          personel.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          personel.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          personel.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setPersonelListesi(filteredData);
+      })
+      .catch(() => setPersonelListesi([]));
+  };
+
+  const handleSearchTermChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
   return (
     <PersonelEkleView
       formData={formData}
       errors={errors}
       personelListesi={personelListesi}
       duzenlemeModu={duzenlemeModu}
+      searchTerm={searchTerm}
       handleInputChange={handleInputChange}
       handleSubmit={handleSubmit}
       personelDuzenle={personelDuzenle}
       personelSilmeOnayi={personelSilmeOnayi}
       duzenlemeyiIptalEt={duzenlemeyiIptalEt}
+      onSearch={handleSearch}
+      onSearchTermChange={handleSearchTermChange}
     />
   );
 };

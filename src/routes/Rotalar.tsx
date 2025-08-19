@@ -5,6 +5,8 @@ import FirmaEkle from '../pages/DeneyEkle/FirmaEkle/FirmaEkle';
 import PersonelEkle from '../pages/PersonelEkle/PersonelEkle';
 import KullaniciEkle from '../pages/KullaniciEkle/KullaniciEkle';
 import DeneyTuruEkle from '../pages/DeneyTuruEkle/DeneyTuruEkle';
+import MakineEkle from '../pages/MakineEkle/MakineEkle';
+import KalibrasyonKurulusEkle from '../pages/KalibrasyonKurulusEkle/KalibrasyonKurulusEkle';
 import Login from '../pages/Login/Login';
 import ProtectedRoute from '../components/ProtectedRoute';
 import AdminRoute from '../components/AdminRoute';
@@ -54,6 +56,20 @@ function Rotalar() {
         <ProtectedRoute>
           <AdminRoute>
             <DeneyTuruEkle />
+          </AdminRoute>
+        </ProtectedRoute>
+      } />
+      <Route path="/makine-ekle" element={
+        <ProtectedRoute>
+          <AdminRoute>
+            <MakineEkle />
+          </AdminRoute>
+        </ProtectedRoute>
+      } />
+      <Route path="/kalibrasyon-kurulus-ekle" element={
+        <ProtectedRoute>
+          <AdminRoute>
+            <KalibrasyonKurulusEkle />
           </AdminRoute>
         </ProtectedRoute>
       } />
