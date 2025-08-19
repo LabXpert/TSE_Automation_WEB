@@ -67,6 +67,30 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP(6) DEFAULT NOW()
 );
 
+-- Calibration organizations table
+CREATE TABLE IF NOT EXISTS calibration_orgs (
+  id SERIAL PRIMARY KEY,
+  org_name TEXT NOT NULL,
+  contact_name TEXT,
+  email TEXT,
+  phone TEXT,
+  created_at TIMESTAMP(6) DEFAULT NOW(),
+  CONSTRAINT uq_calibration_orgs_email UNIQUE (email)
+);
+
+-- Machines table
+CREATE TABLE IF NOT EXISTS machines (
+  id SERIAL PRIMARY KEY,
+  serial_no TEXT NOT NULL,
+  equipment_name TEXT NOT NULL,
+  brand TEXT,
+  model TEXT,
+  measurement_range TEXT,
+  last_calibration_date DATE NOT NULL,
+  calibration_org_id INTEGER NOT NULL REFERENCES calibration_orgs(id) ON DELETE RESTRICT,
+  created_at TIMESTAMP(6) DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_companies_tax_no ON companies(tax_no);
 CREATE INDEX IF NOT EXISTS idx_applications_company_id ON applications(company_id);
@@ -76,3 +100,5 @@ CREATE INDEX IF NOT EXISTS idx_tests_experiment_type_id ON tests(experiment_type
 CREATE INDEX IF NOT EXISTS idx_tests_personnel_id ON tests(responsible_personnel_id);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_machines_last_calibration_date ON machines(last_calibration_date);
+CREATE INDEX IF NOT EXISTS idx_machines_calibration_org_id ON machines(calibration_org_id);

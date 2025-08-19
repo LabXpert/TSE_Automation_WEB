@@ -8,6 +8,8 @@ import personnelRoutes from './routes/personnel.route';
 import companyRoutes from './routes/company.route';
 import applicationRoutes from './routes/application.route';
 import userRoutes from './routes/user.route';
+import calibrationOrgRoutes from './routes/calibrationOrg.route';
+import machineRoutes from './routes/machine.route';
 
 const app = express();
 
@@ -33,7 +35,13 @@ app.get('/api', (_req, res) => {
       'GET /api/users',
       'GET /api/applications/recent',
       'GET /api/applications/all',
-      'POST /api/applications'
+      'POST /api/applications',
+      'GET /api/calibration-orgs',
+      'POST /api/calibration-orgs',
+      'GET /api/machines',
+      'POST /api/machines',
+      'GET /api/machines/expiring',
+      'GET /api/machines/stats'
     ]
   });
 });
@@ -49,6 +57,8 @@ app.use('/api/personnel', personnelRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/calibration-orgs', calibrationOrgRoutes);
+app.use('/api/machines', machineRoutes);
 
 // 404 handler
 app.use((_req, res, next) => {
