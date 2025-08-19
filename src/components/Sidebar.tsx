@@ -5,10 +5,15 @@ import { Link, useLocation } from 'react-router-dom';
 
 function SidebarComponent() {
   const [collapsed, setCollapsed] = useState(false);
+  const [kayitIslemleriAcik, setKayitIslemleriAcik] = useState(false);
   const location = useLocation();
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
+  };
+
+  const toggleKayitIslemleri = () => {
+    setKayitIslemleriAcik(!kayitIslemleriAcik);
   };
 
   // CSS animasyonları için style element
@@ -22,11 +27,26 @@ function SidebarComponent() {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
     }
+    .dropdown-content {
+      overflow: hidden;
+      transition: max-height 0.6s ease, opacity 0.6s ease;
+      max-height: 0;
+      opacity: 0;
+    }
+    
+    .dropdown-content.open {
+      max-height: 200px;
+      opacity: 1;
+    }
   `;
   if (!document.head.querySelector('[data-sidebar-styles]')) {
     styleElement.setAttribute('data-sidebar-styles', 'true');
     document.head.appendChild(styleElement);
   }
+
+  // Kayıt işlemleri sayfalarını kontrol et
+  const kayitIslemleriSayfalar = ['/personel-ekle', '/kullanici-ekle', '/deney-turu-ekle'];
+  const kayitIslemleriAktif = kayitIslemleriSayfalar.includes(location.pathname);
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
@@ -294,6 +314,7 @@ function SidebarComponent() {
               }),
             }}
           >
+            {/* Deney Yönetimi */}
             <MenuItem 
               active={location.pathname === '/deney-ekle' || location.pathname === '/'}
               component={<Link to="/deney-ekle" />}
@@ -326,134 +347,7 @@ function SidebarComponent() {
               </div>
             </MenuItem>
 
-            <MenuItem 
-              active={location.pathname === '/personel-ekle'}
-              component={<Link to="/personel-ekle" />}
-            >
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: collapsed ? '0' : '12px' 
-              }}>
-                <span style={{ 
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '20px',
-                  height: '20px'
-                }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                </span>
-                {!collapsed && (
-                  <span style={{ 
-                    letterSpacing: '-0.01em',
-                    lineHeight: '1.4'
-                  }}>
-                    Personel Yönetimi
-                  </span>
-                )}
-              </div>
-            </MenuItem>
-
-            <MenuItem 
-              active={location.pathname === '/kullanici-ekle'}
-              component={<Link to="/kullanici-ekle" />}
-            >
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: collapsed ? '0' : '12px' 
-              }}>
-                <span style={{ 
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '20px',
-                  height: '20px'
-                }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L12 4L3 7V9C3 10.1 3.9 11 5 11V17H7V11H9V17H11V11H13V17H15V11H17V17H19V11C20.1 11 21 10.1 21 9ZM7 19V21H17V19H7Z"/>
-                  </svg>
-                </span>
-                {!collapsed && (
-                  <span style={{ 
-                    letterSpacing: '-0.01em',
-                    lineHeight: '1.4'
-                  }}>
-                    Kullanıcı Yönetimi
-                  </span>
-                )}
-              </div>
-            </MenuItem>
-
-            <MenuItem 
-              active={location.pathname === '/deney-turu-ekle'}
-              component={<Link to="/deney-turu-ekle" />}
-            >
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: collapsed ? '0' : '12px' 
-              }}>
-                <span style={{ 
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '20px',
-                  height: '20px'
-                }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11ZM19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
-                  </svg>
-                </span>
-                {!collapsed && (
-                  <span style={{ 
-                    letterSpacing: '-0.01em',
-                    lineHeight: '1.4'
-                  }}>
-                    Deney Türü Yönetimi
-                  </span>
-                )}
-              </div>
-            </MenuItem>
-
-            <MenuItem 
-              active={location.pathname === '/login'}
-              component={<Link to="/login" />}
-            >
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: collapsed ? '0' : '12px' 
-              }}>
-                <span style={{ 
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '20px',
-                  height: '20px'
-                }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
-                  </svg>
-                </span>
-                {!collapsed && (
-                  <span style={{ 
-                    letterSpacing: '-0.01em',
-                    lineHeight: '1.4'
-                  }}>
-                    Giriş Yap
-                  </span>
-                )}
-              </div>
-            </MenuItem>
-
+            {/* Raporlama */}
             <MenuItem 
               active={location.pathname === '/raporla'}
               component={<Link to="/raporla" />}
@@ -481,6 +375,221 @@ function SidebarComponent() {
                     lineHeight: '1.4'
                   }}>
                     Raporlama
+                  </span>
+                )}
+              </div>
+            </MenuItem>
+
+            {/* Kayıt İşlemleri - Dropdown Ana Menü */}
+            <MenuItem 
+              active={kayitIslemleriAktif}
+              onClick={toggleKayitIslemleri}
+            >
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: collapsed ? '0' : '12px',
+                justifyContent: 'space-between',
+                width: '100%'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: collapsed ? '0' : '12px' 
+                }}>
+                  <span style={{ 
+                    fontSize: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '20px',
+                    height: '20px'
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4.9 21.1 5.8 22 7 22H17C18.1 22 19 21.1 19 20V8L14 2ZM17 20H7V4H13V9H17V20Z"/>
+                    </svg>
+                  </span>
+                  {!collapsed && (
+                    <span style={{ 
+                      letterSpacing: '-0.01em',
+                      lineHeight: '1.4'
+                    }}>
+                      Kayıt İşlemleri
+                    </span>
+                  )}
+                </div>
+                {!collapsed && (
+                  <svg 
+                    width="12" 
+                    height="12" 
+                    viewBox="0 0 24 24" 
+                    fill="currentColor"
+                    style={{ 
+                      transition: 'transform 0.3s ease',
+                      transform: kayitIslemleriAcik ? 'rotate(90deg)' : 'rotate(0deg)'
+                    }}
+                  >
+                    <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"/>
+                  </svg>
+                )}
+              </div>
+            </MenuItem>
+
+            {/* Kayıt İşlemleri Alt Menüler */}
+            {!collapsed && (
+              <div 
+                className={`dropdown-content ${kayitIslemleriAcik ? 'open' : ''}`}
+                style={{
+                  marginLeft: '8px',
+                  borderLeft: '2px solid #f1f5f9',
+                  paddingLeft: '4px',
+                  marginTop: '4px'
+                }}
+              >
+                {/* Personel Kayıtları */}
+                <MenuItem 
+                  active={location.pathname === '/personel-ekle'}
+                  component={<Link to="/personel-ekle" />}
+                  style={{
+                    margin: '3px 8px',
+                    fontSize: '13px',
+                    padding: '8px 12px'
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px',
+                    paddingLeft: '8px'
+                  }}>
+                    <span style={{ 
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '16px',
+                      height: '16px'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                      </svg>
+                    </span>
+                    <span style={{ 
+                      letterSpacing: '-0.01em',
+                      lineHeight: '1.4',
+                      fontSize: '13px'
+                    }}>
+                      Personel Kayıtları
+                    </span>
+                  </div>
+                </MenuItem>
+
+                {/* Kullanıcı Kayıtları */}
+                <MenuItem 
+                  active={location.pathname === '/kullanici-ekle'}
+                  component={<Link to="/kullanici-ekle" />}
+                  style={{
+                    margin: '3px 8px',
+                    fontSize: '13px',
+                    padding: '8px 12px'
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px',
+                    paddingLeft: '8px'
+                  }}>
+                    <span style={{ 
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '16px',
+                      height: '16px'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L12 4L3 7V9C3 10.1 3.9 11 5 11V17H7V11H9V17H11V11H13V17H15V11H17V17H19V11C20.1 11 21 10.1 21 9ZM7 19V21H17V19H7Z"/>
+                      </svg>
+                    </span>
+                    <span style={{ 
+                      letterSpacing: '-0.01em',
+                      lineHeight: '1.4',
+                      fontSize: '13px'
+                    }}>
+                      Kullanıcı Kayıtları
+                    </span>
+                  </div>
+                </MenuItem>
+
+                {/* Deney Türü Kayıtları */}
+                <MenuItem 
+                  active={location.pathname === '/deney-turu-ekle'}
+                  component={<Link to="/deney-turu-ekle" />}
+                  style={{
+                    margin: '3px 8px',
+                    fontSize: '13px',
+                    padding: '8px 12px'
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px',
+                    paddingLeft: '8px'
+                  }}>
+                    <span style={{ 
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '16px',
+                      height: '16px'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11ZM19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
+                      </svg>
+                    </span>
+                    <span style={{ 
+                      letterSpacing: '-0.01em',
+                      lineHeight: '1.4',
+                      fontSize: '13px'
+                    }}>
+                      Deney Türü Kayıtları
+                    </span>
+                  </div>
+                </MenuItem>
+              </div>
+            )}
+
+            {/* Giriş Yap */}
+            <MenuItem 
+              active={location.pathname === '/login'}
+              component={<Link to="/login" />}
+            >
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: collapsed ? '0' : '12px' 
+              }}>
+                <span style={{ 
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '20px',
+                  height: '20px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                  </svg>
+                </span>
+                {!collapsed && (
+                  <span style={{ 
+                    letterSpacing: '-0.01em',
+                    lineHeight: '1.4'
+                  }}>
+                    Giriş Yap
                   </span>
                 )}
               </div>
