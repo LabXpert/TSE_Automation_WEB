@@ -11,6 +11,7 @@ import userRoutes from './routes/user.route';
 import calibrationOrgRoutes from './routes/calibrationOrg.route';
 import machineRoutes from './routes/machine.route';
 import machineReportRoutes from './routes/machineReport.route';
+import alertRoutes from './routes/alert.route';
 
 const app = express();
 
@@ -46,7 +47,9 @@ app.get('/api', (_req, res) => {
       'GET /api/machine-reports/data',
       'GET /api/machine-reports/stats',
       'GET /api/machine-reports/top-used',
-      'GET /api/machine-reports/calibration-status'
+      'GET /api/machine-reports/calibration-status',
+      'GET /api/alerts/calibration',
+      'GET /api/alerts/calibration/summary'
     ]
   });
 });
@@ -65,6 +68,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/calibration-orgs', calibrationOrgRoutes);
 app.use('/api/machines', machineRoutes);
 app.use('/api/machine-reports', machineReportRoutes);
+app.use('/api/alerts', alertRoutes);
 
 // 404 handler
 app.use((_req, res, next) => {

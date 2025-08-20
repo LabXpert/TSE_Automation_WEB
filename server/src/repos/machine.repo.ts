@@ -264,4 +264,76 @@ export class MachineRepository {
     const result = await this.db.query(query);
     return result.rows;
   }
+
+  // Kalibrasyon uyarıları için özel method
+  async getCalibrationAlerts(): Promise<{
+    expired: Machine[];
+    expiringSoon: Machine[];
+    totalExpired: number;
+    totalExpiringSoon: number;
+  }> {
+    try {
+      // Süresi geçenler (1 yıl + bugün geçmiş)
+      const expiredQuery = `
+        SELECT 
+          m.id,
+          m.serial_no,
+          m.equipment_name,
+          m.brand,
+          m.model,
+          m.measurement_range,
+          m.last_calibration_date,
+          m.calibration_org_id,
+          co.org_name as calibration_org_name,
+          co.contact_name as calibration_contact_name,
+          co.email as calibration_email,
+          co.phone as calibration_phone,
+          (m.last_calibration_date + INTERVAL '1 year') as next_calibration_date,
+          EXTRACT(DAYS FROM (CURRENT_DATE - (m.last_calibration_date + INTERVAL '1 year'))) as days_overdue
+        FROM machines m
+        LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
+        WHERE m.last_calibration_date + INTERVAL '1 year' < CURRENT_DATE
+        ORDER BY m.last_calibration_date ASC
+      `;
+
+      // 30 gün içinde süresi dolacaklar
+      const expiringSoonQuery = `
+        SELECT 
+          m.id,
+          m.serial_no,
+          m.equipment_name,
+          m.brand,
+          m.model,
+          m.measurement_range,
+          m.last_calibration_date,
+          m.calibration_org_id,
+          co.org_name as calibration_org_name,
+          co.contact_name as calibration_contact_name,
+          co.email as calibration_email,
+          co.phone as calibration_phone,
+          (m.last_calibration_date + INTERVAL '1 year') as next_calibration_date,
+          EXTRACT(DAYS FROM ((m.last_calibration_date + INTERVAL '1 year') - CURRENT_DATE)) as days_remaining
+        FROM machines m
+        LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
+        WHERE m.last_calibration_date + INTERVAL '1 year' >= CURRENT_DATE 
+          AND m.last_calibration_date + INTERVAL '1 year' <= CURRENT_DATE + INTERVAL '30 days'
+        ORDER BY m.last_calibration_date ASC
+      `;
+
+      const [expiredResult, expiringSoonResult] = await Promise.all([
+        this.db.query(expiredQuery),
+        this.db.query(expiringSoonQuery)
+      ]);
+
+      return {
+        expired: expiredResult.rows,
+        expiringSoon: expiringSoonResult.rows,
+        totalExpired: expiredResult.rows.length,
+        totalExpiringSoon: expiringSoonResult.rows.length
+      };
+    } catch (error) {
+      console.error('Database query error in getCalibrationAlerts:', error);
+      throw error;
+    }
+  }
 }
