@@ -401,6 +401,39 @@ function SidebarComponent() {
               </div>
             </MenuItem>
 
+            {/* Analiz Dashboard */}
+            <MenuItem 
+              active={location.pathname === '/analiz'}
+              component={<Link to="/analiz" />}
+            >
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: collapsed ? '0' : '12px' 
+              }}>
+                <span style={{ 
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '20px',
+                  height: '20px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3,3V21H21V19H5V3H3M9,17H7V10H9V17M13,17H11V7H13V17M17,17H15V13H17V17Z"/>
+                  </svg>
+                </span>
+                {!collapsed && (
+                  <span style={{ 
+                    letterSpacing: '-0.01em',
+                    lineHeight: '1.4'
+                  }}>
+                    Analiz Dashboard
+                  </span>
+                )}
+              </div>
+            </MenuItem>
+
             {/* Kayıt İşlemleri - Sadece Admin'ler İçin */}
             {isAdmin && (
               <>
@@ -609,7 +642,7 @@ function SidebarComponent() {
                           height: '16px'
                         }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12,18.5C15.5,18.5 19.31,16.69 21.58,12C19.31,7.31 15.5,5.5 12,5.5C8.5,5.5 4.69,7.31 2.42,12C4.69,16.69 8.5,18.5 12,18.5M12,7C14.76,7 17,9.24 17,12C17,14.76 14.76,17 12,17C9.24,17 7,14.76 7,12C7,9.24 9.24,7 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/>
+                            <path d="M12,18.5C15.5,18.5 19.31,16.69 21.58,12C19.31,7.31 15.5,5.5 12,5.5C8.5,5.5 4.69,7.31 2.42,12C4.69,16.69 8,18.5 12,18.5M12,7C14.76,7 17,9.24 17,12C17,14.76 14.76,17 12,17C9.24,17 7,14.76 7,12C7,9.24 9.24,7 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/>
                           </svg>
                         </span>
                         <span style={{ 

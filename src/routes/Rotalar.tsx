@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import DeneyEkle from '../pages/DeneyEkle/DeneyEkle';
 import Raporla from '../pages/Raporla/Raporla';
+import Analiz from '../pages/Analiz/Analiz';
 import FirmaEkle from '../pages/DeneyEkle/FirmaEkle/FirmaEkle';
 import PersonelEkle from '../pages/PersonelEkle/PersonelEkle';
 import KullaniciEkle from '../pages/KullaniciEkle/KullaniciEkle';
@@ -38,6 +39,16 @@ function Rotalar() {
           <FirmaEkle />
         </ProtectedRoute>
       } />
+      <Route path="/raporla" element={
+        <ProtectedRoute>
+          <Raporla />
+        </ProtectedRoute>
+      } />
+      <Route path="/analiz" element={
+        <ProtectedRoute>
+          <Analiz />
+        </ProtectedRoute>
+      } />
       <Route path="/personel-ekle" element={
         <ProtectedRoute>
           <AdminRoute>
@@ -71,11 +82,6 @@ function Rotalar() {
           <AdminRoute>
             <KalibrasyonKurulusEkle />
           </AdminRoute>
-        </ProtectedRoute>
-      } />
-      <Route path="/raporla" element={
-        <ProtectedRoute>
-          <Raporla />
         </ProtectedRoute>
       } />
     </Routes>
