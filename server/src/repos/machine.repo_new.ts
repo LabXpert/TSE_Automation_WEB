@@ -11,9 +11,7 @@ export interface Machine {
   last_calibration_date: string;
   calibration_org_id: number;
   calibration_org_name?: string;
-  calibration_contact_name?: string;
-  calibration_email?: string;
-  calibration_phone?: string;
+  created_at: string;
 }
 
 // Makine oluşturma/güncelleme için input tipi
@@ -32,34 +30,25 @@ export class MachineRepository {
 
   // Tüm makineleri getir (kalibrasyon kuruluş adı ile birlikte)
   async findAll(): Promise<Machine[]> {
-    try {
-      console.log('Executing findAll query...');
-      const query = `
-        SELECT 
-          m.id,
-          m.serial_no,
-          m.equipment_name,
-          m.brand,
-          m.model,
-          m.measurement_range,
-          m.last_calibration_date,
-          m.calibration_org_id,
-          co.org_name as calibration_org_name,
-          co.contact_name as calibration_contact_name,
-          co.email as calibration_email,
-          co.phone as calibration_phone
-        FROM machines m
-        LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
-        ORDER BY m.id DESC
-      `;
-      
-      const result = await this.db.query(query);
-      console.log('Query result:', result.rows.length, 'rows');
-      return result.rows;
-    } catch (error) {
-      console.error('Database query error in findAll:', error);
-      throw error;
-    }
+    const query = `
+      SELECT 
+        m.id,
+        m.serial_no,
+        m.equipment_name,
+        m.brand,
+        m.model,
+        m.measurement_range,
+        m.last_calibration_date,
+        m.calibration_org_id,
+        co.org_name as calibration_org_name,
+        m.created_at
+      FROM machines m
+      LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
+      ORDER BY m.created_at DESC
+    `;
+    
+    const result = await this.db.query(query);
+    return result.rows;
   }
 
   // ID ile makine getir
@@ -75,9 +64,7 @@ export class MachineRepository {
         m.last_calibration_date,
         m.calibration_org_id,
         co.org_name as calibration_org_name,
-        co.contact_name as calibration_contact_name,
-        co.email as calibration_email,
-        co.phone as calibration_phone
+        m.created_at
       FROM machines m
       LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
       WHERE m.id = $1
@@ -194,9 +181,7 @@ export class MachineRepository {
         m.last_calibration_date,
         m.calibration_org_id,
         co.org_name as calibration_org_name,
-        co.contact_name as calibration_contact_name,
-        co.email as calibration_email,
-        co.phone as calibration_phone
+        m.created_at
       FROM machines m
       LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
       WHERE 
@@ -205,7 +190,7 @@ export class MachineRepository {
         LOWER(m.model) LIKE LOWER($1) OR
         LOWER(m.serial_no) LIKE LOWER($1) OR
         LOWER(co.org_name) LIKE LOWER($1)
-      ORDER BY m.id DESC
+      ORDER BY m.created_at DESC
     `;
     
     const searchPattern = `%${searchTerm}%`;
@@ -226,13 +211,11 @@ export class MachineRepository {
         m.last_calibration_date,
         m.calibration_org_id,
         co.org_name as calibration_org_name,
-        co.contact_name as calibration_contact_name,
-        co.email as calibration_email,
-        co.phone as calibration_phone
+        m.created_at
       FROM machines m
       LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
       WHERE m.calibration_org_id = $1
-      ORDER BY m.id DESC
+      ORDER BY m.created_at DESC
     `;
     
     const result = await this.db.query(query, [orgId]);
@@ -252,9 +235,7 @@ export class MachineRepository {
         m.last_calibration_date,
         m.calibration_org_id,
         co.org_name as calibration_org_name,
-        co.contact_name as calibration_contact_name,
-        co.email as calibration_email,
-        co.phone as calibration_phone
+        m.created_at
       FROM machines m
       LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
       WHERE m.last_calibration_date + INTERVAL '1 year' <= CURRENT_DATE + INTERVAL '${days} days'

@@ -74,7 +74,6 @@ CREATE TABLE IF NOT EXISTS calibration_orgs (
   contact_name TEXT,
   email TEXT,
   phone TEXT,
-  created_at TIMESTAMP(6) DEFAULT NOW(),
   CONSTRAINT uq_calibration_orgs_email UNIQUE (email)
 );
 
@@ -87,8 +86,7 @@ CREATE TABLE IF NOT EXISTS machines (
   model TEXT,
   measurement_range TEXT,
   last_calibration_date DATE NOT NULL,
-  calibration_org_id INTEGER NOT NULL REFERENCES calibration_orgs(id) ON DELETE RESTRICT,
-  created_at TIMESTAMP(6) DEFAULT NOW()
+  calibration_org_id INTEGER NOT NULL REFERENCES calibration_orgs(id) ON DELETE RESTRICT
 );
 
 -- Create indexes for better performance

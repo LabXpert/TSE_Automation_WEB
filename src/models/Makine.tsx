@@ -46,3 +46,33 @@ export interface MakineInput {
   last_calibration_date: Date;
   calibration_org_id: number;
 }
+
+// Makine uygulaması arayüzü (raporlama için)
+export interface MakineUygulama {
+  id: number;
+  basvuruNo: string;
+  basvuruTarihi: string;
+  belgelendirmeTuru: 'belgelendirme' | 'özel';
+  firmaAdi: string;
+  sorumluPersonel: string;
+  ucret: number;
+}
+
+// Makine kaydı arayüzü (raporlama için)
+export interface MakineKaydi {
+  id: number;
+  makineAdi: string;
+  model: string;
+  marka: string;
+  seriNo: string;
+  konum: string;
+  tedarikTarihi: string;
+  sonKalibrasyonTarihi: string;
+  sonrakiKalibrasyonTarihi: string;
+  durum: string;
+  notlar: string;
+  kalibrasyonKurulusu: string;
+  kullanimSayisi: number;
+  toplamGelir: number;
+  uygulamalar: MakineUygulama[];
+}
