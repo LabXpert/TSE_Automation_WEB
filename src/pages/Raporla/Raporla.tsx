@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as ExcelJS from 'exceljs';
 import RaporlaView from './RaporlaView.tsx';
-import ExcelImport from './ExcelImport.tsx';
 import type { DeneyKaydi } from '../../models/Deney.tsx';
 
 // API response tip tanımları
@@ -53,9 +52,6 @@ const Raporla: React.FC = () => {
   // Pagination state'leri
   const [sayfaBasiKayit, setSayfaBasiKayit] = useState<number>(25);
   const [aktifSayfa, setAktifSayfa] = useState<number>(1);
-
-  // Excel import state'leri
-  const [excelImportAcik, setExcelImportAcik] = useState<boolean>(false);
 
   // Sayfa yüklendiğinde veritabanından kayıtları getir
   useEffect(() => {
@@ -314,14 +310,6 @@ const Raporla: React.FC = () => {
     }
   };
 
-  // Excel import fonksiyonu
-  const handleExcelImport = (data: any[]) => {
-    console.log('Excel verisi içe aktarıldı:', data);
-    // Burada Excel verisini işleyebilirsiniz
-    // Örneğin API'ye gönderebilir veya mevcut verilere ekleyebilirsiniz
-    alert(`${data.length} satır veri başarıyla içe aktarıldı!`);
-  };
-
   // Birleşik filtreleme fonksiyonu (arama + tarih + personel + deney türü + durum)
   const filtreleriUygula = useCallback(() => {
     let sonuc = kayitlariListesi;
@@ -520,7 +508,6 @@ const Raporla: React.FC = () => {
         durumFiltreleriniTemizle={durumFiltreleriniTemizle}
         // Excel çıktısı props
         exceleCikart={exceleCikart}
-        setExcelImportAcik={setExcelImportAcik}
         // Pagination props
         aktifSayfa={aktifSayfa}
         toplamSayfaSayisi={toplamSayfaSayisi}
@@ -530,12 +517,6 @@ const Raporla: React.FC = () => {
         oncekiSayfa={oncekiSayfa}
         sonrakiSayfa={sonrakiSayfa}
         setSayfaBasiKayit={setSayfaBasiKayit}
-      />
-      
-      <ExcelImport
-        isOpen={excelImportAcik}
-        onClose={() => setExcelImportAcik(false)}
-        onImport={handleExcelImport}
       />
     </>
   );

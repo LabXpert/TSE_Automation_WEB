@@ -339,7 +339,6 @@ function DeneyEkleView({
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span>⚠️</span>
             <span><strong>Düzenleme Modu:</strong> Mevcut kayıt düzenleniyor. Değişiklikleri kaydetmeyi unutmayın!</span>
           </div>
         )}

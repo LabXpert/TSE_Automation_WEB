@@ -86,7 +86,6 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span>⚠️</span>
             <span>Mevcut makine düzenleniyor. Değişiklikleri kaydetmeyi unutmayın!</span>
           </div>
         )}
@@ -269,14 +268,13 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                   color: '#374151',
                   fontSize: '14px'
                 }}>
-                  Model <span style={{ color: '#dc2626' }}>*</span>
+                  Model
                 </label>
                 <input
                   type="text"
                   placeholder="Örn: XRF-2024"
                   value={formData.model}
                   onChange={(e) => onInputChange('model', e.target.value)}
-                  required
                   disabled={loading}
                   style={{ 
                     width: '100%', 
@@ -310,14 +308,13 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                   color: '#374151',
                   fontSize: '14px'
                 }}>
-                  Marka <span style={{ color: '#dc2626' }}>*</span>
+                  Marka
                 </label>
                 <input
                   type="text"
                   placeholder="Örn: Shimadzu"
                   value={formData.brand}
                   onChange={(e) => onInputChange('brand', e.target.value)}
-                  required
                   disabled={loading}
                   style={{ 
                     width: '100%', 
@@ -540,13 +537,25 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
           overflowY: 'auto'
         }}>
           <h2 style={{
-            fontSize: '22px',
-            fontWeight: '600',
-            color: '#0f172a',
-            marginBottom: '16px'
-          }}>
-            Kayıtlı Makineler ({makineler.length} kayıt)
-          </h2>
+              fontSize: '22px',
+              fontWeight: '600',
+              color: '#0f172a',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M4 22h16V10l-4 2V6l-4 2V2H4v20zM2 22h20v2H2v-2z" />
+              </svg>
+              Kayıtlı Makineler ({makineler.length} kayıt)
+            </h2>
+
 
           {/* Arama Alanı */}
           <div style={{
@@ -612,9 +621,14 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
               <div style={{
                 fontSize: '48px',
                 marginBottom: '16px',
-                color: '#94a3b8'
+                color: '#94a3b8',
+                display: 'flex',
+                justifyContent: 'center'
               }}>
-                🔧
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 6L13 7H9L7 6L1 7V9L7 8V18H9V12H15V18H17V8L21 9Z"/>
+                  <path d="M19.36 2.72L20.78 4.14L15.06 9.85C16.13 11.39 16.28 13.24 15.38 14.44L9.06 8.12C10.26 7.22 12.11 7.37 13.65 8.44L19.36 2.72Z"/>
+                </svg>
               </div>
               <div style={{ fontSize: '18px', marginBottom: '8px', color: '#374151' }}>
                 Henüz makine kaydı bulunmuyor

@@ -32,6 +32,14 @@ export class CalibrationOrgService {
         throw new Error('Kuruluş adı gereklidir');
       }
 
+      if (!orgData.contact_name?.trim()) {
+        throw new Error('İletişim kişisi gereklidir');
+      }
+
+      if (!orgData.phone?.trim()) {
+        throw new Error('Telefon numarası gereklidir');
+      }
+
       if (orgData.email && !this.isValidEmail(orgData.email)) {
         throw new Error('Geçerli bir e-posta adresi giriniz');
       }
@@ -48,6 +56,14 @@ export class CalibrationOrgService {
       // Validation
       if (orgData.org_name !== undefined && !orgData.org_name?.trim()) {
         throw new Error('Kuruluş adı gereklidir');
+      }
+
+      if (orgData.contact_name !== undefined && !orgData.contact_name?.trim()) {
+        throw new Error('İletişim kişisi gereklidir');
+      }
+
+      if (orgData.phone !== undefined && !orgData.phone?.trim()) {
+        throw new Error('Telefon numarası gereklidir');
       }
 
       if (orgData.email && !this.isValidEmail(orgData.email)) {

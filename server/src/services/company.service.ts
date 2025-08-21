@@ -60,17 +60,11 @@ export class CompanyService {
     // Vergi numarası benzersizlik kontrolü için boşluk karakterlerini temizle
     data.tax_no = data.tax_no.trim();
     
-    if (!data.contact_name?.trim()) {
-      throw new Error('İletişim adı gereklidir');
-    }
     if (!data.address?.trim()) {
       throw new Error('Adres gereklidir');
     }
     if (!data.phone?.trim()) {
       throw new Error('Telefon gereklidir');
-    }
-    if (!data.email?.trim()) {
-      throw new Error('Email gereklidir');
     }
 
     // Email validation

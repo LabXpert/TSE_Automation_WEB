@@ -79,7 +79,6 @@ const PersonelEkleView: React.FC<PersonelEkleViewProps> = ({
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span>⚠️</span>
             <span>Mevcut personel düzenleniyor. Değişiklikleri kaydetmeyi unutmayın!</span>
           </div>
         )}

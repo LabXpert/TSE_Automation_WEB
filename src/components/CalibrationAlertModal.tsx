@@ -95,7 +95,6 @@ const CalibrationAlertModal: React.FC<CalibrationAlertModalProps> = ({
             alignItems: 'center',
             gap: '12px'
           }}>
-            <span style={{ fontSize: '24px' }}>⚠️</span>
             <div>
               <h2 style={{
                 margin: 0,
@@ -152,7 +151,6 @@ const CalibrationAlertModal: React.FC<CalibrationAlertModalProps> = ({
               textAlign: 'center',
               padding: '40px'
             }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>✅</div>
               <h3 style={{ 
                 color: '#059669', 
                 margin: '0 0 8px 0',

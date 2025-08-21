@@ -99,7 +99,6 @@ const KullaniciEkleView: React.FC<KullaniciEkleViewProps> = ({
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span>⚠️</span>
             <span><strong>Düzenleme Modu:</strong> Mevcut kullanıcı düzenleniyor. Değişiklikleri kaydetmeyi unutmayın!</span>
           </div>
         )}
@@ -855,7 +854,7 @@ const KullaniciEkleView: React.FC<KullaniciEkleViewProps> = ({
                               color: '#64748b',
                               marginBottom: '4px'
                             }}>
-                              🎯 {kullanici.unvan}
+                              Unvan: {kullanici.unvan}
                             </div>
                           )}
                           {kullanici.phone && (
@@ -863,7 +862,7 @@ const KullaniciEkleView: React.FC<KullaniciEkleViewProps> = ({
                               fontSize: '12px',
                               color: '#64748b'
                             }}>
-                              📞 {kullanici.phone}
+                              Tel: {kullanici.phone}
                             </div>
                           )}
                         </div>

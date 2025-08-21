@@ -132,7 +132,9 @@ const MakineRaporlaView: React.FC<Props> = ({
               alignItems: 'center',
               gap: '8px'
             }}>
-              <span style={{ fontSize: '20px' }}>🔍</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 18H6V6H10V4H6C4.9 4 4 4.9 4 6V18C4 19.1 4.9 20 6 20H10V18ZM19 3.5L17.5 2L14 5.5L17.5 9L19 7.5L16.5 5H23V3H16.5L19 0.5V3.5ZM10 8H8V6H10V8ZM14 6V8H12V6H14ZM10 10H8V12H10V10ZM14 12V10H12V12H14ZM10 14H8V16H10V14ZM14 16V14H12V16H14Z"/>
+              </svg>
               Filtreleme & Arama
             </h3>
           </div>
@@ -149,13 +151,18 @@ const MakineRaporlaView: React.FC<Props> = ({
               {/* Arama */}
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                   fontSize: '14px',
                   fontWeight: '600',
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  🔍 Genel Arama
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 2a8 8 0 106.32 12.906l4.387 4.387-1.414 1.414-4.387-4.387A8 8 0 1010 2z"/>
+                  </svg>
+                  Genel Arama
                 </label>
                 <input
                   type="text"
@@ -184,13 +191,18 @@ const MakineRaporlaView: React.FC<Props> = ({
               {/* Kalibrasyon Durumu */}
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                   fontSize: '14px',
                   fontWeight: '600',
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  ⚡ Kalibrasyon Durumu
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l4 8H8l4-8zm0 20l-4-8h8l-4 8z"/>
+                  </svg>
+                  Kalibrasyon Durumu
                 </label>
                 <div style={{
                   display: 'flex',
@@ -198,9 +210,41 @@ const MakineRaporlaView: React.FC<Props> = ({
                   flexWrap: 'wrap'
                 }}>
                   {[
-                    { key: 'gecti', label: 'Geçenler', color: '#dc2626', bg: '#fee2e2' },
-                    { key: 'yaklasıyor', label: 'Yaklaşanlar', color: '#d97706', bg: '#fef3c7' },
-                    { key: 'normal', label: 'Normallar', color: '#059669', bg: '#dcfce7' }
+                    { 
+                      key: 'gecti', 
+                      label: 'Geçenler', 
+                      color: '#dc2626', 
+                      bg: '#fee2e2',
+                      icon: (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 6L13 7H9L7 6L1 7V9L7 8V18H9V12H15V18H17V8L21 9Z"/>
+                          <path d="M12 7C10.9 7 10 7.9 10 9S10.9 11 12 11 14 10.1 14 9 13.1 7 12 7ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM12 17C8.69 17 6 14.31 6 11S8.69 5 12 5 18 7.69 18 11 15.31 17 12 17Z"/>
+                        </svg>
+                      )
+                    },
+                    { 
+                      key: 'yaklasıyor', 
+                      label: 'Yaklaşanlar', 
+                      color: '#d97706', 
+                      bg: '#fef3c7',
+                      icon: (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM12 7C9.8 7 8 8.8 8 11C8 13.2 9.8 15 12 15C14.2 15 16 13.2 16 11C16 8.8 14.2 7 12 7Z"/>
+                          <path d="M12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2C17.5 2 22 6.5 22 12C22 17.5 17.5 22 12 22ZM12 20C16.4 20 20 16.4 20 12C20 7.6 16.4 4 12 4C7.6 4 4 7.6 4 12C4 16.4 7.6 20 12 20Z"/>
+                        </svg>
+                      )
+                    },
+                    { 
+                      key: 'normal', 
+                      label: 'Normallar', 
+                      color: '#059669', 
+                      bg: '#dcfce7',
+                      icon: (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM9 20L7 22L2 17L3.5 15.5L7 19L20.5 5.5L22 7L9 20Z"/>
+                        </svg>
+                      )
+                    }
                   ].map((durum) => (
                     <button
                       key={durum.key}
@@ -220,9 +264,13 @@ const MakineRaporlaView: React.FC<Props> = ({
                         fontSize: '12px',
                         fontWeight: '600',
                         cursor: 'pointer',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
                       }}
                     >
+                      {durum.icon}
                       {durum.label}
                     </button>
                   ))}
@@ -240,13 +288,18 @@ const MakineRaporlaView: React.FC<Props> = ({
               {/* Marka Seçimi */}
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                   fontSize: '14px',
                   fontWeight: '600',
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  🏭 Marka
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4 4h16v2H4zm0 14h16v2H4zM4 9h16v6H4z"/>
+                  </svg>
+                  Marka
                 </label>
                 <select
                   value={secilenMarka}
@@ -275,13 +328,18 @@ const MakineRaporlaView: React.FC<Props> = ({
               {/* Model Seçimi */}
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                   fontSize: '14px',
                   fontWeight: '600',
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  ⚙️ Model
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l9 4.5-9 4.5-9-4.5zM3 13l9 4.5 9-4.5"/>
+                  </svg>
+                  Model
                 </label>
                 <select
                   value={secilenModel}
@@ -310,13 +368,18 @@ const MakineRaporlaView: React.FC<Props> = ({
               {/* Kalibrasyon Kuruluşu */}
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                   fontSize: '14px',
                   fontWeight: '600',
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  🏢 Kalibrasyon Kuruluşu
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M2 3h20v2H2zm2 4h16v2H4zm0 4h16v10H4z"/>
+                  </svg>
+                  Kalibrasyon Kuruluşu
                 </label>
                 <select
                   value={secilenKalibrasyonOrg}
@@ -346,17 +409,9 @@ const MakineRaporlaView: React.FC<Props> = ({
             {/* Aksiyon Butonları */}
             <div style={{
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               alignItems: 'center'
             }}>
-              <div style={{
-                fontSize: '13px',
-                color: '#6b7280',
-                fontStyle: 'italic'
-              }}>
-                {makineData.length} makine gösteriliyor
-              </div>
-              
               <button
                 onClick={filtreleriTemizle}
                 style={{
@@ -382,7 +437,10 @@ const MakineRaporlaView: React.FC<Props> = ({
                   e.currentTarget.style.color = '#6b7280';
                 }}
               >
-                🧹 Filtreleri Temizle
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.36 2.72L20.78 4.14L15.06 9.85C16.13 11.39 16.28 13.24 15.38 14.44L9.06 8.12C10.26 7.22 12.11 7.37 13.65 8.44L19.36 2.72ZM5.93 17.57C3.92 15.56 2.69 13.16 2.35 10.92L7.23 8.83C8.74 10.13 11.12 10.69 13.09 9.59L19.42 15.92C17.21 18.13 14.34 19.42 11.35 19.92C9.26 20.25 6.95 19.83 5.14 18.64C4.64 18.11 4.18 17.29 3.8 16.5C3.85 17.07 4.32 17.69 5.93 17.57Z"/>
+                </svg>
+                Filtreleri Temizle
               </button>
             </div>
           </div>
@@ -429,7 +487,6 @@ const MakineRaporlaView: React.FC<Props> = ({
           alignItems: 'center',
           gap: '12px'
         }}>
-          <span style={{ fontSize: '24px' }}>⚠️</span>
           <div>
             <p style={{ fontSize: '14px', fontWeight: '600', color: '#991b1b', margin: '0 0 4px 0' }}>
               Hata Oluştu
@@ -456,18 +513,20 @@ const MakineRaporlaView: React.FC<Props> = ({
             borderBottom: '1px solid #e2e8f0',
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
           }}>
-            <h3 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#0f172a',
-              margin: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <span style={{ fontSize: '24px' }}>🏭</span>
-              Makine Listesi ({makineData.length} makine)
-            </h3>
+          <h3 style={{
+            fontSize: '20px',
+            fontWeight: '600',
+            color: '#0f172a',
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 22h16V10l-4 2V6l-4 2V2H4v20zM2 22h20v2H2v-2z"/>
+            </svg>
+            Makine Listesi ({makineData.length} makine)
+          </h3>
           </div>
 
           {/* Tablo */}
@@ -627,39 +686,67 @@ const MakineRaporlaView: React.FC<Props> = ({
                       padding: '16px 12px',
                       borderRight: '1px solid #f1f5f9'
                     }}>
-                      <div>
+                        <div>
+                        {/* Kuruluş adı */}
                         <div style={{
                           fontSize: '14px',
                           fontWeight: '600',
                           color: '#0f172a',
-                          marginBottom: '2px'
+                          marginBottom: '2px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
                         }}>
                           {makine.calibration_org_name || 'Belirtilmemiş'}
                         </div>
+
+                        {/* Yetkili kişi */}
                         {makine.calibration_contact_name && (
                           <div style={{
                             fontSize: '12px',
                             color: '#64748b',
-                            marginBottom: '2px'
+                            marginBottom: '2px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
                           }}>
-                            📞 {makine.calibration_contact_name}
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a4 4 0 110-8 4 4 0 010 8z"/>
+                            </svg>
+                            {makine.calibration_contact_name}
                           </div>
                         )}
+
+                        {/* Telefon */}
                         {makine.calibration_phone && (
                           <div style={{
                             fontSize: '11px',
                             color: '#64748b',
-                            marginBottom: '1px'
+                            marginBottom: '1px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
                           }}>
-                            📱 {makine.calibration_phone}
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1v3.5a1 1 0 01-1 1C10.29 22 2 13.71 2 3.5a1 1 0 011-1H6.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
+                            </svg>
+                            {makine.calibration_phone}
                           </div>
                         )}
+
+                        {/* Mail */}
                         {makine.calibration_email && (
                           <div style={{
                             fontSize: '11px',
-                            color: '#64748b'
+                            color: '#64748b',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
                           }}>
-                            ✉️ {makine.calibration_email}
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M20 4H4a2 2 0 00-2 2v12c0 1.1.9 2 2 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                            {makine.calibration_email}
                           </div>
                         )}
                       </div>
@@ -814,7 +901,6 @@ const MakineRaporlaView: React.FC<Props> = ({
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                         >
-                          <span style={{ fontSize: '9px' }}>🔧</span>
                           <span>Kalibre Et</span>
                         </button>
                       </div>
@@ -825,54 +911,63 @@ const MakineRaporlaView: React.FC<Props> = ({
             </table>
           </div>
 
-          {/* Excel Çıktısı Butonu */}
+          {/* Pagination ve Excel Butonları */}
           {makineData.length > 0 && (
             <div style={{
               display: 'flex',
               justifyContent: 'flex-end',
+              alignItems: 'center',
               marginTop: '20px',
               paddingTop: '20px',
-              borderTop: '1px solid #e2e8f0'
+              borderTop: '1px solid #e2e8f0',
+              flexWrap: 'wrap',
+              gap: '16px'
             }}>
-              <button
-                onClick={exportToExcel}
-                disabled={loading || makineData.length === 0}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 20px',
-                  background: loading || makineData.length === 0 ? '#94a3b8' : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#ffffff',
-                  cursor: loading || makineData.length === 0 ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading && makineData.length > 0) {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.35)';
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading && makineData.length > 0) {
-                    e.currentTarget.style.transform = 'translateY(0px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.25)';
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
-                  }
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                  <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
-                </svg>
-                Excel'e Çıkart ({makineData.length} makine)
-              </button>
+              {/* Excel Butonu */}
+              <div style={{
+                display: 'flex',
+                gap: '12px'
+              }}>
+                <button
+                  onClick={exportToExcel}
+                  disabled={loading || makineData.length === 0}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 20px',
+                    background: loading || makineData.length === 0 ? '#94a3b8' : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#ffffff',
+                    cursor: loading || makineData.length === 0 ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading && makineData.length > 0) {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.35)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading && makineData.length > 0) {
+                      e.currentTarget.style.transform = 'translateY(0px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.25)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+                    }
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
+                  </svg>
+                  Excel'e Çıkart ({makineData.length} makine)
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -888,12 +983,6 @@ const MakineRaporlaView: React.FC<Props> = ({
           padding: '60px',
           textAlign: 'center'
         }}>
-          <div style={{
-            fontSize: '80px',
-            marginBottom: '20px'
-          }}>
-            ⚙️
-          </div>
           <h3 style={{
             fontSize: '24px',
             fontWeight: '600',

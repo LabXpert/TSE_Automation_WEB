@@ -93,7 +93,6 @@ const DeneyTuruEkleView: React.FC<DeneyTuruEkleViewProps> = ({
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span>⚠️</span>
             <span><strong>Düzenleme Modu:</strong> Mevcut deney türü düzenleniyor. Değişiklikleri kaydetmeyi unutmayın!</span>
           </div>
         )}
@@ -549,7 +548,7 @@ const DeneyTuruEkleView: React.FC<DeneyTuruEkleViewProps> = ({
                             alignItems: 'center',
                             gap: '8px'
                           }}>
-                            <span style={{ fontWeight: '500' }}>💰 Temel Fiyat:</span>
+                            <span style={{ fontWeight: '500' }}>Temel Fiyat:</span>
                             <span style={{ 
                               color: '#059669', 
                               fontWeight: '600'

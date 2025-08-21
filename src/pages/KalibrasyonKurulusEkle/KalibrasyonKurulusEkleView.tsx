@@ -91,7 +91,6 @@ const KalibrasyonKurulusEkleView: React.FC<KalibrasyonKurulusEkleViewProps> = ({
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span>⚠️</span>
             <span>Mevcut kuruluş düzenleniyor. Değişiklikleri kaydetmeyi unutmayın!</span>
           </div>
         )}
@@ -253,13 +252,14 @@ const KalibrasyonKurulusEkleView: React.FC<KalibrasyonKurulusEkleViewProps> = ({
                   color: '#374151',
                   fontSize: '14px'
                 }}>
-                  İletişim Kişisi
+                  İletişim Kişisi *
                 </label>
                 <input
                   type="text"
                   placeholder="Örn: Ali Veli"
                   value={formData.contact_name || ''}
                   onChange={(e) => onInputChange('contact_name', e.target.value)}
+                  required
                   disabled={loading}
                   style={{ 
                     width: '100%', 
@@ -293,13 +293,14 @@ const KalibrasyonKurulusEkleView: React.FC<KalibrasyonKurulusEkleViewProps> = ({
                   color: '#374151',
                   fontSize: '14px'
                 }}>
-                  Telefon
+                  Telefon *
                 </label>
                 <input
                   type="tel"
                   placeholder="Örn: +90 312 XXX XX XX"
                   value={formData.phone || ''}
                   onChange={(e) => onInputChange('phone', e.target.value)}
+                  required
                   disabled={loading}
                   style={{ 
                     width: '100%', 
@@ -563,7 +564,6 @@ const KalibrasyonKurulusEkleView: React.FC<KalibrasyonKurulusEkleViewProps> = ({
                 marginBottom: '16px',
                 color: '#94a3b8'
               }}>
-                🏢
               </div>
               <div style={{ fontSize: '18px', marginBottom: '8px', color: '#374151' }}>
                 Henüz kalibrasyon kuruluşu kaydı bulunmuyor
