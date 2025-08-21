@@ -265,6 +265,23 @@ export class MachineRepository {
     return result.rows;
   }
 
+  // Kalibrasyon tarihi güncelle
+  async updateCalibrationDate(id: number, calibrationDate: string): Promise<Machine | null> {
+    const query = `
+      UPDATE machines 
+      SET last_calibration_date = $1
+      WHERE id = $2
+      RETURNING *
+    `;
+
+    const result = await this.db.query(query, [calibrationDate, id]);
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return await this.findById(id);
+  }
+
   // Kalibrasyon uyarıları için özel method
   async getCalibrationAlerts(): Promise<{
     expired: Machine[];

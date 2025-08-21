@@ -153,6 +153,41 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
+// PUT /api/machines/:id/calibration - Kalibrasyon tarihi güncelle
+router.put('/:id/calibration', async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Geçerli bir ID giriniz'
+      });
+    }
+
+    const { calibrationDate } = req.body;
+    if (!calibrationDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kalibrasyon tarihi gereklidir'
+      });
+    }
+
+    const updatedMachine = await machineService.updateCalibrationDate(id, calibrationDate);
+    res.json({
+      success: true,
+      message: 'Kalibrasyon tarihi başarıyla güncellendi',
+      data: updatedMachine
+    });
+  } catch (error) {
+    console.error('PUT /api/machines/:id/calibration error:', error);
+    const statusCode = error instanceof Error && error.message.includes('bulunamadı') ? 404 : 400;
+    res.status(statusCode).json({
+      success: false,
+      message: error instanceof Error ? error.message : 'Kalibrasyon tarihi güncellenemedi'
+    });
+  }
+});
+
 // PUT /api/machines/:id - Makineyi güncelle
 router.put('/:id', async (req: Request, res: Response) => {
   try {

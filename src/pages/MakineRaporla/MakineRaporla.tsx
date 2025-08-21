@@ -121,6 +121,39 @@ const MakineRaporla: React.FC = () => {
     setSecilenDurumlar([]);
   };
 
+  // Makine kalibrasyon tarihini güncelle
+  const makineKalibrasyonGuncelle = async (makineId: number, yeniTarih: string) => {
+    try {
+      const response = await fetch(`/api/machines/${makineId}/calibration`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          calibrationDate: yeniTarih
+        }),
+      });
+
+      if (response.ok) {
+        // Başarılı güncelleme sonrası local state'i güncelle
+        setMakineData(prevData => 
+          prevData.map(makine => 
+            makine.id === makineId 
+              ? { ...makine, last_calibration_date: yeniTarih }
+              : makine
+          )
+        );
+        alert('Kalibrasyon tarihi başarıyla güncellendi!');
+      } else {
+        const errorData = await response.json();
+        alert(`Güncelleme hatası: ${errorData.message || 'Bilinmeyen hata'}`);
+      }
+    } catch (error) {
+      console.error('Kalibrasyon güncelleme hatası:', error);
+      alert('Kalibrasyon tarihi güncellenirken bir hata oluştu!');
+    }
+  };
+
   // Excel çıktısı alma fonksiyonu
   const exceleCikart = async () => {
     try {
@@ -363,6 +396,7 @@ const MakineRaporla: React.FC = () => {
         modeller={modeller}
         kalibrasyonOrglari={kalibrasyonOrglari}
         filtreleriTemizle={filtreleriTemizle}
+        makineKalibrasyonGuncelle={makineKalibrasyonGuncelle}
       />
     </>
   );

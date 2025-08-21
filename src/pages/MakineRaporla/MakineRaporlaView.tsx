@@ -40,6 +40,7 @@ interface Props {
   modeller: string[];
   kalibrasyonOrglari: string[];
   filtreleriTemizle: () => void;
+  makineKalibrasyonGuncelle: (makineId: number, yeniTarih: string) => Promise<void>;
 }
 
 const MakineRaporlaView: React.FC<Props> = ({
@@ -61,7 +62,8 @@ const MakineRaporlaView: React.FC<Props> = ({
   markalar,
   modeller,
   kalibrasyonOrglari,
-  filtreleriTemizle
+  filtreleriTemizle,
+  makineKalibrasyonGuncelle
 }) => {
 
   // Excel'e aktar - sadece ana export fonksiyonunu kullan
@@ -531,9 +533,17 @@ const MakineRaporlaView: React.FC<Props> = ({
                   <th style={{
                     padding: '16px 12px',
                     textAlign: 'center',
-                    fontWeight: '600'
+                    fontWeight: '600',
+                    borderRight: '1px solid #991b1b'
                   }}>
                     Durum
+                  </th>
+                  <th style={{
+                    padding: '16px 12px',
+                    textAlign: 'center',
+                    fontWeight: '600'
+                  }}>
+                    İşlemler
                   </th>
                 </tr>
               </thead>
@@ -694,7 +704,8 @@ const MakineRaporlaView: React.FC<Props> = ({
                     {/* Durum */}
                     <td style={{
                       padding: '16px 12px',
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      borderRight: '1px solid #f1f5f9'
                     }}>
                       {getKalibrasyonDurumu && makine.last_calibration_date ? (() => {
                         const durumInfo = getKalibrasyonDurumu(makine.last_calibration_date);
@@ -735,6 +746,78 @@ const MakineRaporlaView: React.FC<Props> = ({
                           Belirtilmemiş
                         </div>
                       )}
+                    </td>
+
+                    {/* İşlemler */}
+                    <td style={{
+                      padding: '16px 12px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px',
+                        alignItems: 'center',
+                        minWidth: '140px'
+                      }}>
+                        {/* Tarih Seçici */}
+                        <input
+                          type="date"
+                          defaultValue={new Date().toISOString().split('T')[0]}
+                          style={{
+                            padding: '4px 6px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            width: '100%',
+                            maxWidth: '110px',
+                            textAlign: 'center'
+                          }}
+                          id={`tarih-${makine.id}`}
+                        />
+                        
+                        {/* Kalibre Edildi Butonu */}
+                        <button
+                          onClick={() => {
+                            const tarihInput = document.getElementById(`tarih-${makine.id}`) as HTMLInputElement;
+                            if (tarihInput && tarihInput.value) {
+                              makineKalibrasyonGuncelle(makine.id, tarihInput.value);
+                            } else {
+                              alert('Lütfen geçerli bir tarih seçin!');
+                            }
+                          }}
+                          style={{
+                            padding: '4px 8px',
+                            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            width: '100%',
+                            maxWidth: '110px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.3)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <span style={{ fontSize: '9px' }}>🔧</span>
+                          <span>Kalibre Et</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

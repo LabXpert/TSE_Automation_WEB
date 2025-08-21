@@ -133,6 +133,27 @@ export class MachineService {
     }
   }
 
+  async updateCalibrationDate(id: number, calibrationDate: string): Promise<Machine> {
+    try {
+      // Tarih kontrolü
+      const calibrationDateObj = new Date(calibrationDate);
+      const today = new Date();
+      
+      if (calibrationDateObj > today) {
+        throw new Error('Kalibrasyon tarihi gelecekte olamaz');
+      }
+
+      const updatedMachine = await this.machineRepo.updateCalibrationDate(id, calibrationDate);
+      if (!updatedMachine) {
+        throw new Error('Makine bulunamadı');
+      }
+      return updatedMachine;
+    } catch (error) {
+      console.error('Error updating calibration date:', error);
+      throw error;
+    }
+  }
+
   async getCalibrationStats(): Promise<{
     total: number;
     expiring30Days: number;
