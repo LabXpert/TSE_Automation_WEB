@@ -20,14 +20,11 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  Radar,
-  ScatterChart,
-  Scatter
+  Radar
 } from 'recharts';
-import { Calendar, Users, TrendingUp, Award, Building2, Clock, BarChart3, PieChart as PieChartIcon, Activity, Target, Star } from 'lucide-react';
+import { Calendar, Users, TrendingUp, Building2, Clock, BarChart3, PieChart as PieChartIcon, Activity, Target, Star } from 'lucide-react';
 
 // Type definitions
-type MetricType = 'testSayisi' | 'uygunluk' | 'gelir' | 'akredite';
 type TimeRangeType = '7gun' | '30gun' | '3ay' | '6ay' | '12ay' | 'tumzaman';
 type TabType = 'genel' | 'firmalar' | 'personel' | 'testler' | 'zaman';
 
@@ -154,14 +151,11 @@ const CHART_COLORS = [
 
 const AnalizView = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRangeType>('12ay');
-  const [selectedMetric, setSelectedMetric] = useState<MetricType>('testSayisi');
+
   const [loading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('genel');
 
-  // Metric değiştirme fonksiyonu
-  const handleMetricChange = (metric: MetricType) => {
-    setSelectedMetric(metric);
-  };
+
 
   // Zaman aralığı değiştirme
   const handleTimeRangeChange = (range: TimeRangeType) => {
@@ -297,29 +291,7 @@ const AnalizView = () => {
               <option value="tumzaman">Tüm Zamanlar</option>
             </select>
 
-            {/* Metrik Seçici */}
-            <select
-              value={selectedMetric}
-              onChange={(e) => handleMetricChange(e.target.value as MetricType)}
-              style={{
-                padding: '12px 16px',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                fontSize: '14px',
-                fontWeight: '600',
-                backgroundColor: '#ffffff',
-                color: '#374151',
-                outline: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                minWidth: '140px'
-              }}
-            >
-              <option value="testSayisi">Test Sayısı</option>
-              <option value="uygunluk">Uygunluk Oranı</option>
-              <option value="gelir">Gelir Analizi</option>
-              <option value="akredite">Akredite Oranı</option>
-            </select>
+
           </div>
         </div>
       </div>
@@ -402,14 +374,7 @@ const AnalizView = () => {
                 color: COLORS.primary,
                 trend: '+12%'
               },
-              {
-                title: 'Uygunluk Oranı',
-                value: `%${mockData.stats.uygunlukOrani}`,
-                change: mockData.stats.uygunlukOrani >= 85 ? 'Hedef üzerinde' : 'Hedef altında',
-                icon: Award,
-                color: COLORS.success,
-                trend: '+3%'
-              },
+
               {
                 title: 'Akredite Oranı',
                 value: `%${mockData.stats.akrediteOrani}`,
@@ -426,14 +391,7 @@ const AnalizView = () => {
                 color: COLORS.warning,
                 trend: '+8%'
               },
-              {
-                title: 'Ortalama Tamamlanma',
-                value: `${mockData.stats.ortalamaTamamlanmaSuresi} gün`,
-                change: 'Hedef: 5 gün',
-                icon: Clock,
-                color: COLORS.info,
-                trend: '-15%'
-              },
+
               {
                 title: 'Aylık Performans',
                 value: mockData.stats.enYuksekAylikTest.toString(),
@@ -561,25 +519,8 @@ const AnalizView = () => {
                   gap: '12px'
                 }}>
                   <TrendingUp size={20} style={{ color: COLORS.primary }} />
-                  12 Aylık Performans Trendi
+                  12 Aylık Toplam Deney Sayısı Trendi
                 </h3>
-                <div style={{
-                  display: 'flex',
-                  gap: '8px'
-                }}>
-                  {['Test Sayısı', 'Uygunluk %', 'Gelir'].map((metric) => (
-                    <div key={metric} style={{
-                      fontSize: '12px',
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      background: '#f1f5f9',
-                      color: '#475569',
-                      fontWeight: '600'
-                    }}>
-                      {metric}
-                    </div>
-                  ))}
-                </div>
               </div>
               <ResponsiveContainer width="100%" height={350}>
                 <ComposedChart data={mockData.aylikTrend}>
@@ -616,21 +557,6 @@ const AnalizView = () => {
                     fill="url(#testGradient)"
                     strokeWidth={3}
                   />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="uygunluk"
-                    stroke={COLORS.success}
-                    strokeWidth={3}
-                    dot={{ fill: COLORS.success, strokeWidth: 2, r: 4 }}
-                  />
-                  <Bar
-                    yAxisId="left"
-                    dataKey="gelir"
-                    fill={COLORS.secondary}
-                    opacity={0.7}
-                    radius={[4, 4, 0, 0]}
-                  />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -653,7 +579,7 @@ const AnalizView = () => {
                 gap: '8px'
               }}>
                 <PieChartIcon size={18} style={{ color: COLORS.secondary }} />
-                Test Türü Dağılımı
+                Deney Türü Dağılımı
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -693,7 +619,7 @@ const AnalizView = () => {
           }}>
             {[
               { title: 'En Aktif Firma', value: mockData.topFirmalar[0].firma, subtitle: `${mockData.topFirmalar[0].testSayisi} test` },
-              { title: 'En Yüksek Uygunluk', value: `%${Math.max(...mockData.topFirmalar.map(f => f.uygunlukOrani))}`, subtitle: 'HAVELSAN A.Ş.' },
+              { title: 'En Aktif Firma Test Sayısı', value: mockData.topFirmalar[0].testSayisi, subtitle: mockData.topFirmalar[0].firma },
               { title: 'Toplam Gelir', value: `${(mockData.topFirmalar.reduce((acc, f) => acc + f.toplamGelir, 0) / 1000).toFixed(0)}K ₺`, subtitle: 'Tüm firmalardan' },
               { title: 'Ortalama Test/Firma', value: Math.round(mockData.topFirmalar.reduce((acc, f) => acc + f.testSayisi, 0) / mockData.topFirmalar.length), subtitle: 'Aylık ortalama' }
             ].map((stat, index) => (
@@ -743,7 +669,7 @@ const AnalizView = () => {
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
-                    {['Sıra', 'Firma Adı', 'Test Sayısı', 'Uygunluk Oranı', 'Toplam Gelir', 'Favori Test Türü', 'Son Test'].map((header, index) => (
+                    {['Sıra', 'Firma Adı', 'Test Sayısı', 'Akredite Oranı', 'Toplam Gelir', 'Favori Test Türü', 'Son Test'].map((header, index) => (
                       <th key={index} style={{
                         padding: '16px 12px',
                         textAlign: 'left',
@@ -795,16 +721,14 @@ const AnalizView = () => {
                       </td>
                       <td style={{ padding: '16px 12px', textAlign: 'center' }}>
                         <span style={{
-                          background: firma.uygunlukOrani >= 90 ? 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)' : 
-                                   firma.uygunlukOrani >= 85 ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' : 
-                                   'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-                          color: firma.uygunlukOrani >= 90 ? '#166534' : firma.uygunlukOrani >= 85 ? '#92400e' : '#dc2626',
+                          background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                          color: '#1e40af',
                           padding: '4px 12px',
                           borderRadius: '20px',
                           fontSize: '13px',
                           fontWeight: '700'
                         }}>
-                          %{firma.uygunlukOrani}
+                          %{Math.floor(Math.random() * 30) + 70}
                         </span>
                       </td>
                       <td style={{ padding: '16px 12px', fontWeight: '600', color: COLORS.success }}>
@@ -852,8 +776,9 @@ const AnalizView = () => {
                   <YAxis 
                     type="category" 
                     dataKey="firma"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
-                    width={100}
+                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    width={120}
+                    tickFormatter={(value) => value.length > 15 ? value.substring(0, 12) + '...' : value}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar 
@@ -879,10 +804,10 @@ const AnalizView = () => {
                 color: '#0f172a',
                 margin: '0 0 20px 0'
               }}>
-                Uygunluk Oranları
+                Akredite Oranları
               </h4>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={mockData.topFirmalar.slice(0, 6)}>
+                <BarChart data={mockData.topFirmalar.slice(0, 6).map(firma => ({...firma, akrediteOrani: Math.floor(Math.random() * 30) + 70}))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis 
                     dataKey="firma"
@@ -894,7 +819,7 @@ const AnalizView = () => {
                   <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar 
-                    dataKey="uygunlukOrani" 
+                    dataKey="akrediteOrani" 
                     fill={COLORS.success}
                     radius={[4, 4, 0, 0]}
                   />
@@ -916,10 +841,10 @@ const AnalizView = () => {
             marginBottom: '32px'
           }}>
             {[
-              { title: 'En Aktif Personel', value: mockData.topPersonel[0].personel.split(' ').slice(-2).join(' '), subtitle: `${mockData.topPersonel[0].testSayisi} test` },
-              { title: 'En Yüksek Uygunluk', value: `%${Math.max(...mockData.topPersonel.map(p => p.uygunlukOrani))}`, subtitle: 'Dr. Fatma DEMİR' },
-              { title: 'En Hızlı Tamamlama', value: `${Math.min(...mockData.topPersonel.map(p => p.ortalamaSure))} gün`, subtitle: 'Ortalama süre' },
-              { title: 'Toplam Proje', value: mockData.topPersonel.reduce((acc, p) => acc + p.tamamlananProjeSayisi, 0), subtitle: 'Tamamlanan' }
+              { title: 'En Aktif Personel', value: mockData.topPersonel[0].personel.split(' ').slice(-2).join(' '), subtitle: '' },
+              { title: 'En Aktif Personel Test Sayısı', value: mockData.topPersonel[0].testSayisi, subtitle: 'Test Sayısı' },
+              { title: 'Toplam Gelir', value: `${(mockData.topPersonel[0].testSayisi * 2500 / 1000).toFixed(0)}K ₺`, subtitle: 'En aktif personel' },
+              { title: 'Performans Artışı', value: '%+15', subtitle: 'Bu aya göre artış' }
             ].map((stat, index) => (
               <div key={index} style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -967,7 +892,7 @@ const AnalizView = () => {
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
-                    {['Sıra', 'Personel Adı', 'Test Sayısı', 'Uygunluk %', 'Uzmanlık Alanı', 'Proje Sayısı', 'Ort. Süre'].map((header, index) => (
+                    {['Sıra', 'Personel Adı', 'Test Sayısı', 'Akredite %', 'Unvan', 'Gelir'].map((header, index) => (
                       <th key={index} style={{
                         padding: '16px 12px',
                         textAlign: 'left',
@@ -977,7 +902,7 @@ const AnalizView = () => {
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
                         ...(index === 0 && { borderTopLeftRadius: '12px' }),
-                        ...(index === 6 && { borderTopRightRadius: '12px' })
+                        ...(index === 5 && { borderTopRightRadius: '12px' })
                       }}>
                         {header}
                       </th>
@@ -1019,16 +944,14 @@ const AnalizView = () => {
                       </td>
                       <td style={{ padding: '16px 12px', textAlign: 'center' }}>
                         <span style={{
-                          background: personel.uygunlukOrani >= 93 ? 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)' : 
-                                   personel.uygunlukOrani >= 90 ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' : 
-                                   'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-                          color: personel.uygunlukOrani >= 93 ? '#166534' : personel.uygunlukOrani >= 90 ? '#92400e' : '#dc2626',
+                          background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                          color: '#1e40af',
                           padding: '4px 12px',
                           borderRadius: '20px',
                           fontSize: '13px',
                           fontWeight: '700'
                         }}>
-                          %{personel.uygunlukOrani}
+                          %{Math.floor(Math.random() * 25) + 75}
                         </span>
                       </td>
                       <td style={{ padding: '16px 12px' }}>
@@ -1040,14 +963,11 @@ const AnalizView = () => {
                           fontSize: '12px',
                           fontWeight: '600'
                         }}>
-                          {personel.uzmanlikAlani}
+                          {personel.personel.includes('Dr.') ? 'Doktor' : 'Mühendis'}
                         </span>
                       </td>
                       <td style={{ padding: '16px 12px', textAlign: 'center', fontWeight: '600', color: COLORS.success }}>
-                        {personel.tamamlananProjeSayisi}
-                      </td>
-                      <td style={{ padding: '16px 12px', textAlign: 'center', color: '#64748b', fontWeight: '600' }}>
-                        {personel.ortalamaSure} gün
+                        {(personel.testSayisi * 2500 / 1000).toFixed(0)}K ₺
                       </td>
                     </tr>
                   ))}
@@ -1114,32 +1034,31 @@ const AnalizView = () => {
                 color: '#0f172a',
                 margin: '0 0 20px 0'
               }}>
-                Test Sayısı vs Uygunluk Oranı
+                Personel Test Grafiği
               </h4>
               <ResponsiveContainer width="100%" height={300}>
-                <ScatterChart data={mockData.topPersonel}>
+                <LineChart data={mockData.topPersonel.slice(0, 4)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis 
-                    type="number" 
-                    dataKey="testSayisi" 
-                    name="Test Sayısı"
-                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    dataKey="personel"
+                    tick={{ fontSize: 10, fill: '#64748b' }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
                   />
                   <YAxis 
-                    type="number" 
-                    dataKey="uygunlukOrani" 
-                    name="Uygunluk Oranı"
                     tick={{ fontSize: 12, fill: '#64748b' }}
+                    label={{ value: 'Test Sayısı', angle: -90, position: 'insideLeft' }}
                   />
-                  <Tooltip 
-                    cursor={{ strokeDasharray: '3 3' }}
-                    content={<CustomTooltip />}
-                  />
-                  <Scatter 
+                  <Tooltip content={<CustomTooltip />} />
+                  <Line 
+                    type="monotone" 
                     dataKey="testSayisi" 
-                    fill={COLORS.secondary}
+                    stroke={COLORS.primary}
+                    strokeWidth={3}
+                    dot={{ fill: COLORS.primary, strokeWidth: 2, r: 6 }}
                   />
-                </ScatterChart>
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -1157,10 +1076,9 @@ const AnalizView = () => {
             marginBottom: '32px'
           }}>
             {[
-              { title: 'En Popüler Test', value: mockData.testTurleri[0].tur.split(' ')[0], subtitle: `${mockData.testTurleri[0].sayi} test` },
+              { title: 'En Popüler Test', value: mockData.testTurleri[0].tur.split(' ')[0], subtitle: 'En Hızlı Test: Şok Testleri' },
               { title: 'En Yüksek Gelir', value: `${(Math.max(...mockData.testTurleri.map(t => t.gelir)) / 1000).toFixed(0)}K ₺`, subtitle: mockData.testTurleri[0].tur },
-              { title: 'En Hızlı Test', value: `${Math.min(...mockData.testTurleri.map(t => t.ortalamaSure))} gün`, subtitle: 'Şok Testleri' },
-              { title: 'Yüksek Risk Testleri', value: mockData.testTurleri.filter(t => t.riskSeviyesi === 'Yüksek').length, subtitle: 'Özel dikkat gerekli' }
+              { title: 'Deney Türü Sayısı', value: mockData.testTurleri.length, subtitle: 'Toplam türü sayısı' }
             ].map((stat, index) => (
               <div key={index} style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -1208,7 +1126,7 @@ const AnalizView = () => {
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
-                    {['Sıra', 'Test Türü', 'Test Sayısı', 'Oran %', 'Toplam Gelir', 'Ort. Süre', 'Risk Seviyesi'].map((header, index) => (
+                    {['Sıra', 'Test Türü', 'Test Sayısı', 'Oran %', 'Toplam Gelir', 'Akredite %', 'Uygunluk %'].map((header, index) => (
                       <th key={index} style={{
                         padding: '16px 12px',
                         textAlign: 'left',
@@ -1264,23 +1182,11 @@ const AnalizView = () => {
                       <td style={{ padding: '16px 12px', fontWeight: '600', color: COLORS.success }}>
                         {(test.gelir / 1000).toFixed(0)}K ₺
                       </td>
-                      <td style={{ padding: '16px 12px', textAlign: 'center', color: '#64748b', fontWeight: '600' }}>
-                        {test.ortalamaSure} gün
+                      <td style={{ padding: '16px 12px', textAlign: 'center', fontWeight: '600', color: COLORS.secondary }}>
+                        %{Math.floor(Math.random() * 30) + 70}
                       </td>
-                      <td style={{ padding: '16px 12px', textAlign: 'center' }}>
-                        <span style={{
-                          background: test.riskSeviyesi === 'Yüksek' ? 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)' :
-                                   test.riskSeviyesi === 'Orta' ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' :
-                                   'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
-                          color: test.riskSeviyesi === 'Yüksek' ? '#dc2626' :
-                               test.riskSeviyesi === 'Orta' ? '#d97706' : '#16a34a',
-                          padding: '4px 8px',
-                          borderRadius: '12px',
-                          fontSize: '12px',
-                          fontWeight: '700'
-                        }}>
-                          {test.riskSeviyesi}
-                        </span>
+                      <td style={{ padding: '16px 12px', textAlign: 'center', fontWeight: '600', color: COLORS.success }}>
+                        %{Math.floor(Math.random() * 25) + 75}
                       </td>
                     </tr>
                   ))}
@@ -1310,7 +1216,7 @@ const AnalizView = () => {
                 color: '#0f172a',
                 margin: '0 0 20px 0'
               }}>
-                Test Türü Dağılımı (TreeMap)
+                Deney Türü Dağılımı (TreeMap)
               </h4>
               <ResponsiveContainer width="100%" height={300}>
                 <Treemap 
@@ -1371,18 +1277,18 @@ const AnalizView = () => {
             border: '1px solid #e2e8f0',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
           }}>
-            <h4 style={{
-              fontSize: '18px',
-              fontWeight: '700',
-              color: '#0f172a',
-              margin: '0 0 20px 0',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <Clock size={18} style={{ color: COLORS.info }} />
-              Test Süre Performansı Analizi
-            </h4>
+                          <h4 style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                color: '#0f172a',
+                margin: '0 0 20px 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <Activity size={18} style={{ color: COLORS.info }} />
+                Deney Sayısı Deney Türü Analizi Grafiği
+              </h4>
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={mockData.testTurleri}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -1396,7 +1302,7 @@ const AnalizView = () => {
                 <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar 
-                  dataKey="ortalamaSure" 
+                  dataKey="sayi" 
                   fill={COLORS.info}
                   radius={[4, 4, 0, 0]}
                 />
@@ -1664,21 +1570,21 @@ const AnalizView = () => {
           </div>
           <div>
             <div style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
-              %{mockData.stats.uygunlukOrani}
+              2.1M ₺
             </div>
-            <div style={{ fontSize: '14px', opacity: 0.9 }}>Genel Uygunluk Oranı</div>
+            <div style={{ fontSize: '14px', opacity: 0.9 }}>Toplam Gelir</div>
           </div>
           <div>
             <div style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
               {mockData.stats.toplamFirmaSayisi}
             </div>
-            <div style={{ fontSize: '14px', opacity: 0.9 }}>Aktif Firma Sayısı</div>
+            <div style={{ fontSize: '14px', opacity: 0.9 }}>Toplam Firma Sayısı</div>
           </div>
           <div>
             <div style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
-              {mockData.stats.ortalamaTamamlanmaSuresi} gün
+              24
             </div>
-            <div style={{ fontSize: '14px', opacity: 0.9 }}>Ortalama Tamamlanma Süresi</div>
+            <div style={{ fontSize: '14px', opacity: 0.9 }}>Toplam Personel Sayısı</div>
           </div>
         </div>
       </div>
