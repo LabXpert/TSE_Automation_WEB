@@ -202,12 +202,12 @@ const Raporla: React.FC = () => {
         'Firma Adı', 
         'Başvuru No',
         'Başvuru Tarihi',
-        'Belgelendirme Türü',
         'Deney Türü',
-        'Sorumlu Personel',
+        'Deney Adı',
+        'Deney Personeli',
         'Akredite',
         'Uygunluk',
-        'Ücret (TL)'
+        'Ücret (TL)  (Kdv Dahil)'
       ];
 
       // Başlık satırını ekle

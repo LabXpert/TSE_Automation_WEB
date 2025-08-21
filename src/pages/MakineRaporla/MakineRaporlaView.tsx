@@ -909,67 +909,49 @@ const MakineRaporlaView: React.FC<Props> = ({
                 ))}
               </tbody>
             </table>
-          </div>
+                            </div>
+                  {/* Excel Butonu */}
+                  {makineData.length > 0 && (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'flex-end', // sağa yasla
+                      marginTop: '20px',
+                      paddingTop: '20px',
+                            marginRight: "24px", // sağdan boşluk
+                        marginBottom: "16px", // alttan boşluk
+                      borderTop: '1px solid #e2e8f0'
+                    }}>
+                      <button
+                        onClick={exportToExcel}
+                        disabled={loading || makineData.length === 0}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '12px 20px',
+                          background: loading || makineData.length === 0
+                            ? '#94a3b8'
+                            : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#ffffff',
+                          cursor: loading || makineData.length === 0 ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
+                        }}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                          <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
+                        </svg>
+                        Excel'e Çıkart ({makineData.length} makine)
+                      </button>
+                    </div>
+)}
 
-          {/* Pagination ve Excel Butonları */}
-          {makineData.length > 0 && (
-            <div style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              marginTop: '20px',
-              paddingTop: '20px',
-              borderTop: '1px solid #e2e8f0',
-              flexWrap: 'wrap',
-              gap: '16px'
-            }}>
-              {/* Excel Butonu */}
-              <div style={{
-                display: 'flex',
-                gap: '12px'
-              }}>
-                <button
-                  onClick={exportToExcel}
-                  disabled={loading || makineData.length === 0}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 20px',
-                    background: loading || makineData.length === 0 ? '#94a3b8' : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#ffffff',
-                    cursor: loading || makineData.length === 0 ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading && makineData.length > 0) {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.35)';
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading && makineData.length > 0) {
-                      e.currentTarget.style.transform = 'translateY(0px)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.25)';
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
-                    }
-                  }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                    <path d="M12,11L16,15H13.5V19H10.5V15H8L12,11Z"/>
-                  </svg>
-                  Excel'e Çıkart ({makineData.length} makine)
-                </button>
-              </div>
-            </div>
-          )}
+          
         </div>
       )}
 
