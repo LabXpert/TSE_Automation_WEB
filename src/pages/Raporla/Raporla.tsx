@@ -183,7 +183,7 @@ const Raporla: React.FC = () => {
   };
 
   const tumDurumlarıSec = () => {
-    setSecilenDurumlar(['Uygun', 'Uygun Değil', 'Akredite', 'Akredite Değil']);
+    setSecilenDurumlar(['Uygun', 'Uygun Değil', 'Akredite', 'Akredite Değil', 'Belgelendirme', 'Özel']);
   };
 
   const durumFiltreleriniTemizle = () => {
@@ -360,16 +360,23 @@ const Raporla: React.FC = () => {
       })).filter(kayit => kayit.deneyler.length > 0);
     }
 
-    // Durum filtresi uygula (Uygunluk + Akredite birleşik)
+    // Durum filtresi uygula (Uygunluk + Akredite + Belgelendirme türü birleşik)
     if (secilenDurumlar.length > 0) {
-      sonuc = sonuc.map(kayit => ({
-        ...kayit,
-        deneyler: kayit.deneyler.filter(deney => {
+      sonuc = sonuc.filter(kayit => {
+        // Belgelendirme türü kontrolü
+        const belgelendirmeTuru = kayit.belgelendirmeTuru === 'belgelendirme' ? 'Belgelendirme' : 'Özel';
+        const belgelendirmeEslesti = secilenDurumlar.includes(belgelendirmeTuru);
+        
+        // Deney durumu kontrolü
+        const deneyDurumuEslesti = kayit.deneyler.some(deney => {
           const uygunlukDurumu = deney.uygunluk ? 'Uygun' : 'Uygun Değil';
           const akrediteDurumu = deney.akredite ? 'Akredite' : 'Akredite Değil';
           return secilenDurumlar.includes(uygunlukDurumu) || secilenDurumlar.includes(akrediteDurumu);
-        })
-      })).filter(kayit => kayit.deneyler.length > 0);
+        });
+        
+        // Eğer belgelendirme türü seçildiyse veya deney durumu eşleştiyse göster
+        return belgelendirmeEslesti || deneyDurumuEslesti;
+      });
     }
 
     // Sonra arama filtresi uygula

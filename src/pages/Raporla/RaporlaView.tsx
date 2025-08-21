@@ -1175,6 +1175,73 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                   </div>
                 </div>
 
+                {/* Belgelendirme Türü Bölümü */}
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#475569',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z"/>
+                    </svg>
+                    Belgelendirme Türü
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px'
+                  }}>
+                    {['Belgelendirme', 'Özel'].map((tur) => (
+                      <label
+                        key={tur}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s ease',
+                          backgroundColor: secilenDurumlar.includes(tur) ? '#fef3c7' : 'transparent'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!secilenDurumlar.includes(tur)) {
+                            e.currentTarget.style.backgroundColor = '#f8fafc';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!secilenDurumlar.includes(tur)) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={secilenDurumlar.includes(tur)}
+                          onChange={() => durumSec(tur)}
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            accentColor: '#dc2626'
+                          }}
+                        />
+                        <span style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenDurumlar.includes(tur) ? '600' : '400'
+                        }}>
+                          {tur}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Panel Butonları */}
                 <div style={{
                   display: 'flex',
