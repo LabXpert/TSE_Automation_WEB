@@ -20,7 +20,7 @@ interface MakineData {
 const MakineRaporla: React.FC = () => {
   const [makineData, setMakineData] = useState<MakineData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   // Arama ve filtreleme state'leri
   const [aramaMetni, setAramaMetni] = useState<string>('');
@@ -34,19 +34,22 @@ const MakineRaporla: React.FC = () => {
   useEffect(() => {
     const fetchMachineData = async () => {
       setLoading(true);
+      setError(null);
       try {
         const response = await fetch('/api/machine-reports/data');
         if (response.ok) {
           const data = await response.json();
           console.log('Gerçek veriler alındı:', data);
-          setMakineData(data);
+          setMakineData(Array.isArray(data) ? data : []);
           // İlk başta sadece makineData'yı set et, filtreleme otomatik çalışacak
         } else {
           console.error('API hatası:', response.statusText);
+          setError(`API hatası: ${response.statusText}`);
           setMakineData([]); // Hata durumunda boş liste
         }
       } catch (error) {
         console.error('Veri çekme hatası:', error);
+        setError('Veri çekme hatası oluştu');
         setMakineData([]); // Hata durumunda boş liste
       } finally {
         setLoading(false);
@@ -58,7 +61,7 @@ const MakineRaporla: React.FC = () => {
   }, []);
 
   // Sonraki kalibrasyon tarihini ve durumunu hesapla
-  const getKalibrasyonDurumu = (lastCalibrationDate: string) => {
+  const getKalibrasyonDurumu = useCallback((lastCalibrationDate: string) => {
     // Güvenlik kontrolü
     if (!lastCalibrationDate) {
       return {
@@ -105,12 +108,18 @@ const MakineRaporla: React.FC = () => {
       durum,
       durumText
     };
-  };
+  }, []);
 
   // Benzersiz marka, model ve kalibrasyon org listelerini hesapla
-  const markalar = [...new Set(makineData.map(m => m.brand).filter(Boolean))].sort();
-  const modeller = [...new Set(makineData.map(m => m.model).filter(Boolean))].sort();
-  const kalibrasyonOrglari = [...new Set(makineData.map(m => m.calibration_org_name).filter(Boolean))].sort();
+  const markalar = makineData && makineData.length > 0 
+    ? [...new Set(makineData.map(m => m.brand).filter(Boolean))].sort()
+    : [];
+  const modeller = makineData && makineData.length > 0 
+    ? [...new Set(makineData.map(m => m.model).filter(Boolean))].sort()
+    : [];
+  const kalibrasyonOrglari = makineData && makineData.length > 0 
+    ? [...new Set(makineData.map(m => m.calibration_org_name).filter(Boolean))].sort()
+    : [];
 
   // Tüm filtreleri temizle
   const filtreleriTemizle = () => {
@@ -284,13 +293,14 @@ const MakineRaporla: React.FC = () => {
 
   // Birleşik filtreleme fonksiyonu
   const filtreleriUygula = useCallback(() => {
-    // Eğer makine verisi henüz yüklenmediyse çık
-    if (!makineData || makineData.length === 0) {
-      setFiltrelenmisKayitlar([]);
-      return;
-    }
+    try {
+      // Eğer makine verisi henüz yüklenmediyse çık
+      if (!makineData || makineData.length === 0) {
+        setFiltrelenmisKayitlar([]);
+        return;
+      }
 
-    let sonuc = makineData;
+      let sonuc = makineData;
 
     // Arama filtresi
     if (aramaMetni.trim()) {
@@ -367,6 +377,10 @@ const MakineRaporla: React.FC = () => {
     });
 
     setFiltrelenmisKayitlar(sonuc);
+    } catch (error) {
+      console.error('Filtreleme sırasında hata:', error);
+      setFiltrelenmisKayitlar([]);
+    }
   }, [aramaMetni, secilenMarka, secilenModel, secilenKalibrasyonOrg, secilenDurumlar, makineData, getKalibrasyonDurumu]);
 
   // Filtreler değiştiğinde otomatik uygula
