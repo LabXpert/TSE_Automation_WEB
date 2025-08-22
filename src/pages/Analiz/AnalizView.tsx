@@ -15,7 +15,6 @@ import {
   AreaChart,
   Area,
   ComposedChart,
-  Treemap,
   RadarChart,
   PolarGrid,
   PolarAngleAxis,
@@ -615,7 +614,6 @@ const CHART_COLORS = [
                           ))}
                         </Pie>
                         <Tooltip 
-                          formatter={(value, name) => [value, 'Test Sayısı']}
                           labelFormatter={(label) => `Test Türü: ${label}`}
                           contentStyle={{
                             background: 'rgba(255, 255, 255, 0.95)',
@@ -893,7 +891,6 @@ const CHART_COLORS = [
                       allowDecimals={false}
                     />
                     <Tooltip 
-                      formatter={(value, name) => [value, 'Test Sayısı']}
                       labelFormatter={(label) => `Firma: ${label}`}
                       contentStyle={{
                         background: 'rgba(255, 255, 255, 0.95)',

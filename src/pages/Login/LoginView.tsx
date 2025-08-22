@@ -39,20 +39,11 @@ const LoginView: React.FC<LoginViewProps> = ({
           {/* Sign In Form */}
           <div className="login-form sign-in-form">
             {/* TSE Logo */}
-            <div style={{ 
-              marginBottom: '0px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
+            <div className="tse-logo-container">
               <img 
                 src="/tse-logo.png" 
                 alt="TSE Logo"
-                style={{
-                  width: '360px',
-                  height: '360px',
-                  objectFit: 'contain'
-                }}
+                className="tse-logo"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
