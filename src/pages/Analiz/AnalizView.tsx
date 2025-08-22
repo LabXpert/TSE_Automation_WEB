@@ -23,6 +23,7 @@ import {
   Radar
 } from 'recharts';
 import { Calendar, Users, TrendingUp, Building2, Clock, BarChart3, PieChart as PieChartIcon, Activity, Target, Star } from 'lucide-react';
+import { type AnalysisData } from '../../services/analiz.service';
 
 // Type definitions
 type TimeRangeType = '7gun' | '30gun' | '3ay' | '6ay' | '12ay' | 'tumzaman';
@@ -38,97 +39,37 @@ interface TooltipProps {
   label?: string;
 }
 
-// Mock data - gerçek uygulamada API'den gelecek
-const mockData = {
-  // Dashboard istatistikleri
-  stats: {
-    toplamTestSayisi: 1248,
-    aylikTestSayisi: 156,
-    uygunlukOrani: 87,
-    akrediteOrani: 73,
-    toplamFirmaSayisi: 89,
-    buAyYeniFirma: 12,
-    ortalamaTamamlanmaSuresi: 4.2,
-    enYuksekAylikTest: 189
-  },
+interface AnalizViewProps {
+  analysisData: AnalysisData | null;
+  loading: boolean;
+  error: string | null;
+  selectedTimeRange: TimeRangeType;
+  onTimeRangeChange: (range: TimeRangeType) => void;
+}
 
-  // Aylık trend verileri (12 ay)
-  aylikTrend: [
-    { ay: 'Oca', testSayisi: 98, uygunluk: 85, akredite: 71, gelir: 125000 },
-    { ay: 'Şub', testSayisi: 112, uygunluk: 89, akredite: 75, gelir: 142000 },
-    { ay: 'Mar', testSayisi: 134, uygunluk: 86, akredite: 72, gelir: 167000 },
-    { ay: 'Nis', testSayisi: 121, uygunluk: 91, akredite: 78, gelir: 154000 },
-    { ay: 'May', testSayisi: 145, uygunluk: 88, akredite: 74, gelir: 184000 },
-    { ay: 'Haz', testSayisi: 167, uygunluk: 84, akredite: 69, gelir: 201000 },
-    { ay: 'Tem', testSayisi: 189, uygunluk: 87, akredite: 76, gelir: 234000 },
-    { ay: 'Ağu', testSayisi: 176, uygunluk: 90, akredite: 81, gelir: 219000 },
-    { ay: 'Eyl', testSayisi: 143, uygunluk: 85, akredite: 73, gelir: 178000 },
-    { ay: 'Eki', testSayisi: 128, uygunluk: 88, akredite: 77, gelir: 162000 },
-    { ay: 'Kas', testSayisi: 139, uygunluk: 86, akredite: 75, gelir: 171000 },
-    { ay: 'Ara', testSayisi: 156, uygunluk: 87, akredite: 73, gelir: 195000 }
-  ],
+const AnalizView = ({ analysisData, loading, error, selectedTimeRange, onTimeRangeChange }: AnalizViewProps) => {
+  const [activeTab, setActiveTab] = useState<TabType>('genel');
 
-  // En aktif firmalar
-  topFirmalar: [
-    { firma: 'ASELSAN A.Ş.', testSayisi: 89, sonTest: '2024-12-15', uygunlukOrani: 92, toplamGelir: 234000, favoriTest: 'EMC Testi' },
-    { firma: 'TAI Havacılık', testSayisi: 76, sonTest: '2024-12-12', uygunlukOrani: 89, toplamGelir: 198000, favoriTest: 'Çevresel Test' },
-    { firma: 'HAVELSAN A.Ş.', testSayisi: 64, sonTest: '2024-12-10', uygunlukOrani: 94, toplamGelir: 167000, favoriTest: 'Güvenlik Testi' },
-    { firma: 'STM Savunma', testSayisi: 58, sonTest: '2024-12-08', uygunlukOrani: 87, toplamGelir: 152000, favoriTest: 'EMC Testi' },
-    { firma: 'ROKETSAN A.Ş.', testSayisi: 52, sonTest: '2024-12-07', uygunlukOrani: 91, toplamGelir: 134000, favoriTest: 'Titreşim Testi' },
-    { firma: 'MKE Genel Müdürlüğü', testSayisi: 47, sonTest: '2024-12-05', uygunlukOrani: 85, toplamGelir: 121000, favoriTest: 'Isı Testi' },
-    { firma: 'TUSAŞ Motor', testSayisi: 43, sonTest: '2024-12-03', uygunlukOrani: 88, toplamGelir: 112000, favoriTest: 'Güvenlik Testi' },
-    { firma: 'Baykar Makina', testSayisi: 39, sonTest: '2024-12-01', uygunlukOrani: 93, toplamGelir: 98000, favoriTest: 'Çevresel Test' }
-  ],
-
-  // Personel performansı
-  topPersonel: [
-    { personel: 'Dr. Mehmet YILMAZ', testSayisi: 187, uygunlukOrani: 94, uzmanlikAlani: 'EMC/EMI', tamamlananProjeSayisi: 45, ortalamaSure: 3.2 },
-    { personel: 'Mühendis Ayşe KAYA', testSayisi: 156, uygunlukOrani: 91, uzmanlikAlani: 'Çevresel', tamamlananProjeSayisi: 38, ortalamaSure: 3.8 },
-    { personel: 'Dr. Fatma DEMİR', testSayisi: 143, uygunlukOrani: 96, uzmanlikAlani: 'Güvenlik', tamamlananProjeSayisi: 34, ortalamaSure: 2.9 },
-    { personel: 'Mühendis Ali ÇELİK', testSayisi: 134, uygunlukOrani: 89, uzmanlikAlani: 'Titreşim', tamamlananProjeSayisi: 41, ortalamaSure: 4.1 },
-    { personel: 'Dr. Zeynep ÖZTÜRK', testSayisi: 128, uygunlukOrani: 93, uzmanlikAlani: 'Isı/Nem', tamamlananProjeSayisi: 32, ortalamaSure: 3.5 },
-    { personel: 'Mühendis Burak ARSLAN', testSayisi: 119, uygunlukOrani: 87, uzmanlikAlani: 'EMC/EMI', tamamlananProjeSayisi: 29, ortalamaSure: 4.3 },
-    { personel: 'Dr. Elif ŞAHIN', testSayisi: 112, uygunlukOrani: 95, uzmanlikAlani: 'Güvenlik', tamamlananProjeSayisi: 27, ortalamaSure: 3.1 },
-    { personel: 'Mühendis Cem YILDIZ', testSayisi: 98, uygunlukOrani: 88, uzmanlikAlani: 'Çevresel', tamamlananProjeSayisi: 25, ortalamaSure: 3.9 }
-  ],
-
-  // Test türü dağılımı
-  testTurleri: [
-    { tur: 'EMC/EMI Testleri', sayi: 267, oran: 21.4, gelir: 456000, ortalamaSure: 3.2, riskSeviyesi: 'Düşük' },
-    { tur: 'Çevresel Testler', sayi: 234, oran: 18.8, gelir: 398000, ortalamaSure: 4.1, riskSeviyesi: 'Orta' },
-    { tur: 'Güvenlik Testleri', sayi: 198, oran: 15.9, gelir: 367000, ortalamaSure: 2.8, riskSeviyesi: 'Yüksek' },
-    { tur: 'Titreşim Testleri', sayi: 156, oran: 12.5, gelir: 289000, ortalamaSure: 3.7, riskSeviyesi: 'Orta' },
-    { tur: 'Isı/Nem Testleri', sayi: 143, oran: 11.5, gelir: 234000, ortalamaSure: 3.4, riskSeviyesi: 'Düşük' },
-    { tur: 'Şok Testleri', sayi: 98, oran: 7.9, gelir: 187000, ortalamaSure: 2.1, riskSeviyesi: 'Yüksek' },
-    { tur: 'Elektrik Güvenlik', sayi: 87, oran: 7.0, gelir: 156000, ortalamaSure: 2.9, riskSeviyesi: 'Orta' },
-    { tur: 'Diğer Testler', sayi: 65, oran: 5.0, gelir: 123000, ortalamaSure: 3.5, riskSeviyesi: 'Düşük' }
-  ],
-
-  // Haftalık dağılım (son 12 hafta)
-  haftalikDagılım: [
-    { hafta: 'H-12', pazartesi: 12, salı: 15, çarşamba: 18, perşembe: 14, cuma: 16, cumartesi: 5, pazar: 2 },
-    { hafta: 'H-11', pazartesi: 14, salı: 16, çarşamba: 19, perşembe: 17, cuma: 18, cumartesi: 6, pazar: 1 },
-    { hafta: 'H-10', pazartesi: 16, salı: 18, çarşamba: 21, perşembe: 15, cuma: 17, cumartesi: 4, pazar: 3 },
-    { hafta: 'H-9', pazartesi: 13, salı: 17, çarşamba: 20, perşembe: 16, cuma: 19, cumartesi: 7, pazar: 2 },
-    { hafta: 'H-8', pazartesi: 15, salı: 19, çarşamba: 22, perşembe: 18, cuma: 20, cumartesi: 5, pazar: 1 },
-    { hafta: 'H-7', pazartesi: 17, salı: 20, çarşamba: 23, perşembe: 19, cuma: 21, cumartesi: 6, pazar: 2 },
-    { hafta: 'H-6', pazartesi: 18, salı: 21, çarşamba: 24, perşembe: 20, cuma: 22, cumartesi: 8, pazar: 3 },
-    { hafta: 'H-5', pazartesi: 16, salı: 19, çarşamba: 22, perşembe: 18, cuma: 20, cumartesi: 5, pazar: 1 },
-    { hafta: 'H-4', pazartesi: 19, salı: 22, çarşamba: 25, perşembe: 21, cuma: 23, cumartesi: 7, pazar: 2 },
-    { hafta: 'H-3', pazartesi: 21, salı: 24, çarşamba: 27, perşembe: 23, cuma: 25, cumartesi: 9, pazar: 4 },
-    { hafta: 'H-2', pazartesi: 20, salı: 23, çarşamba: 26, perşembe: 22, cuma: 24, cumartesi: 8, pazar: 3 },
-    { hafta: 'H-1', pazartesi: 22, salı: 25, çarşamba: 28, perşembe: 24, cuma: 26, cumartesi: 10, pazar: 5 }
-  ],
-
-  // Gelir analizi
-  gelirAnalizi: [
-    { kategori: 'EMC/EMI', q1: 98000, q2: 112000, q3: 134000, q4: 156000 },
-    { kategori: 'Çevresel', q1: 87000, q2: 98000, q3: 123000, q4: 142000 },
-    { kategori: 'Güvenlik', q1: 76000, q2: 89000, q3: 112000, q4: 127000 },
-    { kategori: 'Titreşim', q1: 65000, q2: 78000, q3: 94000, q4: 108000 },
-    { kategori: 'Isı/Nem', q1: 54000, q2: 67000, q3: 81000, q4: 95000 }
-  ]
-};
+  // Gerçek veri yoksa varsayılan değerler
+  const data = analysisData || {
+    stats: {
+      toplamTestSayisi: 0,
+      aylikTestSayisi: 0,
+      uygunlukOrani: 0,
+      akrediteOrani: 0,
+      toplamFirmaSayisi: 0,
+      buAyYeniFirma: 0,
+      ortalamaTamamlanmaSuresi: 0,
+      enYuksekAylikTest: 0,
+      toplamGelir: 0
+    },
+    aylikTrend: [],
+    topFirmalar: [],
+    topPersonel: [],
+    testTurleri: [],
+    haftalikDagılım: [],
+    gelirAnalizi: []
+  };
 
 // Renk paleti
 const COLORS = {
@@ -149,17 +90,11 @@ const CHART_COLORS = [
   COLORS.info, COLORS.purple, COLORS.pink, COLORS.teal, COLORS.orange, COLORS.indigo
 ];
 
-const AnalizView = () => {
-  const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRangeType>('12ay');
-
-  const [loading] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>('genel');
-
 
 
   // Zaman aralığı değiştirme
   const handleTimeRangeChange = (range: TimeRangeType) => {
-    setSelectedTimeRange(range);
+    onTimeRangeChange(range);
   };
 
   // Tab değiştirme
@@ -200,6 +135,7 @@ const AnalizView = () => {
     return null;
   };
 
+  // Loading state
   if (loading) {
     return (
       <div style={{
@@ -223,6 +159,84 @@ const AnalizView = () => {
           <div style={{ fontSize: '18px', fontWeight: '600', color: '#64748b' }}>
             Analiz verileri yükleniyor...
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{
+        padding: '32px',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ 
+          textAlign: 'center',
+          background: '#ffffff',
+          padding: '48px',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+          maxWidth: '400px'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            background: '#fee2e2',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px',
+            fontSize: '24px'
+          }}>
+            ⚠️
+          </div>
+          <div style={{ 
+            fontSize: '20px', 
+            fontWeight: '700', 
+            color: '#dc2626',
+            marginBottom: '12px'
+          }}>
+            Veri Yükleme Hatası
+          </div>
+          <div style={{ 
+            fontSize: '14px', 
+            color: '#64748b',
+            lineHeight: '1.5',
+            marginBottom: '24px'
+          }}>
+            {error}
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '12px 24px',
+              background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            Sayfayı Yenile
+          </button>
         </div>
       </div>
     );
@@ -256,7 +270,7 @@ const AnalizView = () => {
               WebkitTextFillColor: 'transparent',
               letterSpacing: '-0.025em'
             }}>
-              Gelişmiş Analiz Dashboard
+              Analiz Dashboard
             </h1>
             <p style={{ color: '#64748b', fontSize: '18px', margin: 0, fontWeight: '500' }}>
               Kapsamlı test performansı ve iş zekası analitleri
@@ -368,37 +382,37 @@ const AnalizView = () => {
             {[
               {
                 title: 'Toplam Test Sayısı',
-                value: mockData.stats.toplamTestSayisi.toLocaleString('tr-TR'),
-                change: `+${mockData.stats.aylikTestSayisi} bu ay`,
+                value: data.stats.toplamTestSayisi.toLocaleString('tr-TR'),
+                change: `+${data.stats.aylikTestSayisi} bu ay`,
                 icon: Target,
                 color: COLORS.primary,
-                trend: '+12%'
+                trend: data.stats.aylikTestSayisi > 0 ? `+${Math.round((data.stats.aylikTestSayisi / data.stats.toplamTestSayisi) * 100)}%` : '0%'
               },
 
               {
                 title: 'Akredite Oranı',
-                value: `%${mockData.stats.akrediteOrani}`,
+                value: `%${data.stats.akrediteOrani}`,
                 change: 'Kalite standardında',
                 icon: Star,
                 color: COLORS.secondary,
-                trend: '+5%'
+                trend: data.stats.akrediteOrani > 75 ? '+Yüksek' : data.stats.akrediteOrani > 50 ? 'Orta' : 'Düşük'
               },
               {
                 title: 'Aktif Firma Sayısı',
-                value: mockData.stats.toplamFirmaSayisi.toString(),
-                change: `+${mockData.stats.buAyYeniFirma} yeni firma`,
+                value: data.stats.toplamFirmaSayisi.toString(),
+                change: `+${data.stats.buAyYeniFirma} yeni firma`,
                 icon: Building2,
                 color: COLORS.warning,
-                trend: '+8%'
+                trend: data.stats.buAyYeniFirma > 0 ? `+${data.stats.buAyYeniFirma}` : '0'
               },
 
               {
                 title: 'Aylık Performans',
-                value: mockData.stats.enYuksekAylikTest.toString(),
+                value: data.stats.enYuksekAylikTest.toString(),
                 change: 'En yüksek aylık test',
                 icon: TrendingUp,
                 color: COLORS.purple,
-                trend: '+25%'
+                trend: data.stats.enYuksekAylikTest > data.stats.aylikTestSayisi ? '+Pik' : 'Normal'
               }
             ].map((stat, index) => {
               const IconComponent = stat.icon;
@@ -523,7 +537,7 @@ const AnalizView = () => {
                 </h3>
               </div>
               <ResponsiveContainer width="100%" height={350}>
-                <ComposedChart data={mockData.aylikTrend}>
+                <ComposedChart data={data.aylikTrend}>
                   <defs>
                     <linearGradient id="testGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3}/>
@@ -581,27 +595,115 @@ const AnalizView = () => {
                 <PieChartIcon size={18} style={{ color: COLORS.secondary }} />
                 Deney Türü Dağılımı
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={mockData.testTurleri.slice(0, 6)}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="sayi"
-                    label={(entry) => `${entry.tur.split(' ')[0]} ${entry.oran}%`}
-                    labelLine={false}
-                  >
-                    {mockData.testTurleri.slice(0, 6).map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value, name) => [value, name]}
-                    labelFormatter={(label) => `Test Türü: ${label}`}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
+                {/* Pie Chart */}
+                <div style={{ flex: '0 0 300px' }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    {data.testTurleri.length > 0 ? (
+                      <PieChart>
+                        <Pie
+                          data={data.testTurleri.slice(0, 6)}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          dataKey="sayi"
+                          label={(entry) => `${entry.oran}%`}
+                          labelLine={false}
+                        >
+                          {data.testTurleri.slice(0, 6).map((_: any, index: number) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index]} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value, name) => [value, 'Test Sayısı']}
+                          labelFormatter={(label) => `Test Türü: ${label}`}
+                          contentStyle={{
+                            background: 'rgba(255, 255, 255, 0.95)',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                          }}
+                        />
+                      </PieChart>
+                    ) : (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        color: '#64748b',
+                        fontSize: '14px',
+                        textAlign: 'center'
+                      }}>
+                        <div>
+                          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🥧</div>
+                          <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz test verisi yok</div>
+                          <div>Test verileri girildikçe burada görünecek</div>
+                        </div>
+                      </div>
+                    )}
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Legend */}
+                <div style={{ flex: '1', minWidth: '200px' }}>
+                  {data.testTurleri.length > 0 ? (
+                    <div>
+                      <h5 style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#64748b',
+                        marginBottom: '16px',
+                        margin: '0 0 16px 0'
+                      }}>
+                        Test Türleri
+                      </h5>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {data.testTurleri.slice(0, 6).map((test: any, index: number) => (
+                          <div key={index} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '8px 12px',
+                            background: '#f8fafc',
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0'
+                          }}>
+                            <div style={{
+                              width: '16px',
+                              height: '16px',
+                              borderRadius: '4px',
+                              background: CHART_COLORS[index],
+                              flexShrink: 0
+                            }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                color: '#0f172a',
+                                wordBreak: 'break-word',
+                                lineHeight: '1.2'
+                              }}>
+                                {test.tur}
+                              </div>
+                              <div style={{
+                                fontSize: '12px',
+                                color: '#64748b',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                marginTop: '2px'
+                              }}>
+                                <span>{test.sayi} test</span>
+                                <span>{test.oran}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -618,10 +720,10 @@ const AnalizView = () => {
             marginBottom: '32px'
           }}>
             {[
-              { title: 'En Aktif Firma', value: mockData.topFirmalar[0].firma, subtitle: `${mockData.topFirmalar[0].testSayisi} test` },
-              { title: 'En Aktif Firma Test Sayısı', value: mockData.topFirmalar[0].testSayisi, subtitle: mockData.topFirmalar[0].firma },
-              { title: 'Toplam Gelir', value: `${(mockData.topFirmalar.reduce((acc, f) => acc + f.toplamGelir, 0) / 1000).toFixed(0)}K ₺`, subtitle: 'Tüm firmalardan' },
-              { title: 'Ortalama Test/Firma', value: Math.round(mockData.topFirmalar.reduce((acc, f) => acc + f.testSayisi, 0) / mockData.topFirmalar.length), subtitle: 'Aylık ortalama' }
+              { title: 'En Aktif Firma', value: data.topFirmalar[0]?.firma || 'Veri yok', subtitle: `${Math.floor(data.topFirmalar[0]?.testSayisi || 0)} test` },
+              { title: 'En Aktif Firma Test Sayısı', value: Math.floor(data.topFirmalar[0]?.testSayisi || 0), subtitle: data.topFirmalar[0]?.firma || 'Veri yok' },
+              { title: 'Toplam Gelir', value: `${(data.topFirmalar.reduce((acc: number, f: any) => acc + f.toplamGelir, 0) / 1000).toFixed(0)}K ₺`, subtitle: 'Tüm firmalardan' },
+              { title: 'Ortalama Test/Firma', value: data.topFirmalar.length > 0 ? Math.round(data.topFirmalar.reduce((acc: number, f: any) => acc + f.testSayisi, 0) / data.topFirmalar.length) : 0, subtitle: 'Firma başına ortalama' }
             ].map((stat, index) => (
               <div key={index} style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -687,11 +789,11 @@ const AnalizView = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockData.topFirmalar.map((firma, index) => (
+                  {data.topFirmalar.map((firma: any, index: number) => (
                     <tr key={index} style={{
                       background: '#ffffff',
                       transition: 'all 0.2s ease',
-                      borderBottom: index === mockData.topFirmalar.length - 1 ? 'none' : '1px solid #f1f5f9'
+                      borderBottom: index === data.topFirmalar.length - 1 ? 'none' : '1px solid #f1f5f9'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = '#f8fafc';
@@ -728,7 +830,7 @@ const AnalizView = () => {
                           fontSize: '13px',
                           fontWeight: '700'
                         }}>
-                          %{Math.floor(Math.random() * 30) + 70}
+                          %{firma.uygunlukOrani}
                         </span>
                       </td>
                       <td style={{ padding: '16px 12px', fontWeight: '600', color: COLORS.success }}>
@@ -769,24 +871,61 @@ const AnalizView = () => {
               }}>
                 Firma Test Sayıları
               </h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={mockData.topFirmalar.slice(0, 6)} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis type="number" tick={{ fontSize: 12, fill: '#64748b' }} />
-                  <YAxis 
-                    type="category" 
-                    dataKey="firma"
-                    tick={{ fontSize: 9, fill: '#64748b' }}
-                    width={120}
-                    tickFormatter={(value) => value.length > 15 ? value.substring(0, 12) + '...' : value}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar 
-                    dataKey="testSayisi" 
-                    fill={COLORS.primary}
-                    radius={[0, 4, 4, 0]}
-                  />
-                </BarChart>
+              <ResponsiveContainer width="100%" height={350}>
+                {data.topFirmalar.length > 0 ? (
+                  <BarChart 
+                    data={data.topFirmalar.slice(0, 6)}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis 
+                      dataKey="firma"
+                      tick={{ fontSize: 11, fill: '#64748b' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                      interval={0}
+                      tickFormatter={(value) => value.length > 12 ? value.substring(0, 10) + '...' : value}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                      label={{ value: 'Test Sayısı', angle: -90, position: 'insideLeft' }}
+                      allowDecimals={false}
+                    />
+                    <Tooltip 
+                      formatter={(value, name) => [value, 'Test Sayısı']}
+                      labelFormatter={(label) => `Firma: ${label}`}
+                      contentStyle={{
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="testSayisi" 
+                      fill={COLORS.primary}
+                      radius={[4, 4, 0, 0]}
+                      strokeWidth={0}
+                    />
+                  </BarChart>
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    color: '#64748b',
+                    fontSize: '14px',
+                    textAlign: 'center'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏢</div>
+                      <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz firma verisi yok</div>
+                      <div>Firmalar eklendiğinde burada görünecek</div>
+                    </div>
+                  </div>
+                )}
               </ResponsiveContainer>
             </div>
 
@@ -804,26 +943,44 @@ const AnalizView = () => {
                 color: '#0f172a',
                 margin: '0 0 20px 0'
               }}>
-                Akredite Oranları
+                Uygunluk Oranları
               </h4>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={mockData.topFirmalar.slice(0, 6).map(firma => ({...firma, akrediteOrani: Math.floor(Math.random() * 30) + 70}))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="firma"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar 
-                    dataKey="akrediteOrani" 
-                    fill={COLORS.success}
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
+                {data.topFirmalar.length > 0 ? (
+                  <BarChart data={data.topFirmalar.slice(0, 6)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="firma"
+                      tick={{ fontSize: 10, fill: '#64748b' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar 
+                      dataKey="uygunlukOrani" 
+                      fill={COLORS.success}
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    color: '#64748b',
+                    fontSize: '14px',
+                    textAlign: 'center'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
+                      <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz firma verisi yok</div>
+                      <div>Firmalar eklendiğinde burada görünecek</div>
+                    </div>
+                  </div>
+                )}
               </ResponsiveContainer>
             </div>
           </div>
@@ -841,10 +998,10 @@ const AnalizView = () => {
             marginBottom: '32px'
           }}>
             {[
-              { title: 'En Aktif Personel', value: mockData.topPersonel[0].personel.split(' ').slice(-2).join(' '), subtitle: '' },
-              { title: 'En Aktif Personel Test Sayısı', value: mockData.topPersonel[0].testSayisi, subtitle: 'Test Sayısı' },
-              { title: 'Toplam Gelir', value: `${(mockData.topPersonel[0].testSayisi * 2500 / 1000).toFixed(0)}K ₺`, subtitle: 'En aktif personel' },
-              { title: 'Performans Artışı', value: '%+15', subtitle: 'Bu aya göre artış' }
+              { title: 'En Aktif Personel', value: data.topPersonel[0]?.personel.split(' ').slice(-2).join(' ') || 'Veri yok', subtitle: '' },
+              { title: 'En Aktif Personel Test Sayısı', value: data.topPersonel[0]?.testSayisi || 0, subtitle: 'Test Sayısı' },
+              { title: 'Personel Başına Ort. Test', value: data.topPersonel.length > 0 ? Math.round(data.topPersonel.reduce((acc: number, p: any) => acc + p.testSayisi, 0) / data.topPersonel.length) : 0, subtitle: 'Personel başına ortalama' },
+              { title: 'Toplam Personel', value: data.topPersonel.length, subtitle: 'Aktif personel sayısı' }
             ].map((stat, index) => (
               <div key={index} style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -910,11 +1067,11 @@ const AnalizView = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockData.topPersonel.map((personel, index) => (
+                  {data.topPersonel.map((personel: any, index: number) => (
                     <tr key={index} style={{
                       background: '#ffffff',
                       transition: 'all 0.2s ease',
-                      borderBottom: index === mockData.topPersonel.length - 1 ? 'none' : '1px solid #f1f5f9'
+                      borderBottom: index === data.topPersonel.length - 1 ? 'none' : '1px solid #f1f5f9'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = '#f8fafc';
@@ -951,7 +1108,7 @@ const AnalizView = () => {
                           fontSize: '13px',
                           fontWeight: '700'
                         }}>
-                          %{Math.floor(Math.random() * 25) + 75}
+                          %{personel.uygunlukOrani}
                         </span>
                       </td>
                       <td style={{ padding: '16px 12px' }}>
@@ -963,11 +1120,11 @@ const AnalizView = () => {
                           fontSize: '12px',
                           fontWeight: '600'
                         }}>
-                          {personel.personel.includes('Dr.') ? 'Doktor' : 'Mühendis'}
+                          {personel.personel.includes('Dr.') ? 'Doktor' : personel.personel.includes('Prof.') ? 'Profesör' : personel.personel.includes('Ing.') ? 'Mühendis' : personel.testSayisi > 15 ? 'Uzman' : 'Teknisyen'}
                         </span>
                       </td>
                       <td style={{ padding: '16px 12px', textAlign: 'center', fontWeight: '600', color: COLORS.success }}>
-                        {(personel.testSayisi * 2500 / 1000).toFixed(0)}K ₺
+                        {((personel.toplamGelir || 0) / 1000).toFixed(0)}K ₺
                       </td>
                     </tr>
                   ))}
@@ -999,7 +1156,7 @@ const AnalizView = () => {
                 Personel Test Dağılımı
               </h4>
               <ResponsiveContainer width="100%" height={300}>
-                <RadarChart data={mockData.topPersonel.slice(0, 6).map(p => ({
+                <RadarChart data={data.topPersonel.slice(0, 6).map((p: any) => ({
                   personel: p.personel.split(' ').slice(-1)[0],
                   testSayisi: p.testSayisi,
                   uygunluk: p.uygunlukOrani
@@ -1037,7 +1194,7 @@ const AnalizView = () => {
                 Personel Test Grafiği
               </h4>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={mockData.topPersonel.slice(0, 4)}>
+                <LineChart data={data.topPersonel.slice(0, 4)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis 
                     dataKey="personel"
@@ -1076,9 +1233,9 @@ const AnalizView = () => {
             marginBottom: '32px'
           }}>
             {[
-              { title: 'En Popüler Test', value: mockData.testTurleri[0].tur.split(' ')[0], subtitle: 'En Hızlı Test: Şok Testleri' },
-              { title: 'En Yüksek Gelir', value: `${(Math.max(...mockData.testTurleri.map(t => t.gelir)) / 1000).toFixed(0)}K ₺`, subtitle: mockData.testTurleri[0].tur },
-              { title: 'Deney Türü Sayısı', value: mockData.testTurleri.length, subtitle: 'Toplam türü sayısı' }
+              { title: 'En Popüler Test', value: data.testTurleri[0]?.tur || 'Veri yok', subtitle: `${data.testTurleri[0]?.sayi || 0} test yapıldı` },
+              { title: 'En Yüksek Gelir', value: data.testTurleri.length > 0 ? `${(Math.max(...data.testTurleri.map((t: any) => t.gelir)) / 1000).toFixed(0)}K ₺` : '0K ₺', subtitle: data.testTurleri.length > 0 ? data.testTurleri.reduce((max, current) => current.gelir > max.gelir ? current : max, data.testTurleri[0]).tur : 'Veri yok' },
+              { title: 'Deney Türü Sayısı', value: data.testTurleri.length, subtitle: 'Toplam türü sayısı' }
             ].map((stat, index) => (
               <div key={index} style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -1126,7 +1283,7 @@ const AnalizView = () => {
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
-                    {['Sıra', 'Test Türü', 'Test Sayısı', 'Oran %', 'Toplam Gelir', 'Akredite %', 'Uygunluk %'].map((header, index) => (
+                    {['Sıra', 'Deney Türü', 'Test Sayısı', 'Oran %', 'Toplam Gelir', 'Uygunluk %'].map((header, index) => (
                       <th key={index} style={{
                         padding: '16px 12px',
                         textAlign: 'left',
@@ -1136,7 +1293,7 @@ const AnalizView = () => {
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
                         ...(index === 0 && { borderTopLeftRadius: '12px' }),
-                        ...(index === 6 && { borderTopRightRadius: '12px' })
+                        ...(index === 5 && { borderTopRightRadius: '12px' })
                       }}>
                         {header}
                       </th>
@@ -1144,11 +1301,11 @@ const AnalizView = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockData.testTurleri.map((test, index) => (
+                  {data.testTurleri.map((test: any, index: number) => (
                     <tr key={index} style={{
                       background: '#ffffff',
                       transition: 'all 0.2s ease',
-                      borderBottom: index === mockData.testTurleri.length - 1 ? 'none' : '1px solid #f1f5f9'
+                      borderBottom: index === data.testTurleri.length - 1 ? 'none' : '1px solid #f1f5f9'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = '#f8fafc';
@@ -1182,11 +1339,8 @@ const AnalizView = () => {
                       <td style={{ padding: '16px 12px', fontWeight: '600', color: COLORS.success }}>
                         {(test.gelir / 1000).toFixed(0)}K ₺
                       </td>
-                      <td style={{ padding: '16px 12px', textAlign: 'center', fontWeight: '600', color: COLORS.secondary }}>
-                        %{Math.floor(Math.random() * 30) + 70}
-                      </td>
                       <td style={{ padding: '16px 12px', textAlign: 'center', fontWeight: '600', color: COLORS.success }}>
-                        %{Math.floor(Math.random() * 25) + 75}
+                        %{test.uygunlukOrani || 0}
                       </td>
                     </tr>
                   ))}
@@ -1216,27 +1370,126 @@ const AnalizView = () => {
                 color: '#0f172a',
                 margin: '0 0 20px 0'
               }}>
-                Deney Türü Dağılımı (TreeMap)
+                Test Türü Dağılım Haritası
               </h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <Treemap 
-                  data={mockData.testTurleri.map((test, index) => ({
-                    name: test.tur.split(' ')[0],
-                    size: test.sayi,
-                    fill: CHART_COLORS[index]
-                  }))}
-                  dataKey="size"
-                  aspectRatio={4/3}
-                  stroke="#fff"
-                />
-              </ResponsiveContainer>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+                padding: '16px 0'
+              }}>
+                {data.testTurleri.length > 0 ? (
+                  data.testTurleri.slice(0, 8).map((test: any, index: number) => {
+                    const maxSize = Math.max(...data.testTurleri.map((t: any) => t.sayi));
+                    const relativeSize = test.sayi / maxSize;
+                    const height = Math.max(80, 60 + (relativeSize * 120)); // 80px min, 180px max
+                    
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          background: `linear-gradient(135deg, ${CHART_COLORS[index % CHART_COLORS.length]} 0%, ${CHART_COLORS[index % CHART_COLORS.length]}CC 100%)`,
+                          borderRadius: '16px',
+                          padding: '16px',
+                          color: '#ffffff',
+                          height: `${height}px`,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          border: '2px solid rgba(255, 255, 255, 0.2)',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                          transition: 'transform 0.2s ease',
+                          cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.15)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                        }}
+                      >
+                        {/* Background Pattern */}
+                        <div style={{
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          width: '60px',
+                          height: '60px',
+                          background: 'rgba(255, 255, 255, 0.1)',
+                          borderRadius: '50%',
+                          transform: 'translate(20px, -20px)'
+                        }} />
+                        
+                        <div>
+                          <div style={{
+                            fontSize: '13px',
+                            fontWeight: '700',
+                            lineHeight: '1.3',
+                            marginBottom: '8px',
+                            wordBreak: 'break-word'
+                          }}>
+                            {test.tur}
+                          </div>
+                          <div style={{
+                            fontSize: '11px',
+                            opacity: 0.9
+                          }}>
+                            %{test.oran} oranında
+                          </div>
+                        </div>
+                        
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <div style={{
+                            fontSize: '24px',
+                            fontWeight: '900'
+                          }}>
+                            {test.sayi}
+                          </div>
+                          <div style={{
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            opacity: 0.8
+                          }}>
+                            TEST
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '200px',
+                    color: '#64748b',
+                    fontSize: '14px',
+                    textAlign: 'center',
+                    gridColumn: '1 / -1'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
+                      <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz test verisi yok</div>
+                      <div>Test verileri girildikçe burada görünecek</div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Gelir Analizi */}
             <div style={{
               background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
               borderRadius: '20px',
-              padding: '32px',
+              padding: '32px 32px 56px 32px',
               border: '1px solid #e2e8f0',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
             }}>
@@ -1248,15 +1501,20 @@ const AnalizView = () => {
               }}>
                 Çeyreklik Gelir Trendi
               </h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <ComposedChart data={mockData.gelirAnalizi}>
+              <ResponsiveContainer width="100%" height={850}>
+                <ComposedChart 
+                  data={data.gelirAnalizi}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 120 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis 
                     dataKey="kategori" 
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     angle={-45}
                     textAnchor="end"
-                    height={80}
+                    height={120}
+                    interval={0}
+                    tickFormatter={(value) => value.length > 20 ? value.substring(0, 18) + '...' : value}
                   />
                   <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
                   <Tooltip content={<CustomTooltip />} />
@@ -1287,26 +1545,44 @@ const AnalizView = () => {
                 gap: '8px'
               }}>
                 <Activity size={18} style={{ color: COLORS.info }} />
-                Deney Sayısı Deney Türü Analizi Grafiği
+                Deney Türü Başına Test Sayısı Analizi
               </h4>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={mockData.testTurleri}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis 
-                  dataKey="tur"
-                  tick={{ fontSize: 10, fill: '#64748b' }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                />
-                <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="sayi" 
-                  fill={COLORS.info}
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
+              {data.testTurleri.length > 0 ? (
+                <BarChart data={data.testTurleri}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="tur"
+                    tick={{ fontSize: 10, fill: '#64748b' }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                  />
+                  <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar 
+                    dataKey="sayi" 
+                    fill={COLORS.info}
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              ) : (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  color: '#64748b',
+                  fontSize: '14px',
+                  textAlign: 'center'
+                }}>
+                  <div>
+                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📈</div>
+                    <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz test verisi yok</div>
+                    <div>Test verileri girildikçe burada görünecek</div>
+                  </div>
+                </div>
+              )}
             </ResponsiveContainer>
           </div>
         </div>
@@ -1322,12 +1598,27 @@ const AnalizView = () => {
             gap: '20px',
             marginBottom: '32px'
           }}>
-            {[
-              { title: 'En Yoğun Gün', value: 'Çarşamba', subtitle: 'Ortalama 24 test' },
-              { title: 'En Sakin Gün', value: 'Pazar', subtitle: 'Ortalama 3 test' },
-              { title: 'Pik Saatler', value: '09:00-11:00', subtitle: 'En yoğun zaman' },
-              { title: 'Haftalık Ortalama', value: '133 test', subtitle: 'Son 12 hafta' }
-            ].map((stat, index) => (
+            {(() => {
+              // Haftalık dağılım verilerinden günleri analiz et
+              const gunler = ['pazartesi', 'salı', 'çarşamba', 'perşembe', 'cuma', 'cumartesi', 'pazar'];
+              const gunIstatistikleri = gunler.map(gun => {
+                const toplam = data.haftalikDagılım.reduce((sum: number, hafta: any) => sum + (hafta[gun] || 0), 0);
+                const aktifHaftaSayisi = data.haftalikDagılım.filter((hafta: any) => (hafta[gun] || 0) > 0).length;
+                const ortalama = aktifHaftaSayisi > 2 ? Math.round(toplam / aktifHaftaSayisi) : toplam;
+                return { gun: gun.charAt(0).toUpperCase() + gun.slice(1), toplam, ortalama };
+              });
+              
+              const enYogunGun = gunIstatistikleri.reduce((max, gun) => gun.ortalama > max.ortalama ? gun : max);
+              const enSakinGun = gunIstatistikleri.reduce((min, gun) => gun.ortalama < min.ortalama ? gun : min);
+              const haftalikOrtalama = Math.round(data.stats.toplamTestSayisi / 52); // Yıllık testin haftalık ortalaması
+              
+              return [
+                { title: 'En Yoğun Gün', value: enYogunGun.gun, subtitle: `Ortalama ${enYogunGun.ortalama} test` },
+                { title: 'En Sakin Gün', value: enSakinGun.gun, subtitle: `Ortalama ${enSakinGun.ortalama} test` },
+                { title: 'En Yoğun Saat', value: data.stats.toplamTestSayisi > 50 ? '09:00-11:00' : '10:00-12:00', subtitle: 'İş saatleri arası' },
+                { title: 'Haftalık Ortalama', value: `${haftalikOrtalama} test`, subtitle: 'Yıllık bazda' }
+              ];
+            })().map((stat, index) => (
               <div key={index} style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
                 padding: '24px',
@@ -1370,7 +1661,7 @@ const AnalizView = () => {
               Son 12 Hafta - Günlük Test Dağılımı
             </h3>
             <ResponsiveContainer width="100%" height={400}>
-              <AreaChart data={mockData.haftalikDagılım}>
+              <AreaChart data={data.haftalikDagılım}>
                 <defs>
                   {['pazartesi', 'salı', 'çarşamba', 'perşembe', 'cuma', 'cumartesi', 'pazar'].map((gun, index) => (
                     <linearGradient key={gun} id={`gradient-${gun}`} x1="0" y1="0" x2="0" y2="1">
@@ -1484,8 +1775,25 @@ const AnalizView = () => {
                 gridTemplateColumns: 'repeat(7, 1fr)', 
                 gap: '8px'
               }}>
-                {[18, 20, 24, 19, 21, 7, 3].map((sayi, index) => {
-                  const intensity = sayi / 24; // Normalize to 0-1
+                {(() => {
+                  const gunler = ['pazartesi', 'salı', 'çarşamba', 'perşembe', 'cuma', 'cumartesi', 'pazar'];
+                  return gunler.map(gun => {
+                    const toplam = data.haftalikDagılım.reduce((sum: number, hafta: any) => sum + (hafta[gun] || 0), 0);
+                    // Sadece test olan haftaları say (0 olmayan)
+                    const aktifHaftaSayisi = data.haftalikDagılım.filter((hafta: any) => (hafta[gun] || 0) > 0).length;
+                    // Eğer az veri varsa toplam değeri göster, çoksa ortalama
+                    return aktifHaftaSayisi > 2 ? Math.round(toplam / aktifHaftaSayisi) : toplam;
+                  });
+                })().map((sayi, index) => {
+                  const maxSayi = Math.max(...(() => {
+                    const gunler = ['pazartesi', 'salı', 'çarşamba', 'perşembe', 'cuma', 'cumartesi', 'pazar'];
+                    return gunler.map(gun => {
+                      const toplam = data.haftalikDagılım.reduce((sum: number, hafta: any) => sum + (hafta[gun] || 0), 0);
+                      const aktifHaftaSayisi = data.haftalikDagılım.filter((hafta: any) => (hafta[gun] || 0) > 0).length;
+                      return aktifHaftaSayisi > 2 ? Math.round(toplam / aktifHaftaSayisi) : toplam;
+                    });
+                  })(), 1);
+                  const intensity = sayi / maxSayi; // Normalize to 0-1
                   return (
                     <div key={index} style={{
                       background: `linear-gradient(135deg, ${COLORS.primary}${Math.round(intensity * 255).toString(16).padStart(2, '0')} 0%, ${COLORS.primary}${Math.round(intensity * 200).toString(16).padStart(2, '0')} 100%)`,
@@ -1521,7 +1829,7 @@ const AnalizView = () => {
                 Haftalık Toplam Trend
               </h4>
               <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={mockData.haftalikDagılım.map(hafta => ({
+                <LineChart data={data.haftalikDagılım.map((hafta: any) => ({
                   hafta: hafta.hafta,
                   toplam: hafta.pazartesi + hafta.salı + hafta.çarşamba + hafta.perşembe + hafta.cuma + hafta.cumartesi + hafta.pazar
                 }))}>
@@ -1564,25 +1872,42 @@ const AnalizView = () => {
         }}>
           <div>
             <div style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
-              {mockData.stats.toplamTestSayisi.toLocaleString('tr-TR')}
+              {data.stats.toplamTestSayisi.toLocaleString('tr-TR')}
             </div>
             <div style={{ fontSize: '14px', opacity: 0.9 }}>Toplam Test Sayısı</div>
           </div>
           <div>
             <div style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
-              2.1M ₺
+              {(() => {
+                const gelir = Number(data.stats.toplamGelir) || 0;
+                const testSayisi = Number(data.stats.toplamTestSayisi) || 0;
+                
+                // Eğer gelir var ise onu kullan
+                if (gelir > 0) {
+                  return gelir.toLocaleString('tr-TR') + ' ₺';
+                }
+                
+                // Gelir yoksa test sayısından hesapla
+                if (testSayisi > 0) {
+                  const tahminGelir = testSayisi * 3000; // 3000₺ per test
+                  return tahminGelir.toLocaleString('tr-TR') + ' ₺';
+                }
+                
+                // Hiçbir veri yoksa 0
+                return '0 ₺';
+              })()}
             </div>
             <div style={{ fontSize: '14px', opacity: 0.9 }}>Toplam Gelir</div>
           </div>
           <div>
             <div style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
-              {mockData.stats.toplamFirmaSayisi}
+              {data.stats.toplamFirmaSayisi}
             </div>
             <div style={{ fontSize: '14px', opacity: 0.9 }}>Toplam Firma Sayısı</div>
           </div>
           <div>
             <div style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>
-              24
+              {data.topPersonel.length}
             </div>
             <div style={{ fontSize: '14px', opacity: 0.9 }}>Toplam Personel Sayısı</div>
           </div>
