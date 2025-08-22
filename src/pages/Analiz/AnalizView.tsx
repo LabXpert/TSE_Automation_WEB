@@ -21,7 +21,7 @@ import {
   PolarRadiusAxis,
   Radar
 } from 'recharts';
-import { Calendar, Users, TrendingUp, Building2, Clock, BarChart3, PieChart as PieChartIcon, Activity, Target, Star } from 'lucide-react';
+import { Calendar, Users, TrendingUp, Building2, Clock, BarChart3, PieChart as PieChartIcon, Activity, Target, Star, Database, FileText, BarChart2 } from 'lucide-react';
 import { type AnalysisData } from '../../services/analiz.service';
 
 // Type definitions
@@ -192,9 +192,9 @@ const CHART_COLORS = [
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 24px',
-            fontSize: '24px'
+            border: '2px solid #fecaca'
           }}>
-            ⚠️
+            <Target size={28} style={{ color: '#dc2626' }} />
           </div>
           <div style={{ 
             fontSize: '20px', 
@@ -626,17 +626,33 @@ const CHART_COLORS = [
                     ) : (
                       <div style={{
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        height: '100%',
+                        height: '300px',
                         color: '#64748b',
                         fontSize: '14px',
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        padding: '32px'
                       }}>
-                        <div>
-                          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🥧</div>
-                          <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz test verisi yok</div>
-                          <div>Test verileri girildikçe burada görünecek</div>
+                        <div style={{
+                          width: '80px',
+                          height: '80px',
+                          background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginBottom: '24px',
+                          border: '2px solid #e2e8f0'
+                        }}>
+                          <PieChartIcon size={32} style={{ color: '#94a3b8' }} />
+                        </div>
+                        <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '16px', color: '#475569' }}>
+                          Henüz test verisi yok
+                        </div>
+                        <div style={{ color: '#64748b', fontSize: '13px', lineHeight: '1.4' }}>
+                          Test verileri girildikçe burada görünecek
                         </div>
                       </div>
                     )}
@@ -644,15 +660,23 @@ const CHART_COLORS = [
                 </div>
 
                 {/* Legend */}
-                <div style={{ flex: '1', minWidth: '200px' }}>
+                <div style={{ 
+                  flex: '1', 
+                  minWidth: '200px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
                   {data.testTurleri.length > 0 ? (
-                    <div>
+                    <div style={{ width: '100%' }}>
                       <h5 style={{
                         fontSize: '14px',
                         fontWeight: '600',
                         color: '#64748b',
                         marginBottom: '16px',
-                        margin: '0 0 16px 0'
+                        margin: '0 0 16px 0',
+                        textAlign: 'center'
                       }}>
                         Test Türleri
                       </h5>
@@ -909,17 +933,33 @@ const CHART_COLORS = [
                 ) : (
                   <div style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: '100%',
+                    height: '350px',
                     color: '#64748b',
                     fontSize: '14px',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    padding: '32px'
                   }}>
-                    <div>
-                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏢</div>
-                      <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz firma verisi yok</div>
-                      <div>Firmalar eklendiğinde burada görünecek</div>
+                    <div style={{
+                      width: '80px',
+                      height: '80px',
+                      background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '24px',
+                      border: '2px solid #e2e8f0'
+                    }}>
+                      <Building2 size={32} style={{ color: '#94a3b8' }} />
+                    </div>
+                    <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '16px', color: '#475569' }}>
+                      Henüz firma verisi yok
+                    </div>
+                    <div style={{ color: '#64748b', fontSize: '13px', lineHeight: '1.4' }}>
+                      Firmalar eklendiğinde burada görünecek
                     </div>
                   </div>
                 )}
@@ -964,17 +1004,33 @@ const CHART_COLORS = [
                 ) : (
                   <div style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: '100%',
+                    height: '300px',
                     color: '#64748b',
                     fontSize: '14px',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    padding: '32px'
                   }}>
-                    <div>
-                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-                      <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz firma verisi yok</div>
-                      <div>Firmalar eklendiğinde burada görünecek</div>
+                    <div style={{
+                      width: '80px',
+                      height: '80px',
+                      background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '24px',
+                      border: '2px solid #e2e8f0'
+                    }}>
+                      <BarChart2 size={32} style={{ color: '#94a3b8' }} />
+                    </div>
+                    <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '16px', color: '#475569' }}>
+                      Henüz firma verisi yok
+                    </div>
+                    <div style={{ color: '#64748b', fontSize: '13px', lineHeight: '1.4' }}>
+                      Firmalar eklendiğinde burada görünecek
                     </div>
                   </div>
                 )}
@@ -1153,24 +1209,58 @@ const CHART_COLORS = [
                 Personel Test Dağılımı
               </h4>
               <ResponsiveContainer width="100%" height={300}>
-                <RadarChart data={data.topPersonel.slice(0, 6).map((p: any) => ({
-                  personel: p.personel.split(' ').slice(-1)[0],
-                  testSayisi: p.testSayisi,
-                  uygunluk: p.uygunlukOrani
-                }))}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="personel" tick={{ fontSize: 11 }} />
-                  <PolarRadiusAxis tick={{ fontSize: 10 }} />
-                  <Radar
-                    name="Test Sayısı"
-                    dataKey="testSayisi"
-                    stroke={COLORS.primary}
-                    fill={COLORS.primary}
-                    fillOpacity={0.3}
-                    strokeWidth={2}
-                  />
-                  <Tooltip />
-                </RadarChart>
+                {data.topPersonel.length > 0 ? (
+                  <RadarChart data={data.topPersonel.slice(0, 6).map((p: any) => ({
+                    personel: p.personel.split(' ').slice(-1)[0],
+                    testSayisi: p.testSayisi,
+                    uygunluk: p.uygunlukOrani
+                  }))}>
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="personel" tick={{ fontSize: 11 }} />
+                    <PolarRadiusAxis tick={{ fontSize: 10 }} />
+                    <Radar
+                      name="Test Sayısı"
+                      dataKey="testSayisi"
+                      stroke={COLORS.primary}
+                      fill={COLORS.primary}
+                      fillOpacity={0.3}
+                      strokeWidth={2}
+                    />
+                    <Tooltip />
+                  </RadarChart>
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '300px',
+                    color: '#64748b',
+                    fontSize: '14px',
+                    textAlign: 'center',
+                    padding: '32px'
+                  }}>
+                    <div style={{
+                      width: '80px',
+                      height: '80px',
+                      background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '24px',
+                      border: '2px solid #e2e8f0'
+                    }}>
+                      <Users size={32} style={{ color: '#94a3b8' }} />
+                    </div>
+                    <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '16px', color: '#475569' }}>
+                      Henüz personel verisi yok
+                    </div>
+                    <div style={{ color: '#64748b', fontSize: '13px', lineHeight: '1.4' }}>
+                      Personel verileri girildikçe burada görünecek
+                    </div>
+                  </div>
+                )}
               </ResponsiveContainer>
             </div>
 
@@ -1191,28 +1281,62 @@ const CHART_COLORS = [
                 Personel Test Grafiği
               </h4>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={data.topPersonel.slice(0, 4)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="personel"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 12, fill: '#64748b' }}
-                    label={{ value: 'Test Sayısı', angle: -90, position: 'insideLeft' }}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="testSayisi" 
-                    stroke={COLORS.primary}
-                    strokeWidth={3}
-                    dot={{ fill: COLORS.primary, strokeWidth: 2, r: 6 }}
-                  />
-                </LineChart>
+                {data.topPersonel.length > 0 ? (
+                  <LineChart data={data.topPersonel.slice(0, 4)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="personel"
+                      tick={{ fontSize: 10, fill: '#64748b' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                      label={{ value: 'Test Sayısı', angle: -90, position: 'insideLeft' }}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Line 
+                      type="monotone" 
+                      dataKey="testSayisi" 
+                      stroke={COLORS.primary}
+                      strokeWidth={3}
+                      dot={{ fill: COLORS.primary, strokeWidth: 2, r: 6 }}
+                    />
+                  </LineChart>
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '300px',
+                    color: '#64748b',
+                    fontSize: '14px',
+                    textAlign: 'center',
+                    padding: '32px'
+                  }}>
+                    <div style={{
+                      width: '80px',
+                      height: '80px',
+                      background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '24px',
+                      border: '2px solid #e2e8f0'
+                    }}>
+                      <TrendingUp size={32} style={{ color: '#94a3b8' }} />
+                    </div>
+                    <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '16px', color: '#475569' }}>
+                      Henüz personel verisi yok
+                    </div>
+                    <div style={{ color: '#64748b', fontSize: '13px', lineHeight: '1.4' }}>
+                      Personel verileri girildikçe burada görünecek
+                    </div>
+                  </div>
+                )}
               </ResponsiveContainer>
             </div>
           </div>
@@ -1464,18 +1588,34 @@ const CHART_COLORS = [
                 ) : (
                   <div style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
                     height: '200px',
                     color: '#64748b',
                     fontSize: '14px',
                     textAlign: 'center',
-                    gridColumn: '1 / -1'
+                    gridColumn: '1 / -1',
+                    padding: '32px'
                   }}>
-                    <div>
-                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-                      <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz test verisi yok</div>
-                      <div>Test verileri girildikçe burada görünecek</div>
+                    <div style={{
+                      width: '80px',
+                      height: '80px',
+                      background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '24px',
+                      border: '2px solid #e2e8f0'
+                    }}>
+                      <Database size={32} style={{ color: '#94a3b8' }} />
+                    </div>
+                    <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '16px', color: '#475569' }}>
+                      Henüz test verisi yok
+                    </div>
+                    <div style={{ color: '#64748b', fontSize: '13px', lineHeight: '1.4' }}>
+                      Test verileri girildikçe burada görünecek
                     </div>
                   </div>
                 )}
@@ -1566,17 +1706,33 @@ const CHART_COLORS = [
               ) : (
                 <div style={{
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  height: '100%',
+                  height: '350px',
                   color: '#64748b',
                   fontSize: '14px',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  padding: '32px'
                 }}>
-                  <div>
-                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📈</div>
-                    <div style={{ fontWeight: '600', marginBottom: '8px' }}>Henüz test verisi yok</div>
-                    <div>Test verileri girildikçe burada görünecek</div>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '24px',
+                    border: '2px solid #e2e8f0'
+                  }}>
+                    <FileText size={32} style={{ color: '#94a3b8' }} />
+                  </div>
+                  <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '16px', color: '#475569' }}>
+                    Henüz test verisi yok
+                  </div>
+                  <div style={{ color: '#64748b', fontSize: '13px', lineHeight: '1.4' }}>
+                    Test verileri girildikçe burada görünecek
                   </div>
                 </div>
               )}
