@@ -60,8 +60,12 @@ const Login: React.FC = () => {
           localStorage.removeItem('savedUsername');
         }
         
-        // Ana sayfaya yönlendir
-        navigate('/');
+        // Rol bazlı yönlendirme
+        if (data.user?.role === 'admin') {
+          navigate('/analiz'); // Admin ise analiz sayfasına
+        } else {
+          navigate('/deney-ekle'); // User ise deney ekle sayfasına
+        }
       } else {
         setError(data.message);
       }

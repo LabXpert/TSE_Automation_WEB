@@ -15,21 +15,29 @@ import AdminRoute from '../components/AdminRoute';
 
 function Rotalar() {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
+
+  // Rol bazlı varsayılan sayfa yönlendirmesi
+  const getDefaultRoute = () => {
+    if (!isLoggedIn) return '/login';
+    return user?.role === 'admin' ? '/analiz' : '/deney-ekle';
+  };
 
   return (
     <Routes>
       {/* Login route - accessible only when not logged in */}
       <Route 
         path="/login" 
-        element={isLoggedIn ? <Navigate to="/" replace /> : <Login />} 
+        element={isLoggedIn ? <Navigate to={getDefaultRoute()} replace /> : <Login />} 
+      />
+      
+      {/* Root route - redirect based on role */}
+      <Route 
+        path="/" 
+        element={<Navigate to={getDefaultRoute()} replace />} 
       />
       
       {/* Protected routes */}
-      <Route path="/" element={
-        <ProtectedRoute>
-          <DeneyEkle />
-        </ProtectedRoute>
-      } />
       <Route path="/deney-ekle" element={
         <ProtectedRoute>
           <DeneyEkle />
