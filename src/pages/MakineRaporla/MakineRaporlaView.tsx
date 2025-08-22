@@ -66,13 +66,9 @@ const MakineRaporlaView: React.FC<Props> = ({
   makineKalibrasyonGuncelle
 }) => {
 
-  // Excel'e aktar - sadece ana export fonksiyonunu kullan
+  // Excel'e aktar - sadece props'tan gelen fonksiyonu çağır
   const exportToExcel = () => {
-    if (exceleCikart) {
-      exceleCikart();
-    } else {
-      alert('Excel export fonksiyonu bulunamadı');
-    }
+    exceleCikart?.();
   };
 
   return (
@@ -863,16 +859,12 @@ const MakineRaporlaView: React.FC<Props> = ({
                           id={`tarih-${makine.id}`}
                         />
                         
-                        {/* Kalibre Edildi Butonu */}
-                        <button
-                          onClick={() => {
-                            const tarihInput = document.getElementById(`tarih-${makine.id}`) as HTMLInputElement;
-                            if (tarihInput && tarihInput.value) {
-                              makineKalibrasyonGuncelle(makine.id, tarihInput.value);
-                            } else {
-                              alert('Lütfen geçerli bir tarih seçin!');
-                            }
-                          }}
+                                                 {/* Kalibre Edildi Butonu */}
+                         <button
+                           onClick={() => {
+                             const tarihInput = document.getElementById(`tarih-${makine.id}`) as HTMLInputElement;
+                             makineKalibrasyonGuncelle(makine.id, tarihInput?.value || '');
+                           }}
                           style={{
                             padding: '4px 8px',
                             background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
