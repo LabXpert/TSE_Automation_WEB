@@ -47,6 +47,40 @@ export interface MakineInput {
   calibration_org_id: number;
 }
 
+// Makine Kalibrasyon Geçmişi Model (from MachineCalibration.tsx)
+export interface MachineCalibration {
+  id: number;
+  machine_id: number;
+  calibration_org_id: number;
+  calibrated_by?: string;
+  calibration_date: Date;
+  created_at?: Date;
+  
+  // Join fields
+  machine?: {
+    id: number;
+    serial_no: string;
+    equipment_name: string;
+    brand?: string;
+    model?: string;
+  };
+  
+  calibration_org?: {
+    id: number;
+    org_name: string;
+    contact_name?: string;
+    email?: string;
+    phone?: string;
+  };
+}
+
+export interface MachineCalibrationInput {
+  machine_id: number;
+  calibration_org_id: number;
+  calibrated_by?: string;
+  calibration_date: Date;
+}
+
 // Makine uygulaması arayüzü (raporlama için)
 export interface MakineUygulama {
   id: number;

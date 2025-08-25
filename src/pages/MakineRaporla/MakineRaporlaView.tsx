@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import KalibrasyonModal from '../../components/KalibrasyonModal';
 
 interface MakineData {
   id: number;
@@ -40,7 +41,7 @@ interface Props {
   modeller: string[];
   kalibrasyonOrglari: string[];
   filtreleriTemizle: () => void;
-  makineKalibrasyonGuncelle: (makineId: number, yeniTarih: string) => Promise<void>;
+  onMakineDataRefresh?: () => void;
 }
 
 const MakineRaporlaView: React.FC<Props> = ({
@@ -63,8 +64,25 @@ const MakineRaporlaView: React.FC<Props> = ({
   modeller,
   kalibrasyonOrglari,
   filtreleriTemizle,
-  makineKalibrasyonGuncelle
+  onMakineDataRefresh
 }) => {
+
+  const [kalibrasyonModalAcik, setKalibrasyonModalAcik] = useState(false);
+  const [secilenMakine, setSecilenMakine] = useState<MakineData | null>(null);
+
+  const handleKalibreEtClick = (makine: MakineData) => {
+    setSecilenMakine(makine);
+    setKalibrasyonModalAcik(true);
+  };
+
+  const handleKalibrasyonTamamlandi = () => {
+    // Ana sayfadaki verileri yenile
+    onMakineDataRefresh?.();
+    
+    // Modal'ı kapat
+    setKalibrasyonModalAcik(false);
+    setSecilenMakine(null);
+  };
 
   // Excel'e aktar - sadece props'tan gelen fonksiyonu çağır
   const exportToExcel = () => {
@@ -838,61 +856,42 @@ const MakineRaporlaView: React.FC<Props> = ({
                     }}>
                       <div style={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
+                        justifyContent: 'center',
                         alignItems: 'center',
                         minWidth: '140px'
                       }}>
-                        {/* Tarih Seçici */}
-                        <input
-                          type="date"
-                          defaultValue={new Date().toISOString().split('T')[0]}
+                        {/* Yeni Kalibrasyon Butonu */}
+                        <button
+                          onClick={() => handleKalibreEtClick(makine)}
                           style={{
-                            padding: '4px 6px',
-                            border: '1px solid #d1d5db',
-                            borderRadius: '4px',
-                            fontSize: '11px',
-                            width: '100%',
-                            maxWidth: '110px',
-                            textAlign: 'center'
-                          }}
-                          id={`tarih-${makine.id}`}
-                        />
-                        
-                                                 {/* Kalibre Edildi Butonu */}
-                         <button
-                           onClick={() => {
-                             const tarihInput = document.getElementById(`tarih-${makine.id}`) as HTMLInputElement;
-                             makineKalibrasyonGuncelle(makine.id, tarihInput?.value || '');
-                           }}
-                          style={{
-                            padding: '4px 8px',
-                            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                            padding: '8px 16px',
+                            background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '10px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
                             fontWeight: '600',
                             cursor: 'pointer',
                             transition: 'all 0.2s ease',
-                            width: '100%',
-                            maxWidth: '110px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '4px'
+                            gap: '6px'
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'linear-gradient(135deg, #047857 0%, #065f46 100%)';
+                            e.currentTarget.style.background = 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)';
                             e.currentTarget.style.transform = 'translateY(-1px)';
-                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.3)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+                            e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)';
                             e.currentTarget.style.transform = 'translateY(0)';
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                         >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM14 21L7 12H10V7H14V12H17L14 21Z"/>
+                          </svg>
                           <span>Kalibre Et</span>
                         </button>
                       </div>
@@ -977,6 +976,17 @@ const MakineRaporlaView: React.FC<Props> = ({
           </p>
         </div>
       )}
+
+      {/* Kalibrasyon Modal'ı */}
+      <KalibrasyonModal
+        isOpen={kalibrasyonModalAcik}
+        onClose={() => {
+          setKalibrasyonModalAcik(false);
+          setSecilenMakine(null);
+        }}
+        makine={secilenMakine}
+        onKalibrasyonTamamlandi={handleKalibrasyonTamamlandi}
+      />
 
       {/* CSS Animation */}
       <style>{`

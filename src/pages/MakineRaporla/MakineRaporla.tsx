@@ -31,34 +31,33 @@ const MakineRaporla: React.FC = () => {
   const [filtrelenmisKayitlar, setFiltrelenmisKayitlar] = useState<MakineData[]>([]);
 
   // Veritabanından makine verilerini yükle
-  useEffect(() => {
-    const fetchMachineData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch('/api/machine-reports/data');
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Gerçek veriler alındı:', data);
-          setMakineData(Array.isArray(data) ? data : []);
-          // İlk başta sadece makineData'yı set et, filtreleme otomatik çalışacak
-        } else {
-          console.error('API hatası:', response.statusText);
-          setError(`API hatası: ${response.statusText}`);
-          setMakineData([]); // Hata durumunda boş liste
-        }
-      } catch (error) {
-        console.error('Veri çekme hatası:', error);
-        setError('Veri çekme hatası oluştu');
+  const fetchMachineData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/machine-reports/data');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Gerçek veriler alındı:', data);
+        setMakineData(Array.isArray(data) ? data : []);
+        // İlk başta sadece makineData'yı set et, filtreleme otomatik çalışacak
+      } else {
+        console.error('API hatası:', response.statusText);
+        setError(`API hatası: ${response.statusText}`);
         setMakineData([]); // Hata durumunda boş liste
-      } finally {
-        setLoading(false);
       }
-    };
-
-   
-    fetchMachineData();
+    } catch (error) {
+      console.error('Veri çekme hatası:', error);
+      setError('Veri çekme hatası oluştu');
+      setMakineData([]); // Hata durumunda boş liste
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchMachineData();
+  }, [fetchMachineData]);
 
   // Sonraki kalibrasyon tarihini ve durumunu hesapla
   const getKalibrasyonDurumu = useCallback((lastCalibrationDate: string) => {
@@ -130,8 +129,8 @@ const MakineRaporla: React.FC = () => {
     setSecilenDurumlar([]);
   };
 
-  // Makine kalibrasyon tarihini güncelle
-  const makineKalibrasyonGuncelle = async (makineId: number, yeniTarih: string) => {
+  // Makine kalibrasyon tarihini güncelle (eski yöntem - artık modal kullanıyoruz)
+  /*const makineKalibrasyonGuncelle = async (makineId: number, yeniTarih: string) => {
     try {
       const response = await fetch(`/api/machines/${makineId}/calibration`, {
         method: 'PUT',
@@ -161,7 +160,7 @@ const MakineRaporla: React.FC = () => {
       console.error('Kalibrasyon güncelleme hatası:', error);
       alert('Kalibrasyon tarihi güncellenirken bir hata oluştu!');
     }
-  };
+  };*/
 
   // Excel çıktısı alma fonksiyonu
   const exceleCikart = async () => {
@@ -410,7 +409,7 @@ const MakineRaporla: React.FC = () => {
         modeller={modeller}
         kalibrasyonOrglari={kalibrasyonOrglari}
         filtreleriTemizle={filtreleriTemizle}
-        makineKalibrasyonGuncelle={makineKalibrasyonGuncelle}
+        onMakineDataRefresh={fetchMachineData}
       />
     </>
   );

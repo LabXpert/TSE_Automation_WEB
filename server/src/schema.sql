@@ -92,6 +92,17 @@ CREATE TABLE IF NOT EXISTS machines (
   calibration_org_id INTEGER NOT NULL REFERENCES calibration_orgs(id) ON DELETE RESTRICT
 );
 
+-- Machine calibration history table
+CREATE TABLE IF NOT EXISTS machine_calibrations (
+  id SERIAL PRIMARY KEY,
+  machine_id INTEGER NOT NULL REFERENCES machines(id) ON DELETE CASCADE,
+  calibration_org_id INTEGER NOT NULL REFERENCES calibration_orgs(id) ON DELETE RESTRICT,
+  calibrated_by TEXT,
+  notes TEXT,
+  calibration_date DATE NOT NULL,
+  created_at TIMESTAMP(6) DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_companies_tax_no ON companies(tax_no);
 CREATE INDEX IF NOT EXISTS idx_applications_company_id ON applications(company_id);
@@ -103,3 +114,4 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_machines_last_calibration_date ON machines(last_calibration_date);
 CREATE INDEX IF NOT EXISTS idx_machines_calibration_org_id ON machines(calibration_org_id);
+CREATE INDEX IF NOT EXISTS idx_machine_calibrations_machine_id ON machine_calibrations(machine_id);

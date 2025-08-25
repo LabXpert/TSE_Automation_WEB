@@ -10,6 +10,7 @@ import applicationRoutes from './routes/application.route';
 import userRoutes from './routes/user.route';
 import calibrationOrgRoutes from './routes/calibrationOrg.route';
 import machineRoutes from './routes/machine.route';
+import machineCalibrationRoutes from './routes/machineCalibration.route';
 import machineReportRoutes from './routes/machineReport.route';
 import alertRoutes from './routes/alert.route';
 
@@ -44,6 +45,10 @@ app.get('/api', (_req, res) => {
       'POST /api/machines',
       'GET /api/machines/expiring',
       'GET /api/machines/stats',
+      'GET /api/machine-calibrations',
+      'POST /api/machine-calibrations',
+      'POST /api/machine-calibrations/calibrate/:machineId',
+      'GET /api/machine-calibrations/stats',
       'GET /api/machine-reports/data',
       'GET /api/machine-reports/stats',
       'GET /api/machine-reports/top-used',
@@ -67,6 +72,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/calibration-orgs', calibrationOrgRoutes);
 app.use('/api/machines', machineRoutes);
+app.use('/api/machine-calibrations', machineCalibrationRoutes);
 app.use('/api/machine-reports', machineReportRoutes);
 app.use('/api/alerts', alertRoutes);
 
