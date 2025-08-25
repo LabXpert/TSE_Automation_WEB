@@ -29,6 +29,7 @@ interface ApiTest {
   uygunluk: boolean;
   unit_price?: number;
   sample_count?: number;
+  total_price?: number;
 }
 
 function DeneyEkle() {
@@ -174,7 +175,8 @@ function DeneyEkle() {
         responsible_personnel_id: personnel?.id,
         unit_price: experimentType?.base_price || 0, // Client'tan gönderilse de server hesaplayacak
         is_accredited: d.akredite || false,
-        uygunluk: d.uygunluk || false
+        uygunluk: d.uygunluk || false,
+        sample_count: d.numuneSayisi || 1
       };
     });
 
@@ -242,7 +244,8 @@ function DeneyEkle() {
           `${test.personnel_first_name} ${test.personnel_last_name}` : '',
         akredite: !!test.is_accredited,
         uygunluk: !!test.uygunluk,
-        unit_price: test.unit_price
+        unit_price: test.unit_price,
+        numuneSayisi: test.sample_count || 1
       })));
     setDuzenlemeModu(true);
     setDuzenlenecekKayitId(id);

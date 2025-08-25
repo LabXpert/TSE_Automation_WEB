@@ -1352,14 +1352,15 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
               <thead>
                 <tr style={{ background: '#7f1d1d', color: 'white' }}>
                   <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '4%' }}>SIRA</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '16%' }}>FİRMA ADI</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '9%' }}>BAŞVURU NO</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '9%' }}>BAŞVURU TARİHİ</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '7%' }}>TÜR</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '16%' }}>DENEY TÜRÜ</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '13%' }}>SORUMLU PERSONEL</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '8%' }}>AKREDİTE</th>
-                  <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '8%' }}>UYGUNLUK</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '15%' }}>FİRMA ADI</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '8%' }}>BAŞVURU NO</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '8%' }}>BAŞVURU TARİHİ</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '6%' }}>TÜR</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '15%' }}>DENEY TÜRÜ</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'left', fontWeight: '600', borderRight: '1px solid #991b1b', width: '12%' }}>SORUMLU PERSONEL</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '6%' }}>NUMUNE</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '7%' }}>AKREDİTE</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', borderRight: '1px solid #991b1b', width: '7%' }}>UYGUNLUK</th>
                   <th style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', width: '10%' }}>ÜCRET</th>
                 </tr>
               </thead>
@@ -1378,13 +1379,14 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                       </td>
                       <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#0f172a', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deney.deneyTuru}</td>
                       <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deney.sorumluPersonel}</td>
+                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center', fontWeight: '600', color: '#0f172a', fontSize: '12px' }}>{deney.numuneSayisi || 1}</td>
                       <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
                         <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: deney.akredite ? '#dcfce7' : '#fee2e2', color: deney.akredite ? '#166534' : '#dc2626', border: `1px solid ${deney.akredite ? '#16a34a' : '#ef4444'}` }}>{deney.akredite ? 'EVET' : 'HAYIR'}</span>
                       </td>
                       <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
                         <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: deney.uygunluk ? '#ddd6fe' : '#f3f4f6', color: deney.uygunluk ? '#5b21b6' : '#6b7280', border: `1px solid ${deney.uygunluk ? '#8b5cf6' : '#d1d5db'}` }}>{deney.uygunluk ? 'EVET' : 'HAYIR'}</span>
                       </td>
-                      <td style={{ padding: '10px 8px', textAlign: 'center', fontWeight: '600', color: '#0f172a', fontSize: '12px' }}>{deney.unit_price != null ? `${deney.unit_price} ₺` : '-'}</td>
+                      <td style={{ padding: '10px 8px', textAlign: 'center', fontWeight: '600', color: '#0f172a', fontSize: '12px' }}>{deney.toplamFiyat != null ? `${Number(deney.toplamFiyat).toFixed(2)} ₺` : '-'}</td>
                     </tr>
                   ))
                 ))}

@@ -23,6 +23,8 @@ interface ApiTest {
   is_accredited: boolean;
   uygunluk: boolean;
   unit_price?: number;
+  sample_count?: number;
+  total_price?: number;
 }
 
 const Raporla: React.FC = () => {
@@ -74,7 +76,9 @@ const Raporla: React.FC = () => {
               `${test.personnel_first_name} ${test.personnel_last_name}` : '',
             akredite: !!test.is_accredited,
             uygunluk: !!test.uygunluk,
-            unit_price: test.unit_price
+            unit_price: test.unit_price,
+            numuneSayisi: test.sample_count || 1,
+            toplamFiyat: test.total_price
           }))
         }));
         setKayitlariListesi(mapped);
@@ -205,9 +209,9 @@ const Raporla: React.FC = () => {
         'Deney Türü',
         'Deney Adı',
         'Deney Personeli',
+        'Numune Sayısı',
         'Akredite',
-        'Uygunluk',
-        'Ücret (TL)  (Kdv Dahil)'
+        'Toplam Ücret (TL)'
       ];
 
       // Başlık satırını ekle
@@ -242,9 +246,9 @@ const Raporla: React.FC = () => {
             kayit.belgelendirmeTuru === 'belgelendirme' ? 'BELGELENDIRME' : 'ÖZEL',
             deney.deneyTuru,
             deney.sorumluPersonel,
+            deney.numuneSayisi || 1,
             deney.akredite ? 'EVET' : 'HAYIR',
-            deney.uygunluk ? 'UYGUN' : 'UYGUN DEĞİL',
-            deney.unit_price ? `₺${deney.unit_price.toLocaleString('tr-TR')}` : '-'
+            deney.toplamFiyat ? `₺${Number(deney.toplamFiyat).toFixed(2)}` : '-'
           ];
           
           const row = worksheet.addRow(rowData);
@@ -259,24 +263,16 @@ const Raporla: React.FC = () => {
             };
             
             // Hizalama
-            if (colNumber === 1 || colNumber === 8 || colNumber === 9) {
+            if (colNumber === 1 || colNumber === 8 || colNumber === 9 || colNumber === 10) {
               cell.alignment = { horizontal: 'center', vertical: 'middle' };
             }
             
             // Durum renklandırması
-            if (colNumber === 8) { // Akredite kolonu
+            if (colNumber === 9) { // Akredite kolonu
               cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: deney.akredite ? 'DCFCE7' : 'FEE2E2' } // Yeşil/Kırmızı
-              };
-            }
-            
-            if (colNumber === 9) { // Uygunluk kolonu
-              cell.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: deney.uygunluk ? 'DCFCE7' : 'FEE2E2' } // Yeşil/Kırmızı
               };
             }
           });
@@ -284,7 +280,7 @@ const Raporla: React.FC = () => {
       });
 
       // Sütun genişliklerini ayarla
-      const columnWidths = [8, 25, 15, 12, 18, 30, 20, 10, 12, 15];
+      const columnWidths = [8, 25, 15, 12, 18, 30, 20, 8, 10, 12];
       columnWidths.forEach((width, index) => {
         worksheet.getColumn(index + 1).width = width;
       });

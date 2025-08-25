@@ -6,6 +6,7 @@ export interface Deney {
   uygunluk: boolean;
   unit_price?: number;
   numuneSayisi?: number;
+  toplamFiyat?: number;
 }
 
 export interface DeneyKaydi {

@@ -130,21 +130,24 @@ export class AnalysisService {
     console.log('Toplam test sayısı:', allTests.length);
     console.log('İlk 5 test detayları:', allTests.slice(0, 5).map(t => ({ 
       id: t.id, 
-      unit_price: t.unit_price, 
+      total_price: t.total_price, 
+      unit_price: t.unit_price,
       experiment_type_base_price: t.experiment_type_base_price,
+      type_total: typeof t.total_price,
       type_unit: typeof t.unit_price,
       type_base: typeof t.experiment_type_base_price
     })));
     
     let totalRevenue = 0;
     allTests.forEach((test, index) => {
+      const totalPrice = Number(test.total_price) || 0;
       const unitPrice = Number(test.unit_price) || 0;
       const basePrice = Number(test.experiment_type_base_price) || 0;
       const fallbackPrice = 2500;
-      const finalPrice = unitPrice || basePrice || fallbackPrice;
+      const finalPrice = totalPrice || unitPrice || basePrice || fallbackPrice;
       
       if (index < 3) {
-        console.log(`Test ${index + 1}: unit=${unitPrice}, base=${basePrice}, final=${finalPrice}`);
+        console.log(`Test ${index + 1}: total=${totalPrice}, unit=${unitPrice}, base=${basePrice}, final=${finalPrice}`);
       }
       
       totalRevenue += finalPrice;
@@ -235,7 +238,7 @@ export class AnalysisService {
       const testCount = monthTests.length;
       const uygunTests = monthTests.filter(test => test.uygunluk).length;
       const akrediteTests = monthTests.filter(test => test.is_accredited).length;
-      const totalRevenue = monthTests.reduce((sum, test) => sum + (Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500), 0);
+      const totalRevenue = monthTests.reduce((sum, test) => sum + (Number(test.total_price) || Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500), 0);
 
       monthlyData.push({
         ay: this.getMonthName(targetMonth),
@@ -322,7 +325,7 @@ export class AnalysisService {
           const existing = personnelStats.get(personnelName);
           existing.testSayisi++;
           existing.uygunTests += test.uygunluk ? 1 : 0;
-          existing.toplamGelir += Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500;
+          existing.toplamGelir += Number(test.total_price) || Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500;
         } else {
           personnelStats.set(personnelName, {
             personel: personnelName,
@@ -331,7 +334,7 @@ export class AnalysisService {
             uzmanlikAlani: test.experiment_type_name || 'Genel',
             tamamlananProjeSayisi: 0, // Aşağıda hesaplanacak
             ortalamaSure: 0, // Placeholder
-            toplamGelir: Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500
+            toplamGelir: Number(test.total_price) || Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500
           });
         }
       });
@@ -359,7 +362,7 @@ export class AnalysisService {
       if (testTypeStats.has(typeName)) {
         const existing = testTypeStats.get(typeName);
         existing.sayi++;
-        existing.gelir += Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500;
+        existing.gelir += Number(test.total_price) || Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500;
         existing.uygunTests += test.uygunluk ? 1 : 0;
               } else {
           // Risk seviyesini test türüne göre belirle
@@ -379,8 +382,8 @@ export class AnalysisService {
           testTypeStats.set(typeName, {
             tur: typeName,
             sayi: 1,
-            gelir: Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500,
-            ortalamaSure: Math.round((2.5 + (Number(test.unit_price) || 1000) / 2000) * 10) / 10, // Fiyat bazlı süre
+            gelir: Number(test.total_price) || Number(test.unit_price) || Number(test.experiment_type_base_price) || 2500,
+            ortalamaSure: (2.5 + (Number(test.total_price) || Number(test.unit_price) || 1000) / 2000), // Fiyat bazlı süre
             riskSeviyesi: getRiskLevel(typeName),
             uygunTests: test.uygunluk ? 1 : 0
           });
