@@ -38,7 +38,12 @@ interface DeneyEkleViewProps {
   firmalar: Firma[];
   personeller: Personel[];
   deneyTurleri: DeneyTuru[];
+  
+  // Hesaplanmış değerler
+  toplamUcretTxt: string;
 }
+
+
 
 function DeneyEkleView({
   deneySayisi,
@@ -64,7 +69,8 @@ function DeneyEkleView({
   onSearchTermChange,
   firmalar,
   personeller,
-  deneyTurleri
+  deneyTurleri,
+  toplamUcretTxt
 }: DeneyEkleViewProps) {
   const navigate = useNavigate();
 
@@ -763,89 +769,115 @@ function DeneyEkleView({
           </div>
         </div>
       </div>
-
-      {/* Alt Kısım - Kaydet Butonu */}
-      <div style={{ marginBottom: '32px' }}>
-        {/* Kaydet/Güncelle ve İptal Butonları */}
-        <div style={{
+{/* Alt Kısım - Kaydet Butonu */}
+<div style={{ marginBottom: '32px' }}>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      gap: '16px',
+      paddingTop: '16px',
+      flexShrink: 0,
+      background: 'transparent',
+      marginTop: '8px',
+      flexWrap: 'wrap',
+    }}
+  >
+    {duzenlemeModu && (
+      <button
+        onClick={duzenlemeyiIptalEt}
+        style={{
           display: 'flex',
-          justifyContent: 'flex-end',
-          gap: '16px',
-          borderTop: '1px solid #e2e8f0',
-          paddingTop: '16px',
-          flexShrink: 0,
-          backgroundColor: '#ffffff',
-          marginTop: '8px'
-        }}>
-          {duzenlemeModu && (
-            <button
-              onClick={duzenlemeyiIptalEt}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
-                background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 8px 25px rgba(107, 114, 128, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(107, 114, 128, 0.3)';
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              İptal
-            </button>
-          )}
-          <button
-            onClick={kaydet}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 24px',
-              background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 8px rgba(220, 38, 38, 0.2)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 21H5C4.45 21 4 20.55 4 20V4C4 3.45 4.45 3 5 3H16L20 7V20C20 20.55 19.55 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            {duzenlemeModu ? 'Güncelle' : 'Kaydet'}
-          </button>
-        </div>
-      </div>
+          alignItems: 'center',
+          gap: '8px',
+          padding: '12px 24px',
+          background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+          color: '#ffffff',
+          border: 'none',
+          borderRadius: '8px',
+          fontSize: '14px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 4px 15px rgba(107,114,128,0.3)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-1px)';
+          e.currentTarget.style.boxShadow = '0 8px 25px rgba(107,114,128,0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 4px 15px rgba(107,114,128,0.3)';
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        İptal
+      </button>
+    )}
+
+    {/* Toplam Ücret rozeti (Kaydet'in hemen solu) */}
+    <div
+      title="Toplam Ücret (önizleme)"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        padding: '10px 14px',
+        borderRadius: '10px',
+        border: '1px solid #e2e8f0',
+        background: 'white',
+        fontSize: '14px',
+        fontWeight: 700,
+        color: '#0f172a',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+      }}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a">
+        <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zm1 17h-2v-2h2v2zm1.9-7.5c-.4 1.1-1.4 1.6-2.4 2-.8.3-1.2.6-1.2 1.1v.4H9v-.5c0-1.6 1.1-2.2 2.2-2.6.9-.3 1.6-.7 1.9-1.4.2-.5.1-1.1-.2-1.5-.3-.4-.9-.7-1.6-.7-.7 0-1.3.3-1.6.8-.2.3-.3.6-.3 1H7.5c0-1 .4-1.9 1.1-2.5.7-.6 1.7-1 2.8-1 1.3 0 2.4.5 3.1 1.3.7.8.9 2 .5 3z"/>
+      </svg>
+      <span>Toplam:</span>
+      <span style={{ fontWeight: 800 }}>{toplamUcretTxt}</span>
+    </div>
+
+    <button
+      onClick={kaydet}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        padding: '12px 24px',
+        background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '8px',
+        fontSize: '14px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 2px 8px rgba(220,38,38,0.2)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-1px)';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220,38,38,0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(220,38,38,0.2)';
+      }}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M19 21H5C4.45 21 4 20.55 4 20V4C4 3.45 4.45 3 5 3H16L20 7V20C20 20.55 19.55 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      {duzenlemeModu ? 'Güncelle' : 'Kaydet'}
+    </button>
+  </div>
+</div>
 
       {/* Kayıtlar Listesi */}
       <div className="card">
