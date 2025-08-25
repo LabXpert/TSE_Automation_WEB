@@ -28,6 +28,7 @@ interface ApiTest {
   is_accredited: boolean;
   uygunluk: boolean;
   unit_price?: number;
+  sample_count?: number;
 }
 
 function DeneyEkle() {

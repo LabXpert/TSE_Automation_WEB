@@ -47,6 +47,7 @@ router.post('/', async (req, res) => {
         experiment_type_id: Number(test.experiment_type_id),
         responsible_personnel_id: Number(test.responsible_personnel_id),
         unit_price: Number(test.unit_price) || 0, // Client'tan gelse de server hesaplayacak
+        sample_count: Number(test.sample_count) || 1, // Yeni alan
         is_accredited: toBool(test.is_accredited),
         uygunluk: toBool(test.uygunluk)
       }))
@@ -82,6 +83,7 @@ router.put('/:id', async (req, res) => {
         experiment_type_id: Number(test.experiment_type_id),
         responsible_personnel_id: Number(test.responsible_personnel_id),
         unit_price: Number(test.unit_price) || 0, // Client'tan gelse de server hesaplayacak
+        sample_count: Number(test.sample_count) || 1, // Yeni alan
         is_accredited: toBool(test.is_accredited),
         uygunluk: toBool(test.uygunluk)
       }))

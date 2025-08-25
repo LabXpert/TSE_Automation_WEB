@@ -5,6 +5,7 @@ export interface Deney {
   akredite: boolean;
   uygunluk: boolean;
   unit_price?: number;
+  numuneSayisi?: number;
 }
 
 export interface DeneyKaydi {

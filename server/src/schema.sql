@@ -41,16 +41,18 @@ CREATE TABLE IF NOT EXISTS applications (
   created_at TIMESTAMP(6) DEFAULT NOW()
 );
 
--- Tests table
+-- Tests table (güncel)
 CREATE TABLE IF NOT EXISTS tests (
   id SERIAL PRIMARY KEY,
   application_id INTEGER REFERENCES applications(id) ON DELETE CASCADE,
   experiment_type_id INTEGER REFERENCES experiment_types(id) ON DELETE CASCADE,
   responsible_personnel_id INTEGER REFERENCES personnel(id),
   unit_price DECIMAL(10,2) DEFAULT 0,
+  sample_count INTEGER NOT NULL DEFAULT 1,               -- ← yeni
   is_accredited BOOLEAN DEFAULT FALSE,
   uygunluk BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP(6) DEFAULT NOW()
+  created_at TIMESTAMP(6) DEFAULT NOW(),
+  CONSTRAINT chk_tests_sample_count_positive CHECK (sample_count >= 1)
 );
 
 -- Users table

@@ -229,6 +229,55 @@ function DeneyEkleView({
               />
             </div>
 
+                        {/* Numune Sayısı */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#374151' }}>
+                Numune Sayısı <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 400 }}>(adet)</span>
+              </label>
+              <input
+                type="number"
+                inputMode="numeric"
+                min={1}
+                step={1}
+                value={
+                  // sayı ya da string olabilir; boşsa 1 göster
+                  (deneyler[i]?.numuneSayisi as unknown as number) ??
+                  (deneyler[i]?.numuneSayisi ? Number(deneyler[i]?.numuneSayisi) : 1)
+                }
+                onChange={(e) => {
+                  const v = e.target.value === '' ? '' : String(Math.max(1, parseInt(e.target.value || '1', 10)));
+                  // değeri string olarak gönderiyoruz (deneyGuncelle tipine uyumlu)
+                  deneyGuncelle(i, 'numuneSayisi' as keyof Deney, v as unknown as string);
+                }}
+                onBlur={(e) => {
+                  if (!e.target.value || Number(e.target.value) < 1) {
+                    e.target.value = '1';
+                    deneyGuncelle(i, 'numuneSayisi' as keyof Deney, '1' as unknown as string);
+                  }
+                }}
+                placeholder="Örn: 3"
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  padding: '10px 12px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#dc2626';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                }}
+                onBlurCapture={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#e5e7eb';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+
             <div>
               <label style={{ 
                 display: 'flex', 
