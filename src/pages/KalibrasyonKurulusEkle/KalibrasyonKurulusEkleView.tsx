@@ -724,22 +724,21 @@ const KalibrasyonKurulusEkleView: React.FC<KalibrasyonKurulusEkleViewProps> = ({
 
                     <div style={{
                       display: 'flex',
-                      flexDirection: 'column',
                       gap: '6px'
                     }}>
                       <button
                         onClick={() => onEdit(kuruluş)}
                         style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#3b82f6',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          cursor: 'pointer',
-                          transition: 'background-color 0.2s'
-                        }}
+                            padding: '8px 12px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#dc2626',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = '#2563eb';
                         }}
@@ -747,21 +746,24 @@ const KalibrasyonKurulusEkleView: React.FC<KalibrasyonKurulusEkleViewProps> = ({
                           e.currentTarget.style.backgroundColor = '#3b82f6';
                         }}
                       >
-                        Düzenle
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 4H4C3.45 4 3 4.45 3 5V20C3 20.55 3.45 21 4 21H19C19.55 21 20 20.55 20 20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M18.5 2.5C18.89 2.11 19.39 1.89 19.93 1.89C20.47 1.89 20.97 2.11 21.36 2.5C21.75 2.89 21.97 3.39 21.97 3.93C21.97 4.47 21.75 4.97 21.36 5.36L12 14.83L8 16L9.17 12L18.5 2.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                       </button>
                       <button
                         onClick={() => onDelete(kuruluş.id)}
                         style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#ef4444',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          cursor: 'pointer',
-                          transition: 'background-color 0.2s'
-                        }}
+                            padding: '8px 12px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = '#dc2626';
                         }}
@@ -769,7 +771,10 @@ const KalibrasyonKurulusEkleView: React.FC<KalibrasyonKurulusEkleViewProps> = ({
                           e.currentTarget.style.backgroundColor = '#ef4444';
                         }}
                       >
-                        Sil
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <polyline points="3,6 5,6 21,6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M19 6V20C19 20.55 18.55 21 18 21H6C5.45 21 5 20.55 5 20V6M8 6V4C8 3.45 8.45 3 9 3H15C15.55 3 16 3.45 16 4V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                       </button>
                     </div>
                   </div>

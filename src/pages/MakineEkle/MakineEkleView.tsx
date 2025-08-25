@@ -714,17 +714,16 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                       <button
                         onClick={() => onEdit(makine)}
                         style={{
-                          padding: '6px',
-                          background: '#3b82f6',
-                          color: '#ffffff',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'background-color 0.2s ease'
-                        }}
+                            padding: '8px 12px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#dc2626',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = '#2563eb';
                         }}
@@ -740,17 +739,16 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                       <button
                         onClick={() => onDelete(makine.id)}
                         style={{
-                          padding: '6px',
-                          background: '#ef4444',
-                          color: '#ffffff',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'background-color 0.2s ease'
-                        }}
+                            padding: '8px 12px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = '#dc2626';
                         }}

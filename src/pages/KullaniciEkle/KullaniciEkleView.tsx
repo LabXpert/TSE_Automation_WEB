@@ -889,10 +889,10 @@ const KullaniciEkleView: React.FC<KullaniciEkleViewProps> = ({
                             e.currentTarget.style.backgroundColor = '#dc2626';
                           }}
                         >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
-                            <path d="M14.06 9L15 9.94L5.92 19H5V18.08L14.06 9ZM17.66 3C17.41 3 17.15 3.1 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.17 3.09 17.92 3 17.66 3ZM14.06 6.19L3 17.25V21H6.75L17.81 9.94L14.06 6.19Z"/>
-                          </svg>
-                          Düzenle
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 4H4C3.45 4 3 4.45 3 5V20C3 20.55 3.45 21 4 21H19C19.55 21 20 20.55 20 20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M18.5 2.5C18.89 2.11 19.39 1.89 19.93 1.89C20.47 1.89 20.97 2.11 21.36 2.5C21.75 2.89 21.97 3.39 21.97 3.93C21.97 4.47 21.75 4.97 21.36 5.36L12 14.83L8 16L9.17 12L18.5 2.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                         </button>
                         <button 
                           onClick={() => kullaniciSilmeOnayi(kullanici.id)}
@@ -914,10 +914,10 @@ const KullaniciEkleView: React.FC<KullaniciEkleViewProps> = ({
                             e.currentTarget.style.backgroundColor = '#ef4444';
                           }}
                         >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px', verticalAlign: 'middle' }}>
-                            <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"/>
-                          </svg>
-                          Sil
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <polyline points="3,6 5,6 21,6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M19 6V20C19 20.55 18.55 21 18 21H6C5.45 21 5 20.55 5 20V6M8 6V4C8 3.45 8.45 3 9 3H15C15.55 3 16 3.45 16 4V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                         </button>
                       </div>
                     </div>
