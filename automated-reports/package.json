@@ -4,7 +4,7 @@
   "description": "Automated weekly email reports for TSE Automation system",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "cross-env GMAIL_USER=tse.laboratuvar@gmail.com GMAIL_APP_PASSWORD=\"lher suwv spea xzjq\" REPORT_RECIPIENT=karub360@gmail.com PORT=3002 TSE_BACKEND_URL=http://localhost:3001 CRON_EXPRESSION=\"0 16 * * 5\" CRON_TZ=Europe/Istanbul REPORT_DIR=./reports ts-node src/server.ts",
+    "dev": "cross-env NODE_ENV=development ts-node src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc",
     "test": "npm run send-now"
