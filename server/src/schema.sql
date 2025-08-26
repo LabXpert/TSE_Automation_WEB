@@ -89,8 +89,13 @@ CREATE TABLE IF NOT EXISTS machines (
   model TEXT,
   measurement_range TEXT,
   last_calibration_date DATE NOT NULL,
-  calibration_org_id INTEGER NOT NULL REFERENCES calibration_orgs(id) ON DELETE RESTRICT
+  calibration_org_id INTEGER NOT NULL REFERENCES calibration_orgs(id) ON DELETE RESTRICT,
+
+  -- yeni alan:
+  calibration_interval INTEGER NOT NULL DEFAULT 1,
+  CONSTRAINT chk_calib_interval_pos CHECK (calibration_interval >= 1)
 );
+
 
 -- Machine calibration history table
 CREATE TABLE IF NOT EXISTS machine_calibrations (

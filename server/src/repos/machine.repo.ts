@@ -10,6 +10,7 @@ export interface Machine {
   measurement_range?: string;
   last_calibration_date: string;
   calibration_org_id: number;
+  calibration_interval: number;
   calibration_org_name?: string;
   calibration_contact_name?: string;
   calibration_email?: string;
@@ -25,6 +26,7 @@ export interface MachineInput {
   measurement_range?: string;
   last_calibration_date: string;
   calibration_org_id: number;
+  calibration_interval: number;
 }
 
 export class MachineRepository {
@@ -44,6 +46,7 @@ export class MachineRepository {
           m.measurement_range,
           m.last_calibration_date,
           m.calibration_org_id,
+          m.calibration_interval,
           co.org_name as calibration_org_name,
           co.contact_name as calibration_contact_name,
           co.email as calibration_email,
@@ -55,10 +58,11 @@ export class MachineRepository {
       
       const result = await this.db.query(query);
       console.log('Query result:', result.rows.length, 'rows');
-      return result.rows;
+      return result.rows || [];
     } catch (error) {
       console.error('Database query error in findAll:', error);
-      throw error;
+      // Hata durumunda boş array döndür, hatayı yukarı fırlatma
+      return [];
     }
   }
 
@@ -74,6 +78,7 @@ export class MachineRepository {
         m.measurement_range,
         m.last_calibration_date,
         m.calibration_org_id,
+        m.calibration_interval,
         co.org_name as calibration_org_name,
         co.contact_name as calibration_contact_name,
         co.email as calibration_email,
@@ -97,9 +102,10 @@ export class MachineRepository {
         model, 
         measurement_range, 
         last_calibration_date, 
-        calibration_org_id
+        calibration_org_id,
+        calibration_interval
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
     
@@ -110,7 +116,8 @@ export class MachineRepository {
       machineData.model || null,
       machineData.measurement_range || null,
       machineData.last_calibration_date,
-      machineData.calibration_org_id
+      machineData.calibration_org_id,
+      machineData.calibration_interval
     ];
     
     const result = await this.db.query(query, values);
@@ -153,6 +160,10 @@ export class MachineRepository {
       fields.push(`calibration_org_id = $${paramIndex++}`);
       values.push(machineData.calibration_org_id);
     }
+    if (machineData.calibration_interval !== undefined) {
+      fields.push(`calibration_interval = $${paramIndex++}`);
+      values.push(machineData.calibration_interval);
+    }
 
     if (fields.length === 0) {
       return await this.findById(id);
@@ -193,6 +204,7 @@ export class MachineRepository {
         m.measurement_range,
         m.last_calibration_date,
         m.calibration_org_id,
+        m.calibration_interval,
         co.org_name as calibration_org_name,
         co.contact_name as calibration_contact_name,
         co.email as calibration_email,
@@ -225,6 +237,7 @@ export class MachineRepository {
         m.measurement_range,
         m.last_calibration_date,
         m.calibration_org_id,
+        m.calibration_interval,
         co.org_name as calibration_org_name,
         co.contact_name as calibration_contact_name,
         co.email as calibration_email,
@@ -251,13 +264,14 @@ export class MachineRepository {
         m.measurement_range,
         m.last_calibration_date,
         m.calibration_org_id,
+        m.calibration_interval,
         co.org_name as calibration_org_name,
         co.contact_name as calibration_contact_name,
         co.email as calibration_email,
         co.phone as calibration_phone
       FROM machines m
       LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
-      WHERE m.last_calibration_date + INTERVAL '1 year' <= CURRENT_DATE + INTERVAL '${days} days'
+      WHERE m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year') <= CURRENT_DATE + INTERVAL '${days} days'
       ORDER BY m.last_calibration_date ASC
     `;
     
@@ -290,7 +304,7 @@ export class MachineRepository {
     totalExpiringSoon: number;
   }> {
     try {
-      // Süresi geçenler (1 yıl + bugün geçmiş)
+      // Süresi geçenler (dinamik kalibrasyon aralığı + bugün geçmiş)
       const expiredQuery = `
         SELECT 
           m.id,
@@ -301,19 +315,20 @@ export class MachineRepository {
           m.measurement_range,
           m.last_calibration_date,
           m.calibration_org_id,
+          m.calibration_interval,
           co.org_name as calibration_org_name,
           co.contact_name as calibration_contact_name,
           co.email as calibration_email,
           co.phone as calibration_phone,
-          (m.last_calibration_date + INTERVAL '1 year') as next_calibration_date,
-          EXTRACT(DAYS FROM (CURRENT_DATE - (m.last_calibration_date + INTERVAL '1 year'))) as days_overdue
+          (m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year')) as next_calibration_date,
+          EXTRACT(DAYS FROM (CURRENT_DATE - (m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year')))) as days_overdue
         FROM machines m
         LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
-        WHERE m.last_calibration_date + INTERVAL '1 year' < CURRENT_DATE
+        WHERE m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year') < CURRENT_DATE
         ORDER BY m.last_calibration_date ASC
       `;
 
-      // 30 gün içinde süresi dolacaklar
+      // 30 gün içinde süresi dolacaklar (dinamik kalibrasyon aralığı)
       const expiringSoonQuery = `
         SELECT 
           m.id,
@@ -324,16 +339,17 @@ export class MachineRepository {
           m.measurement_range,
           m.last_calibration_date,
           m.calibration_org_id,
+          m.calibration_interval,
           co.org_name as calibration_org_name,
           co.contact_name as calibration_contact_name,
           co.email as calibration_email,
           co.phone as calibration_phone,
-          (m.last_calibration_date + INTERVAL '1 year') as next_calibration_date,
-          EXTRACT(DAYS FROM ((m.last_calibration_date + INTERVAL '1 year') - CURRENT_DATE)) as days_remaining
+          (m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year')) as next_calibration_date,
+          EXTRACT(DAYS FROM ((m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year')) - CURRENT_DATE)) as days_remaining
         FROM machines m
         LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
-        WHERE m.last_calibration_date + INTERVAL '1 year' >= CURRENT_DATE 
-          AND m.last_calibration_date + INTERVAL '1 year' <= CURRENT_DATE + INTERVAL '30 days'
+        WHERE m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year') >= CURRENT_DATE 
+          AND m.last_calibration_date + (m.calibration_interval * INTERVAL '1 year') <= CURRENT_DATE + INTERVAL '30 days'
         ORDER BY m.last_calibration_date ASC
       `;
 

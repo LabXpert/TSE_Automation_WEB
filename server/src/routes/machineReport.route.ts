@@ -59,6 +59,7 @@ router.get('/data', async (req: Request, res: Response) => {
       model: machine.model || 'Belirtilmemiş',
       measurement_range: machine.measurement_range || 'Belirtilmemiş',
       last_calibration_date: machine.last_calibration_date,
+      calibration_interval: machine.calibration_interval,
       calibration_org_name: machine.calibration_org_name || 'Belirtilmemiş',
       calibration_contact_name: machine.calibration_contact_name || null,
       calibration_email: machine.calibration_email || null,
@@ -69,62 +70,8 @@ router.get('/data', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('GET /api/machine-reports/data error:', error);
     
-    // Hata durumunda örnek veri döndür
-    console.log('Returning fallback sample data...');
-    const sampleData = [
-      {
-        id: 1,
-        serial_no: 'TKM001',
-        equipment_name: 'TSE Kalibrasyon Makinesi 1',
-        brand: 'TSE',
-        model: 'TKM-2024',
-        measurement_range: '0-100kg',
-        last_calibration_date: '2024-01-15',
-        calibration_org_name: 'TSE Kalibrasyon Merkezi'
-      },
-      {
-        id: 2,
-        serial_no: 'HOC2024001',
-        equipment_name: 'Hassas Ölçüm Cihazı',
-        brand: 'Metrology Tech',
-        model: 'HOC-Pro-X1',
-        measurement_range: '0-50mm',
-        last_calibration_date: '2024-06-20',
-        calibration_org_name: 'Akredite Kalibrasyon Ltd.'
-      },
-      {
-        id: 3,
-        serial_no: 'ETU500-2023',
-        equipment_name: 'Elektronik Test Ünitesi',
-        brand: 'TestLab',
-        model: 'ETU-500',
-        measurement_range: '0-1000V',
-        last_calibration_date: '2024-01-10',
-        calibration_org_name: 'Teknik Kalibrasyon A.Ş.'
-      },
-      {
-        id: 4,
-        serial_no: 'TAS2024',
-        equipment_name: 'Termal Analiz Sistemi',
-        brand: 'ThermoLab',
-        model: 'TAS-Advanced',
-        measurement_range: '-50°C - 500°C',
-        last_calibration_date: '2024-08-01',
-        calibration_org_name: 'TSE Kalibrasyon Merkezi'
-      },
-      {
-        id: 5,
-        serial_no: 'SPEC2000-001',
-        equipment_name: 'Spektroskopi Cihazı',
-        brand: 'AnalytikPro',
-        model: 'SPEC-2000',
-        measurement_range: '200-800nm',
-        last_calibration_date: '2024-09-15',
-        calibration_org_name: 'Precision Cal. Ltd.'
-      }
-    ];
-
-    res.json(sampleData);
+    // Hata durumunda boş array döndür
+    res.json([]);
   }
 });
 

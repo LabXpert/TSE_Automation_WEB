@@ -5,10 +5,12 @@ export class MachineService {
 
   async getAllMachines(): Promise<Machine[]> {
     try {
-      return await this.machineRepo.findAll();
+      const machines = await this.machineRepo.findAll();
+      return machines;
     } catch (error) {
       console.error('Error fetching machines:', error);
-      throw new Error('Makineler getirilemedi');
+      // Hata durumunda boş array döndür
+      return [];
     }
   }
 
@@ -44,6 +46,10 @@ export class MachineService {
         throw new Error('Kalibrasyon kuruluşu seçiniz');
       }
 
+      if (!machineData.calibration_interval || machineData.calibration_interval < 1) {
+        throw new Error('Kalibrasyon aralığı en az 1 yıl olmalıdır');
+      }
+
       // Tarih kontrolü
       const calibrationDate = new Date(machineData.last_calibration_date);
       const today = new Date();
@@ -67,6 +73,10 @@ export class MachineService {
 
       if (machineData.equipment_name !== undefined && !machineData.equipment_name?.trim()) {
         throw new Error('Ekipman adı gereklidir');
+      }
+
+      if (machineData.calibration_interval !== undefined && (machineData.calibration_interval < 1)) {
+        throw new Error('Kalibrasyon aralığı en az 1 yıl olmalıdır');
       }
 
       if (machineData.last_calibration_date) {
