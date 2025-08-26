@@ -4,8 +4,8 @@ import FirmaEkleView from './FirmaEkleView';
 interface ApiCompany {
   id: number;
   name: string;
-  vat_number: string;
-  contact_person: string;
+  tax_no: string;
+  contact_name: string;
   phone: string;
   address: string;
   email: string;
@@ -148,8 +148,8 @@ const FirmaEkle: React.FC = () => {
             }
             setFormData({
               ad: firma.name,
-              vergiNo: firma.vat_number || '',
-              yetkili: firma.contact_person || '',
+              vergiNo: firma.tax_no || '',
+              yetkili: firma.contact_name  || '',
               telefon: firma.phone || '',
               adres: firma.address || '',
               email: firma.email || ''

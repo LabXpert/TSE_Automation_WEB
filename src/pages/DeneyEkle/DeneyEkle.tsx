@@ -31,13 +31,18 @@ interface ApiTest {
   sample_count?: number;
   total_price?: number;
 }
+const todayYMD = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().split('T')[0];
+};
 
 function DeneyEkle() {
   const [deneySayisi, setDeneySeayisi] = useState(1);
   const [belgelendirmeTuru, setBelgelendirmeTuru] = useState<'özel' | 'belgelendirme'>('özel');
   const [firmaAdi, setFirmaAdi] = useState('');
   const [basvuruNo, setBasvuruNo] = useState('');
-  const [basvuruTarihi, setBasvuruTarihi] = useState('');
+  const [basvuruTarihi, setBasvuruTarihi] = useState(todayYMD());
   const [deneyler, setDeneyler] = useState<Deney[]>([]);
   const [kayitlariListesi, setKayitlariListesi] = useState<DeneyKaydi[]>([]);
   // Deney türleri, personel ve firma listesi API'den gelecek
