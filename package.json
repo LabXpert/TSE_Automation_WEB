@@ -11,7 +11,8 @@
     "server": "npm --prefix server run dev",
     "server:build": "npm --prefix server run build",
     "server:start": "npm --prefix server run start",
-    "dev": "concurrently -n WEB,API -c auto \"npm:web\" \"npm:server\"",
+    "reports": "npm --prefix automated-reports run dev",
+    "dev": "concurrently -n WEB,API,REPORTS -c auto \"npm:web\" \"npm:server\" \"npm:reports\"",
     "start:full": "concurrently -n WEB,API -c auto \"npm:preview\" \"npm:server:start\""
   },
   "dependencies": {
