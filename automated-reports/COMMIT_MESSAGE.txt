@@ -1,0 +1,28 @@
+feat: TSE Automation otomatik haftalık rapor sistemi
+
+✅ Özellikler:
+- Haftalık otomatik Excel rapor üretimi (Pazartesi 09:00)
+- Gmail ile email gönderimi (retry mekanizması)
+- Makine kalibrasyon durumları raporlama
+- Otomatik dosya temizliği (30+ gün)
+- Manuel tetikleme API'leri
+
+📁 Dosya yapısı:
+- src/server.ts: Ana sunucu + cron jobs (Türkçe yorumlu)
+- src/report.ts: Excel rapor üretimi (Türkçe yorumlu)
+- src/mailer.ts: Email gönderimi + retry (Türkçe yorumlu)
+- src/cleanup.ts: Dosya temizliği (Türkçe yorumlu)
+
+🔧 Yapılandırma:
+- .env ile kolay kurulum
+- Gmail App Password desteği
+- Configurable cron zamanlaması
+- TSE backend entegrasyonu
+
+🚀 Kullanım:
+1. npm install
+2. .env dosyasını düzenle (Gmail bilgileri)
+3. npm run dev
+4. Test: POST /send-now
+
+Ports: 3002 (automated reports), 3001 (TSE backend)
