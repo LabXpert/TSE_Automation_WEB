@@ -11,6 +11,7 @@ interface MakineData {
   model: string;
   measurement_range: string;
   last_calibration_date: string;
+  calibration_interval: number;
   calibration_org_name: string; // JOIN ile kalibrasyon kuruluş adı
   calibration_contact_name?: string;
   calibration_email?: string;
@@ -60,7 +61,7 @@ const MakineRaporla: React.FC = () => {
   }, [fetchMachineData]);
 
   // Sonraki kalibrasyon tarihini ve durumunu hesapla
-  const getKalibrasyonDurumu = useCallback((lastCalibrationDate: string) => {
+  const getKalibrasyonDurumu = useCallback((lastCalibrationDate: string, calibrationInterval: number = 1) => {
     // Güvenlik kontrolü
     if (!lastCalibrationDate) {
       return {
@@ -81,8 +82,11 @@ const MakineRaporla: React.FC = () => {
       };
     }
 
+    // Kalibrasyon aralığı kontrolü ve varsayılan değer
+    const interval = calibrationInterval && calibrationInterval > 0 ? calibrationInterval : 1;
+
     const nextDate = new Date(lastDate);
-    nextDate.setFullYear(lastDate.getFullYear() + 1); // +1 yıl
+    nextDate.setFullYear(lastDate.getFullYear() + interval); // Dinamik kalibrasyon aralığı
     
     const today = new Date();
     const diffTime = nextDate.getTime() - today.getTime();
@@ -180,6 +184,7 @@ const MakineRaporla: React.FC = () => {
         'Seri No',
         'Ölçüm Aralığı',
         'Son Kalibrasyon',
+        'Kalibrasyon Aralığı (Yıl)',
         'Sonraki Kalibrasyon',
         'Kalibrasyon Durumu',
         'Kalibrasyon Kuruluşu',
@@ -211,7 +216,7 @@ const MakineRaporla: React.FC = () => {
 
       // Veri satırlarını ekle
       filtrelenmisKayitlar.forEach((makine, index) => {
-        const kalibrasyonDurumu = getKalibrasyonDurumu(makine.last_calibration_date);
+        const kalibrasyonDurumu = getKalibrasyonDurumu(makine.last_calibration_date, makine.calibration_interval);
         
         const rowData = [
           index + 1,
@@ -221,6 +226,7 @@ const MakineRaporla: React.FC = () => {
           makine.serial_no,
           makine.measurement_range || '-',
           new Date(makine.last_calibration_date).toLocaleDateString('tr-TR'),
+          makine.calibration_interval,
           new Date(kalibrasyonDurumu.sonrakiTarih).toLocaleDateString('tr-TR'),
           kalibrasyonDurumu.durumText,
           makine.calibration_org_name || '-',
@@ -241,12 +247,12 @@ const MakineRaporla: React.FC = () => {
           };
           
           // Hizalama
-          if (colNumber === 1 || colNumber === 7 || colNumber === 8 || colNumber === 9) {
+          if (colNumber === 1 || colNumber === 7 || colNumber === 8 || colNumber === 9 || colNumber === 10) {
             cell.alignment = { horizontal: 'center', vertical: 'middle' };
           }
           
           // Durum renklandırması
-          if (colNumber === 9) { // Kalibrasyon durumu kolonu
+          if (colNumber === 10) { // Kalibrasyon durumu kolonu (sütun kaydı)
             let bgColor = 'DCFCE7'; // Yeşil (normal)
             if (kalibrasyonDurumu.durum === 'yaklasıyor') {
               bgColor = 'FEF3C7'; // Sarı
@@ -264,7 +270,7 @@ const MakineRaporla: React.FC = () => {
       });
 
       // Sütun genişliklerini ayarla
-      const columnWidths = [8, 30, 15, 15, 15, 20, 15, 15, 20, 25, 20, 15, 25];
+      const columnWidths = [8, 30, 15, 15, 15, 20, 15, 12, 15, 20, 25, 20, 15, 25];
       columnWidths.forEach((width, index) => {
         worksheet.getColumn(index + 1).width = width;
       });
@@ -331,7 +337,7 @@ const MakineRaporla: React.FC = () => {
     // Durum filtresi (kalibrasyon durumu)
     if (secilenDurumlar.length > 0) {
       sonuc = sonuc.filter(makine => {
-        const kalibrasyonDurumu = getKalibrasyonDurumu(makine.last_calibration_date);
+        const kalibrasyonDurumu = getKalibrasyonDurumu(makine.last_calibration_date, makine.calibration_interval);
         return secilenDurumlar.includes(kalibrasyonDurumu.durum);
       });
     }
@@ -343,8 +349,8 @@ const MakineRaporla: React.FC = () => {
         return 0; // Tarih yoksa sıralama yapma
       }
 
-      const durumA = getKalibrasyonDurumu(a.last_calibration_date);
-      const durumB = getKalibrasyonDurumu(b.last_calibration_date);
+      const durumA = getKalibrasyonDurumu(a.last_calibration_date, a.calibration_interval);
+      const durumB = getKalibrasyonDurumu(b.last_calibration_date, b.calibration_interval);
       
       // Durum önceliği: gecti (0) -> yaklasıyor (1) -> normal (2)
       const oncelikA = durumA.durum === 'gecti' ? 0 : durumA.durum === 'yaklasıyor' ? 1 : 2;

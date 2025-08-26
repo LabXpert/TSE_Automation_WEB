@@ -19,7 +19,8 @@ const MakineEkle: React.FC = () => {
     model: '',
     measurement_range: '',
     last_calibration_date: new Date(),
-    calibration_org_id: 0
+    calibration_org_id: 0,
+    calibration_interval: 1
   });
 
   // Pagination state'leri
@@ -118,7 +119,8 @@ const MakineEkle: React.FC = () => {
       model: '',
       measurement_range: '',
       last_calibration_date: new Date(),
-      calibration_org_id: 0
+      calibration_org_id: 0,
+      calibration_interval: 1
     });
     setEditingMakine(null);
     setError('');
@@ -134,7 +136,8 @@ const MakineEkle: React.FC = () => {
       model: makine.model || '',
       measurement_range: makine.measurement_range || '',
       last_calibration_date: new Date(makine.last_calibration_date),
-      calibration_org_id: makine.calibration_org_id
+      calibration_org_id: makine.calibration_org_id,
+      calibration_interval: makine.calibration_interval
     });
     setEditingMakine(makine);
   };

@@ -25,6 +25,7 @@ export interface Makine {
   measurement_range?: string;
   last_calibration_date: Date;
   calibration_org_id: number;
+  calibration_interval: number;
   created_at?: Date;
   
   // Join fields
@@ -45,6 +46,7 @@ export interface MakineInput {
   measurement_range?: string;
   last_calibration_date: Date;
   calibration_org_id: number;
+  calibration_interval: number;
 }
 
 // Makine Kalibrasyon Geçmişi Model (from MachineCalibration.tsx)

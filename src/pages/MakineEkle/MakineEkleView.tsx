@@ -339,6 +339,46 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                 />
               </div>
 
+              {/* Ölçüm Aralığı */}
+              <div>
+                <label style={{ 
+                  display: 'block',
+                  marginBottom: '8px', 
+                  fontWeight: '600', 
+                  color: '#374151',
+                  fontSize: '14px'
+                }}>
+                  Ölçüm Aralığı
+                </label>
+                <input
+                  type="text"
+                  placeholder="Örn: 0-100 kg, 200-800 nm"
+                  value={formData.measurement_range}
+                  onChange={(e) => onInputChange('measurement_range', e.target.value)}
+                  disabled={loading}
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px',
+                    border: `2px solid #e5e7eb`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
+                    color: '#374151',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#dc2626';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+
               {/* Kalibrasyon Kuruluşu */}
               <div>
                 <label style={{ 
@@ -384,7 +424,56 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                   ))}
                 </select>
               </div>
-
+{/* Kalibrasyon Aralığı */}
+              <div>
+                <label style={{ 
+                  display: 'block',
+                  marginBottom: '8px', 
+                  fontWeight: '600', 
+                  color: '#374151',
+                  fontSize: '14px'
+                }}>
+                  Kalibrasyon Aralığı (Yıl) <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  placeholder="Kaç yılda bir kalibre edilecek"
+                  value={formData.calibration_interval}
+                  onChange={(e) => onInputChange('calibration_interval', parseInt(e.target.value) || 1)}
+                  required
+                  disabled={loading}
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px',
+                    border: `2px solid #e5e7eb`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
+                    color: '#374151',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#dc2626';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+                <div style={{
+                  fontSize: '12px',
+                  color: '#64748b',
+                  marginTop: '4px'
+                }}>
+                  Bu makinenin kaç yılda bir kalibre edileceğini belirtin (1-10 yıl arası)
+                </div>
+              </div>
+              
               {/* Son Kalibrasyon Tarihi */}
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ 

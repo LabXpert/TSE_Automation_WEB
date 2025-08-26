@@ -9,6 +9,7 @@ interface MakineData {
   model: string;
   measurement_range: string;
   last_calibration_date: string;
+  calibration_interval: number;
   calibration_org_name: string;
   calibration_contact_name?: string;
   calibration_email?: string;
@@ -19,7 +20,7 @@ interface Props {
   makineData: MakineData[];
   loading: boolean;
   error: string | null;
-  getKalibrasyonDurumu?: (lastCalibrationDate: string) => {
+  getKalibrasyonDurumu?: (lastCalibrationDate: string, calibrationInterval?: number) => {
     sonrakiTarih: string;
     durum: string;
     durumText: string;
@@ -601,6 +602,14 @@ const MakineRaporlaView: React.FC<Props> = ({
                     fontWeight: '600',
                     borderRight: '1px solid #991b1b'
                   }}>
+                    Kalibrasyon Aralığı (Yıl)
+                  </th>
+                  <th style={{
+                    padding: '16px 12px',
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    borderRight: '1px solid #991b1b'
+                  }}>
                     Sonraki Kalibrasyon
                   </th>
                   <th style={{
@@ -784,6 +793,21 @@ const MakineRaporlaView: React.FC<Props> = ({
                       </div>
                     </td>
                     
+                    {/* Kalibrasyon Aralığı */}
+                    <td style={{
+                      padding: '16px 12px',
+                      textAlign: 'center',
+                      borderRight: '1px solid #f1f5f9'
+                    }}>
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#0f172a'
+                      }}>
+                        {makine.calibration_interval} yıl
+                      </div>
+                    </td>
+                    
                     {/* Sonraki Kalibrasyon */}
                     <td style={{
                       padding: '16px 12px',
@@ -796,7 +820,7 @@ const MakineRaporlaView: React.FC<Props> = ({
                         color: '#0f172a'
                       }}>
                         {getKalibrasyonDurumu && makine.last_calibration_date ? 
-                          new Date(getKalibrasyonDurumu(makine.last_calibration_date).sonrakiTarih).toLocaleDateString('tr-TR') : 
+                          new Date(getKalibrasyonDurumu(makine.last_calibration_date, makine.calibration_interval).sonrakiTarih).toLocaleDateString('tr-TR') : 
                           'Belirtilmemiş'
                         }
                       </div>
@@ -809,7 +833,7 @@ const MakineRaporlaView: React.FC<Props> = ({
                       borderRight: '1px solid #f1f5f9'
                     }}>
                       {getKalibrasyonDurumu && makine.last_calibration_date ? (() => {
-                        const durumInfo = getKalibrasyonDurumu(makine.last_calibration_date);
+                        const durumInfo = getKalibrasyonDurumu(makine.last_calibration_date, makine.calibration_interval);
                         let bgColor = '#dcfce7'; // Yeşil (normal)
                         let textColor = '#166534';
                         
