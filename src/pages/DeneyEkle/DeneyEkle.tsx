@@ -231,7 +231,7 @@ function DeneyEkle() {
     try {
       const response = await fetch(`/api/applications/all`);
       const allApps = await response.json();
-      const app = allApps.find((a: ApiApplication) => a.id === Number(id));
+      const app = allApps.find((a: ApiApplication) => Number(a.id) === Number(id));
       if (!app) {
         alert('Kayıt bulunamadı!');
         return;
