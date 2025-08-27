@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS tests (
   is_accredited BOOLEAN DEFAULT FALSE,
   uygunluk BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP(6) DEFAULT NOW(),
-  total_price DECIMAL(12,2) GENERATED ALWAYS AS (unit_price * sample_count) STORED,
+  total_price DECIMAL(12,2) GENERATED ALWAYS AS (unit_price) STORED,
   CONSTRAINT chk_tests_sample_count_positive CHECK (sample_count >= 1)
 );
 

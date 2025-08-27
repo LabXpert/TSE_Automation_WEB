@@ -309,13 +309,12 @@ function DeneyEkle() {
     setSearchTerm(term);
   };
 
-  // Toplam Ücret (önizleme): (base_price + uygunluk(750₺)) * numune
+  // Toplam Ücret (önizleme): base_price + uygunluk(750₺)
   const toplamUcret = deneyler.reduce((acc, d) => {
     const tur = deneyTurleri.find(t => t.name === d.deneyTuru);
     const base = Number(tur?.base_price ?? 0);
-    const sample = Math.max(1, parseInt(String(d.numuneSayisi ?? 1), 10));
     const uygunlukEk = d.uygunluk ? 750 : 0;
-    return acc + (base + uygunlukEk) * sample;
+    return acc + base + uygunlukEk;
   }, 0);
 
   const toplamUcretTxt = new Intl.NumberFormat('tr-TR', {

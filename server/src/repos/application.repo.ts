@@ -184,8 +184,11 @@ export class ApplicationRepository {
       const createdTests = [];
       for (const test of data.tests) {
         const testResult = await client.query(
-          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, sample_count, is_accredited, uygunluk, created_at)
-           SELECT $1, $2, $3, et.base_price + (CASE WHEN $4 THEN 750 ELSE 0 END), $6, $5, $4, NOW()
+          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, total_price, sample_count, is_accredited, uygunluk, created_at)
+           SELECT $1, $2, $3,
+                  et.base_price + (CASE WHEN $4 THEN 750 ELSE 0 END),
+                  et.base_price + (CASE WHEN $4 THEN 750 ELSE 0 END),
+                  $6, $5, $4, NOW()
            FROM experiment_types et WHERE et.id = $2
            RETURNING *`,
           [newApp.id, test.experiment_type_id, test.responsible_personnel_id, test.uygunluk, test.is_accredited, test.sample_count || 1]
@@ -233,8 +236,11 @@ export class ApplicationRepository {
       const createdTests = [];
       for (const test of data.tests) {
         const testResult = await client.query(
-          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, sample_count, is_accredited, uygunluk, created_at)
-           SELECT $1, $2, $3, et.base_price + (CASE WHEN $4 THEN 750 ELSE 0 END), $6, $5, $4, NOW()
+          `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, total_price, sample_count, is_accredited, uygunluk, created_at)
+           SELECT $1, $2, $3,
+                  et.base_price + (CASE WHEN $4 THEN 750 ELSE 0 END),
+                  et.base_price + (CASE WHEN $4 THEN 750 ELSE 0 END),
+                  $6, $5, $4, NOW()
            FROM experiment_types et WHERE et.id = $2
            RETURNING *`,
           [id, test.experiment_type_id, test.responsible_personnel_id, test.uygunluk, test.is_accredited, test.sample_count || 1]
