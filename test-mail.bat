@@ -16,7 +16,7 @@ if "%choice%"=="1" (
     echo.
     echo Test email gonderiliyor...
     echo --------------------------------
-    powershell -Command "Invoke-WebRequest -Uri http://localhost:3002/test-email -Method POST -UseBasicParsing"
+    powershell -Command "try { Invoke-WebRequest -Uri http://localhost:3002/test-email -Method POST -UseBasicParsing; Write-Host 'Test email basariyla gonderildi!' } catch { Write-Host 'Hata: ' $_.Exception.Message }"
     echo.
     echo Test email gonderildi! Gmail'inizi kontrol edin.
     goto end
@@ -26,7 +26,7 @@ if "%choice%"=="2" (
     echo.
     echo Gercek rapor gonderiliyor...
     echo --------------------------------
-    powershell -Command "Invoke-WebRequest -Uri http://localhost:3002/send-now -Method POST -UseBasicParsing"
+    powershell -Command "try { Invoke-WebRequest -Uri http://localhost:3002/send-now -Method POST -UseBasicParsing; Write-Host 'Rapor basariyla gonderildi!' } catch { Write-Host 'Hata: ' $_.Exception.Message }"
     echo.
     echo Rapor gonderildi! 1-2 dakika icinde Gmail'inizi kontrol edin.
     goto end
@@ -36,7 +36,7 @@ if "%choice%"=="3" (
     echo.
     echo Sistem durumu kontrol ediliyor...
     echo --------------------------------
-    powershell -Command "Invoke-WebRequest -Uri http://localhost:3002/health -UseBasicParsing"
+    powershell -Command "try { $response = Invoke-WebRequest -Uri http://localhost:3002/health -UseBasicParsing; Write-Host 'Sistem durumu:' $response.Content } catch { Write-Host 'Hata: ' $_.Exception.Message }"
     echo.
     goto end
 )

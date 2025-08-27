@@ -52,26 +52,27 @@ async function generateAndSendWeeklyReport(): Promise<void> {
     console.log('=== Haftalık rapor üretimi ve gönderimi başlıyor ===');
     console.log(`Zaman damgası: ${new Date().toLocaleString('tr-TR')}`);
     
-    // Raporu üret
-    console.log('Adım 1: Excel raporu oluşturuluyor...');
-    const reportPath = await reportGenerator.generateWeeklyReport();
+    // Raporları üret
+    console.log('Adım 1: Excel raporları oluşturuluyor...');
+    const reportPaths = await reportGenerator.generateWeeklyReport();
     
     // Email gönder
     console.log('Adım 2: Email gönderiliyor...');
     const dateRange = reportGenerator.getWeekDateRange();
-    const subject = `Haftalık Rapor — ${dateRange}`;
+    const subject = `Haftalık Raporlar — ${dateRange}`;
     
-    const success = await emailService.sendReport(
+    const success = await emailService.sendMultipleReports(
       config.reportRecipient,
-      reportPath,
+      reportPaths,
       subject,
       2 // Maksimum 2 kez tekrar deneme
     );
     
     if (success) {
-      console.log('✅ Haftalık rapor başarıyla oluşturuldu ve gönderildi!');
+      console.log('✅ Haftalık raporlar başarıyla oluşturuldu ve gönderildi!');
+      console.log(`📊 Gönderilen raporlar: ${reportPaths.map(path => path.split('/').pop()).join(', ')}`);
     } else {
-      console.error('❌ Haftalık rapor emaili gönderilemedi');
+      console.error('❌ Haftalık raporlar emaili gönderilemedi');
     }
     
   } catch (error) {

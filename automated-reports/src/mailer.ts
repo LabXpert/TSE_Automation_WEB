@@ -47,7 +47,120 @@ export class EmailService {
   }
 
   /**
-   * Send email with attachment and retry logic
+   * Send email with multiple attachments and retry logic
+   */
+  async sendMultipleReports(
+    recipient: string, 
+    filepaths: string[], 
+    subject: string,
+    maxRetries: number = 2
+  ): Promise<boolean> {
+    
+    // Verify all files exist
+    for (const filepath of filepaths) {
+      if (!fs.existsSync(filepath)) {
+        throw new Error(`Report file not found: ${filepath}`);
+      }
+    }
+
+    const attachments = filepaths.map(filepath => {
+      const filename = path.basename(filepath);
+      const stats = fs.statSync(filepath);
+      const fileSizeKB = Math.round(stats.size / 1024);
+      return { filename, filepath, fileSizeKB };
+    });
+
+    const totalSizeKB = attachments.reduce((sum, att) => sum + att.fileSizeKB, 0);
+
+    // Email content
+    const currentDate = new Date().toLocaleDateString('tr-TR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #DC2626;">TSE Automation - Haftalık Raporlar</h2>
+        
+        <p>Merhaba,</p>
+        
+        <p>TSE Automation sistemi haftalık raporları ektedir.</p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <strong>Rapor Detayları:</strong><br/>
+          📅 Tarih: <strong>${currentDate}</strong><br/>
+          📄 Dosya Sayısı: ${attachments.length}<br/>
+          📊 Toplam Boyut: ${totalSizeKB} KB<br/>
+          🕐 Oluşturulma Zamanı: ${currentDate}
+        </div>
+        
+        <p>Bu raporlar aşağıdaki bilgileri içerir:</p>
+        <ul>
+          <li><strong>Makine Kalibrasyon Raporu:</strong> Tüm makine kalibrasyon durumları, süresinin yaklaştığı veya geçen kalibrasyonlar, kalibrasyon kuruluşu iletişim bilgileri</li>
+          <li><strong>Deney Raporu:</strong> Haftalık deney kayıtları, firma bilgileri, deney türleri, personel bilgileri ve ücret detayları</li>
+        </ul>
+        
+        <p>Herhangi bir sorunuz varsa lütfen sistem yöneticinize başvurun.</p>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;"/>
+        <p style="color: #6c757d; font-size: 12px;">
+          Bu e-posta TSE Automation sistemi tarafından otomatik olarak gönderilmiştir.<br/>
+          TSE Automation - Kalibrasyon ve Deney Yönetim Sistemi
+        </p>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: this.gmailUser,
+      to: recipient,
+      subject: subject,
+      html: htmlContent,
+      attachments: attachments.map(att => ({
+        filename: att.filename,
+        path: att.filepath
+      }))
+    };
+
+    // Retry logic
+    let lastError: Error | null = null;
+    
+    for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+      try {
+        console.log(`Sending email with ${attachments.length} attachments, attempt ${attempt}/${maxRetries + 1} to ${recipient}`);
+        
+        const info = await this.transporter.sendMail(mailOptions);
+        console.log(`Email sent successfully on attempt ${attempt}:`, info.messageId);
+        console.log(`Email delivered to: ${recipient}`);
+        console.log(`Attachments: ${attachments.map(att => `${att.filename} (${att.fileSizeKB} KB)`).join(', ')}`);
+        
+        return true;
+        
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`Email send attempt ${attempt} failed:`, error);
+        
+        if (attempt <= maxRetries) {
+          // Calculate delay: 5 minutes for first retry, 10 minutes for second
+          const delayMinutes = attempt === 1 ? 5 : 10;
+          const delayMs = delayMinutes * 60 * 1000;
+          
+          console.log(`Retrying in ${delayMinutes} minutes...`);
+          await this.sleep(delayMs);
+        }
+      }
+    }
+    
+    // All attempts failed
+    console.error(`Failed to send email after ${maxRetries + 1} attempts. Last error:`, lastError);
+    throw lastError || new Error('Unknown email sending error');
+  }
+
+  /**
+   * Send email with single attachment and retry logic (for backward compatibility)
    */
   async sendReport(
     recipient: string, 

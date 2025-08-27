@@ -18,6 +18,30 @@ interface MachineData {
   calibration_phone?: string;        // Telefon (opsiyonel)
 }
 
+// Deney verisi için tip tanımı
+interface DeneyData {
+  id: number;
+  companies?: { name: string };
+  application_no: string;
+  application_date: string;
+  certification_type: string;
+  test_count: number;
+  created_at: string;
+  tests?: DeneyTest[];
+}
+
+interface DeneyTest {
+  id: number;
+  experiment_type_name?: string;
+  personnel_first_name?: string;
+  personnel_last_name?: string;
+  is_accredited: boolean;
+  uygunluk: boolean;
+  unit_price?: number;
+  sample_count?: number;
+  total_price?: number;
+}
+
 export class ReportGenerator {
   private backendUrl: string;  // TSE Backend URL'si
   private reportDir: string;   // Raporların kaydedileceği klasör
@@ -99,6 +123,34 @@ export class ReportGenerator {
       }
     } catch (error) {
       console.error('Error fetching machine data:', error);
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNREFUSED') {
+          throw new Error('TSE Backend is not accessible. Please ensure the main server is running on the configured URL.');
+        }
+        throw new Error(`HTTP Error: ${error.response?.status} - ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch deney data from the backend endpoint
+   */
+  async fetchDeneyData(): Promise<DeneyData[]> {
+    try {
+      console.log(`Fetching deney data from: ${this.backendUrl}/api/applications/all`);
+      const response = await axios.get(`${this.backendUrl}/api/applications/all`, {
+        timeout: 30000 // 30 second timeout
+      });
+      
+      if (response.status === 200 && Array.isArray(response.data)) {
+        console.log(`Successfully fetched ${response.data.length} deney records`);
+        return response.data;
+      } else {
+        throw new Error(`Unexpected response format: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching deney data:', error);
       if (axios.isAxiosError(error)) {
         if (error.code === 'ECONNREFUSED') {
           throw new Error('TSE Backend is not accessible. Please ensure the main server is running on the configured URL.');
@@ -236,6 +288,122 @@ export class ReportGenerator {
   }
 
   /**
+   * Generate Excel report for deney data
+   */
+  async generateDeneyExcelReport(deneyData: DeneyData[]): Promise<string> {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Haftalık Deney Raporu');
+
+    // Define headers
+    const headers = [
+      'No',
+      'Firma Adı', 
+      'Başvuru No',
+      'Başvuru Tarihi',
+      'Deney Türü',
+      'Deney Adı',
+      'Deney Personeli',
+      'Numune Sayısı',
+      'Akredite',
+      'Toplam Ücret (TL)'
+    ];
+
+    // Add header row
+    worksheet.addRow(headers);
+
+    // Style header row
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'DC2626' } // Red theme
+      };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+
+    // Add data rows
+    let rowIndex = 1;
+    deneyData.forEach((kayit, kayitIndex) => {
+      kayit.tests?.forEach((deney, deneyIndex) => {
+        rowIndex++;
+        const rowData = [
+          `${kayitIndex + 1}.${deneyIndex + 1}`,
+          kayit.companies?.name || '',
+          kayit.application_no,
+          new Date(kayit.application_date).toLocaleDateString('tr-TR'),
+          kayit.certification_type === 'belgelendirme' ? 'BELGELENDIRME' : 'ÖZEL',
+          deney.experiment_type_name || '',
+          deney.personnel_first_name && deney.personnel_last_name ? 
+            `${deney.personnel_first_name} ${deney.personnel_last_name}` : '',
+          deney.sample_count || 1,
+          deney.is_accredited ? 'EVET' : 'HAYIR',
+          deney.total_price ? `₺${Number(deney.total_price).toFixed(2)}` : '-'
+        ];
+        
+        const row = worksheet.addRow(rowData);
+        
+        // Style data rows
+        row.eachCell((cell, colNumber) => {
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+          
+          // Alignment
+          if (colNumber === 1 || colNumber === 8 || colNumber === 9 || colNumber === 10) {
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          }
+          
+          // Status color coding
+          if (colNumber === 9) { // Akredite kolonu
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: deney.is_accredited ? 'DCFCE7' : 'FEE2E2' } // Yeşil/Kırmızı
+            };
+          }
+        });
+      });
+    });
+
+    // Set column widths
+    const columnWidths = [8, 25, 15, 12, 18, 30, 20, 8, 10, 12];
+    columnWidths.forEach((width, index) => {
+      worksheet.getColumn(index + 1).width = width;
+    });
+
+    // Generate filename with current date and ISO week
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    
+    // Calculate ISO week number
+    const firstDayOfYear = new Date(year, 0, 1);
+    const pastDaysOfYear = (today.getTime() - firstDayOfYear.getTime()) / 86400000;
+    const week = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    
+    const filename = `deney_report_${year}-${month}-${day}_week${week}.xlsx`;
+    const filepath = path.join(this.reportDir, filename);
+    
+    // Write file
+    await workbook.xlsx.writeFile(filepath);
+    console.log(`Deney Excel report generated: ${filepath}`);
+    
+    return filepath;
+  }
+
+  /**
    * Get week date range for email subject
    */
   getWeekDateRange(): string {
@@ -258,22 +426,40 @@ export class ReportGenerator {
   /**
    * Main function to generate and save weekly report
    */
-  async generateWeeklyReport(): Promise<string> {
+  async generateWeeklyReport(): Promise<string[]> {
     console.log('Starting weekly report generation...');
     
     try {
+      const reportPaths: string[] = [];
+      
       // Fetch machine data
+      console.log('Fetching machine data...');
       const machineData = await this.fetchMachineData();
       
       if (machineData.length === 0) {
         console.warn('No machine data found, generating empty report');
       }
       
-      // Generate Excel report
-      const filepath = await this.generateExcelReport(machineData);
+      // Generate machine Excel report
+      console.log('Generating machine calibration report...');
+      const machineReportPath = await this.generateExcelReport(machineData);
+      reportPaths.push(machineReportPath);
       
-      console.log(`Weekly report generated successfully: ${filepath}`);
-      return filepath;
+      // Fetch deney data
+      console.log('Fetching deney data...');
+      const deneyData = await this.fetchDeneyData();
+      
+      if (deneyData.length === 0) {
+        console.warn('No deney data found, generating empty report');
+      }
+      
+      // Generate deney Excel report
+      console.log('Generating deney report...');
+      const deneyReportPath = await this.generateDeneyExcelReport(deneyData);
+      reportPaths.push(deneyReportPath);
+      
+      console.log(`Weekly reports generated successfully: ${reportPaths.join(', ')}`);
+      return reportPaths;
       
     } catch (error) {
       console.error('Error generating weekly report:', error);
