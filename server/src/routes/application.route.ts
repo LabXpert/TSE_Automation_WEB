@@ -26,6 +26,17 @@ router.get('/all', async (_req, res) => {
   }
 });
 
+// GET /api/applications/last7days
+router.get('/last7days', async (_req, res) => {
+  try {
+    const applications = await applicationService.getLast7DaysApplications();
+    res.json(applications);
+  } catch (error) {
+    console.error('Error fetching last 7 days applications:', error);
+    res.status(500).json({ error: 'Sunucu hatası' });
+  }
+});
+
 // Helper function to normalize booleans
 const toBool = (value: any): boolean => {
   if (typeof value === 'boolean') return value;

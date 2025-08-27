@@ -59,7 +59,7 @@ async function generateAndSendWeeklyReport(): Promise<void> {
     // Email gönder
     console.log('Adım 2: Email gönderiliyor...');
     const dateRange = reportGenerator.getWeekDateRange();
-    const subject = `Haftalık Raporlar — ${dateRange}`;
+    const subject = `Haftalık Raporlar (Son 7 Günlük Deney) — ${dateRange}`;
     
     const success = await emailService.sendMultipleReports(
       config.reportRecipient,

@@ -116,6 +116,55 @@ export class ApplicationRepository {
     }));
   }
 
+  async findLast7Days() {
+    const result = await pool.query(`
+      SELECT 
+        a.*,
+        c.name as company_name, c.tax_no, c.contact_name, c.address, c.phone, c.email,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', t.id,
+              'experiment_type_id', t.experiment_type_id,
+              'responsible_personnel_id', t.responsible_personnel_id,
+              'unit_price', t.unit_price,
+              'sample_count', t.sample_count,
+              'total_price', t.total_price,
+              'is_accredited', t.is_accredited,
+              'uygunluk', t.uygunluk,
+              'created_at', t.created_at,
+              'experiment_type_name', et.name,
+              'experiment_type_base_price', et.base_price,
+              'personnel_first_name', p.first_name,
+              'personnel_last_name', p.last_name,
+              'personnel_title', p.title
+            )
+          ) FILTER (WHERE t.id IS NOT NULL), '[]'::json
+        ) as tests
+      FROM applications a
+      LEFT JOIN companies c ON a.company_id = c.id
+      LEFT JOIN tests t ON a.id = t.application_id
+      LEFT JOIN experiment_types et ON t.experiment_type_id = et.id
+      LEFT JOIN personnel p ON t.responsible_personnel_id = p.id
+      WHERE a.application_date >= CURRENT_DATE - INTERVAL '7 days'
+      GROUP BY a.id, c.id
+      ORDER BY a.created_at DESC
+    `);
+    
+    return result.rows.map(row => ({
+      ...row,
+      companies: {
+        id: row.company_id,
+        name: row.company_name,
+        tax_no: row.tax_no,
+        contact_name: row.contact_name,
+        address: row.address,
+        phone: row.phone,
+        email: row.email
+      }
+    }));
+  }
+
   async create(data: ApplicationData) {
     const client = await pool.connect();
     try {

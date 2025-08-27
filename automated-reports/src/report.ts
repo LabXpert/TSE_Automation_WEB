@@ -134,7 +134,7 @@ export class ReportGenerator {
   }
 
   /**
-   * Fetch deney data from the backend endpoint
+   * Fetch deney data from the backend endpoint (last 7 days only)
    */
   async fetchDeneyData(): Promise<DeneyData[]> {
     try {
@@ -144,8 +144,19 @@ export class ReportGenerator {
       });
       
       if (response.status === 200 && Array.isArray(response.data)) {
-        console.log(`Successfully fetched ${response.data.length} deney records`);
-        return response.data;
+        console.log(`Successfully fetched ${response.data.length} total deney records`);
+        
+        // Filter for last 7 days
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        const filteredData = response.data.filter((app: DeneyData) => {
+          const appDate = new Date(app.application_date);
+          return appDate >= sevenDaysAgo;
+        });
+        
+        console.log(`Filtered to ${filteredData.length} deney records from last 7 days`);
+        return filteredData;
       } else {
         throw new Error(`Unexpected response format: ${response.status}`);
       }
@@ -292,7 +303,7 @@ export class ReportGenerator {
    */
   async generateDeneyExcelReport(deneyData: DeneyData[]): Promise<string> {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Haftalık Deney Raporu');
+    const worksheet = workbook.addWorksheet('Son 7 Günlük Deney Raporu');
 
     // Define headers
     const headers = [
@@ -393,7 +404,7 @@ export class ReportGenerator {
     const pastDaysOfYear = (today.getTime() - firstDayOfYear.getTime()) / 86400000;
     const week = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
     
-    const filename = `deney_report_${year}-${month}-${day}_week${week}.xlsx`;
+    const filename = `deney_report_son7gun_${year}-${month}-${day}_week${week}.xlsx`;
     const filepath = path.join(this.reportDir, filename);
     
     // Write file

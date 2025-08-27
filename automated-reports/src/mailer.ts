@@ -101,7 +101,7 @@ export class EmailService {
         <p>Bu raporlar aşağıdaki bilgileri içerir:</p>
         <ul>
           <li><strong>Makine Kalibrasyon Raporu:</strong> Tüm makine kalibrasyon durumları, süresinin yaklaştığı veya geçen kalibrasyonlar, kalibrasyon kuruluşu iletişim bilgileri</li>
-          <li><strong>Deney Raporu:</strong> Haftalık deney kayıtları, firma bilgileri, deney türleri, personel bilgileri ve ücret detayları</li>
+          <li><strong>Deney Raporu:</strong> <strong>Son 7 günlük</strong> deney kayıtları, firma bilgileri, deney türleri, personel bilgileri ve ücret detayları</li>
         </ul>
         
         <p>Herhangi bir sorunuz varsa lütfen sistem yöneticinize başvurun.</p>

@@ -11,6 +11,10 @@ export class ApplicationService {
     return await this.repo.findAll();
   }
 
+  async getLast7DaysApplications() {
+    return await this.repo.findLast7Days();
+  }
+
   async createApplication(data: ApplicationData) {
     // Business logic validations
     this.validateApplicationData(data);
