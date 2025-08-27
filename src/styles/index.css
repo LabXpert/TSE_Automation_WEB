@@ -228,3 +228,20 @@ input[type="checkbox"], input[type="radio"] {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* COMPANY INFO POPOVER - SELECTABLE TEXT */
+.company-info-popover {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  pointer-events: auto !important;
+}
+
+.company-info-popover * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  pointer-events: auto !important;
+}

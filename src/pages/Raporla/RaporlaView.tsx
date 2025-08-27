@@ -1389,9 +1389,15 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                   const rowColor = pastelColors[kayitIndex % pastelColors.length];
                   return kayit.deneyler.map((deney, deneyIndex) => (
                     <React.Fragment key={`${kayit.id}-${deney.id}`}>
-                      <tr style={{ backgroundColor: rowColor, borderBottom: '1px solid #f1f5f9', transition: 'filter 0.2s ease', position: 'relative', zIndex: openInfo === `${kayit.id}-${deney.id}` ? 1 : 'auto' }}
-                        onMouseOver={(e) => { e.currentTarget.style.filter = 'brightness(0.95)'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}>
+                                                                    <tr style={{ 
+                          backgroundColor: rowColor, 
+                          borderBottom: '1px solid #f1f5f9', 
+                          transition: 'filter 0.2s ease', 
+                          position: 'relative', 
+                          zIndex: openInfo === `${kayit.id}-${deney.id}` ? 1 : 'auto'
+                        }}
+                         onMouseOver={(e) => { e.currentTarget.style.filter = 'brightness(0.95)'; }}
+                         onMouseOut={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}>
                         <td style={{ padding: '12px 8px', textAlign: 'center', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#374151', fontSize: '12px' }}>{kayitIndex + 1}.{deneyIndex + 1}</td>
                         <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#0f172a', fontSize: '12px', position: 'relative' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1402,34 +1408,41 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15h-1v-6h2v6h-1zm0-8h-1V7h2v2h-1z"/>
                               </svg>
                             </button>
-                            {openInfo === `${kayit.id}-${deney.id}` && (
-      <div
-        className="company-info-popover"
-        style={{
-          position: 'absolute',
-          left: '100%',
-          top: 0,
-          marginLeft: '8px',
-          backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          padding: '12px',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          zIndex: 1000,
-          width: '200px',
-          fontSize: '12px',
-          color: '#374151',
-          lineHeight: '1.6',
-  userSelect:'auto', WebkitUserSelect:'auto'
-        }}
-      >
-        <div><strong>Vergi No:</strong> {kayit.companyInfo?.taxNo || '-'}</div>
-        <div><strong>Yetkili:</strong> {kayit.companyInfo?.contactName || '-'}</div>
-        <div><strong>Adres:</strong> {kayit.companyInfo?.address || '-'}</div>
-        <div><strong>Telefon:</strong> {kayit.companyInfo?.phone || '-'}</div>
-                              <div><strong>E-posta:</strong> {kayit.companyInfo?.email || '-'}</div>
-                            </div>
-                          )}  </div>
+                                                                                      {openInfo === `${kayit.id}-${deney.id}` && (
+        <div
+          className="company-info-popover"
+          style={{
+            position: 'absolute',
+            left: '100%',
+            top: 0,
+            marginLeft: '8px',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            padding: '12px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            zIndex: 99999,
+            width: '200px',
+            fontSize: '12px',
+            color: '#374151',
+            lineHeight: '1.6',
+            userSelect: 'text',
+            WebkitUserSelect: 'text',
+            MozUserSelect: 'text',
+            msUserSelect: 'text',
+            pointerEvents: 'auto',
+            isolation: 'isolate'
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Vergi No:</strong> {kayit.companyInfo?.taxNo || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Yetkili:</strong> {kayit.companyInfo?.contactName || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Adres:</strong> {kayit.companyInfo?.address || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Telefon:</strong> {kayit.companyInfo?.phone || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>E-posta:</strong> {kayit.companyInfo?.email || '-'}</div>
+                             </div>
+                           )}  </div>
 
                         </td>
                         <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kayit.basvuruNo}</td>
