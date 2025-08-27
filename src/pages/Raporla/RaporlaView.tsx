@@ -1436,11 +1436,11 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Vergi No:</strong> {kayit.companyInfo?.taxNo || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Yetkili:</strong> {kayit.companyInfo?.contactName || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Adres:</strong> {kayit.companyInfo?.address || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Telefon:</strong> {kayit.companyInfo?.phone || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>E-posta:</strong> {kayit.companyInfo?.email || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Vergi No:</strong> {kayit.companyInfo?.taxNo || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Yetkili:</strong> {kayit.companyInfo?.contactName || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Adres:</strong> {kayit.companyInfo?.address || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Telefon:</strong> {kayit.companyInfo?.phone || '-'}</div>
+         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>E-posta:</strong> {kayit.companyInfo?.email || '-'}</div>
                              </div>
                            )}  </div>
 
