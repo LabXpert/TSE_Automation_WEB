@@ -18,4 +18,11 @@ export interface DeneyKaydi {
   deneySayisi: number;
   deneyler: Deney[];
   kayitTarihi: string;
+  companyInfo?: {
+  taxNo?: string;
+  contactName?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  };
 }

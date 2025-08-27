@@ -6,12 +6,19 @@ import type { DeneyKaydi } from '../../models/Deney.tsx';
 // API response tip tanımları
 interface ApiApplication {
   id: number;
-  companies?: { name: string };
   application_no: string;
   application_date: string;
   certification_type: string;
   test_count: number;
   created_at: string;
+  companies?: {
+   name: string;
+   tax_no?: string;
+   contact_name?: string;
+   address?: string;
+   phone?: string;
+   email?: string;
+  };
   tests?: ApiTest[];
 }
 
@@ -69,11 +76,17 @@ const Raporla: React.FC = () => {
           belgelendirmeTuru: app.certification_type === 'belgelendirme' ? 'belgelendirme' : 'özel',
           deneySayisi: app.test_count,
           kayitTarihi: app.created_at,
+          companyInfo: {
+            taxNo: app.companies?.tax_no || '',
+            contactName: app.companies?.contact_name || '',
+            address: app.companies?.address || '',
+            phone: app.companies?.phone || '',
+            email: app.companies?.email || ''
+          },
           deneyler: (app.tests || []).map((test: ApiTest) => ({
             id: test.id,
             deneyTuru: test.experiment_type_name || '',
-            sorumluPersonel: test.personnel_first_name && test.personnel_last_name ? 
-              `${test.personnel_first_name} ${test.personnel_last_name}` : '',
+            sorumluPersonel: test.personnel_first_name && test.personnel_last_name ?              `${test.personnel_first_name} ${test.personnel_last_name}` : '',
             akredite: !!test.is_accredited,
             uygunluk: !!test.uygunluk,
             unit_price: test.unit_price,

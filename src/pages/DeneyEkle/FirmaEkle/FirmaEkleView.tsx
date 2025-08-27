@@ -276,7 +276,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                   color: '#374151',
                   fontSize: '14px'
                 }}>
-                  Yetkili Kişi
+                  Yetkili Kişi *
                 </label>
                 <input 
                   type="text" 
@@ -364,7 +364,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                   color: '#374151',
                   fontSize: '14px'
                 }}>
-                  Email Adresi
+                  Email Adresi *
                 </label>
                 <input 
                   type="email"
@@ -408,7 +408,7 @@ const FirmaEkleView: React.FC<FirmaEkleViewProps> = ({
                   color: '#374151',
                   fontSize: '14px'
                 }}>
-                  Adres
+                  Adres *
                 </label>
                 <textarea 
                   placeholder="Firma adresi"

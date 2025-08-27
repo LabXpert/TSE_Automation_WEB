@@ -296,7 +296,7 @@ function SidebarComponent() {
                 transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)'
               }}
             >
-              <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z"/>
+              <path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z" />
             </svg>
           </button>
         </div>

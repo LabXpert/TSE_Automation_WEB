@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { DeneyKaydi } from '../../models/Deney.tsx';
 
 interface RaporlaViewProps {
@@ -101,6 +101,26 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
   sonrakiSayfa,
   setSayfaBasiKayit
 }) => {
+ const pastelColors = [
+    'rgba(127, 29, 29, 0.08)',
+    'rgba(127, 29, 29, 0.06)',
+    'rgba(127, 29, 29, 0.04)',
+    'rgba(127, 29, 29, 0.03)',
+    'rgba(127, 29, 29, 0.05)'
+  ];
+  const [openInfo, setOpenInfo] = useState<string | null>(null);
+ useEffect(() => {
+  const handleClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.company-info-popover') && !target.closest('.info-button')) {
+      setOpenInfo(null);
+    }
+  };
+  if (openInfo) document.addEventListener('click', handleClick);
+  return () => document.removeEventListener('click', handleClick);
+}, [openInfo]);
+
+
   return (
     <div style={{ padding: '32px', fontFamily: 'inherit', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
       {/* Page Header */}
@@ -206,7 +226,7 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
           </div>
 
           {/* Tarih Filtreleme Butonu */}
-          <div style={{ position: 'relative' }}>
+          <div className="company-info-panel" style={{ position: 'relative' }}>
             <button
               onClick={() => setTarihPaneliAcik(!tarihPaneliAcik)}
               style={{
@@ -1365,32 +1385,72 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {kayitlariListesi.map((kayit, kayitIndex) => (
-                  kayit.deneyler.map((deney, deneyIndex) => (
-                    <tr key={`${kayit.id}-${deney.id}`} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background-color 0.2s ease' }}
-                      onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#f8fafc'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}>
-                      <td style={{ padding: '10px 8px', textAlign: 'center', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#374151', fontSize: '12px' }}>{kayitIndex + 1}.{deneyIndex + 1}</td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#0f172a', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kayit.firmaAdi}</td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kayit.basvuruNo}</td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px' }}>{new Date(kayit.basvuruTarihi).toLocaleDateString('tr-TR')}</td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
-                        <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: kayit.belgelendirmeTuru === 'belgelendirme' ? '#fed7aa' : '#fef7cd', color: kayit.belgelendirmeTuru === 'belgelendirme' ? '#c2410c' : '#a16207', border: `1px solid ${kayit.belgelendirmeTuru === 'belgelendirme' ? '#f97316' : '#ca8a04'}` }}>{kayit.belgelendirmeTuru === 'belgelendirme' ? 'BELG.' : 'ÖZEL'}</span>
-                      </td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#0f172a', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deney.deneyTuru}</td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deney.sorumluPersonel}</td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center', fontWeight: '600', color: '#0f172a', fontSize: '12px' }}>{deney.numuneSayisi || 1}</td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
-                        <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: deney.akredite ? '#dcfce7' : '#fee2e2', color: deney.akredite ? '#166534' : '#dc2626', border: `1px solid ${deney.akredite ? '#16a34a' : '#ef4444'}` }}>{deney.akredite ? 'EVET' : 'HAYIR'}</span>
-                      </td>
-                      <td style={{ padding: '10px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
-                        <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: deney.uygunluk ? '#ddd6fe' : '#f3f4f6', color: deney.uygunluk ? '#5b21b6' : '#6b7280', border: `1px solid ${deney.uygunluk ? '#8b5cf6' : '#d1d5db'}` }}>{deney.uygunluk ? 'EVET' : 'HAYIR'}</span>
-                      </td>
-                      <td style={{ padding: '10px 8px', textAlign: 'center', fontWeight: '600', color: '#0f172a', fontSize: '12px' }}>{deney.toplamFiyat != null ? `${Number(deney.toplamFiyat).toFixed(2)} ₺` : '-'}</td>
-                    </tr>
-                  ))
-                ))}
-              </tbody>
+                   {kayitlariListesi.map((kayit, kayitIndex) => {
+                  const rowColor = pastelColors[kayitIndex % pastelColors.length];
+                  return kayit.deneyler.map((deney, deneyIndex) => (
+                    <React.Fragment key={`${kayit.id}-${deney.id}`}>
+                      <tr style={{ backgroundColor: rowColor, borderBottom: '1px solid #f1f5f9', transition: 'filter 0.2s ease', position: 'relative', zIndex: openInfo === `${kayit.id}-${deney.id}` ? 1 : 'auto' }}
+                        onMouseOver={(e) => { e.currentTarget.style.filter = 'brightness(0.95)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.filter = 'brightness(1)'; }}>
+                        <td style={{ padding: '12px 8px', textAlign: 'center', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#374151', fontSize: '12px' }}>{kayitIndex + 1}.{deneyIndex + 1}</td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#0f172a', fontSize: '12px', position: 'relative' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kayit.firmaAdi}</span>
+                            <button className="info-button" onClick={() => setOpenInfo(openInfo === `${kayit.id}-${deney.id}` ? null : `${kayit.id}-${deney.id}`)}
+                                style={{ marginLeft: '8px', background: openInfo === `${kayit.id}-${deney.id}` ? '#ffe4e6' : 'none', border: 'none', cursor: 'pointer', color: openInfo === `${kayit.id}-${deney.id}` ? '#be123c' : '#0f172a', borderRadius: '4px', padding: '2px' }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15h-1v-6h2v6h-1zm0-8h-1V7h2v2h-1z"/>
+                              </svg>
+                            </button>
+                            {openInfo === `${kayit.id}-${deney.id}` && (
+      <div
+        className="company-info-popover"
+        style={{
+          position: 'absolute',
+          left: '100%',
+          top: 0,
+          marginLeft: '8px',
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          padding: '12px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          zIndex: 1000,
+          width: '200px',
+          fontSize: '12px',
+          color: '#374151',
+          lineHeight: '1.6',
+  userSelect:'auto', WebkitUserSelect:'auto'
+        }}
+      >
+        <div><strong>Vergi No:</strong> {kayit.companyInfo?.taxNo || '-'}</div>
+        <div><strong>Yetkili:</strong> {kayit.companyInfo?.contactName || '-'}</div>
+        <div><strong>Adres:</strong> {kayit.companyInfo?.address || '-'}</div>
+        <div><strong>Telefon:</strong> {kayit.companyInfo?.phone || '-'}</div>
+                              <div><strong>E-posta:</strong> {kayit.companyInfo?.email || '-'}</div>
+                            </div>
+                          )}  </div>
+
+                        </td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kayit.basvuruNo}</td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px' }}>{new Date(kayit.basvuruTarihi).toLocaleDateString('tr-TR')}</td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
+                          <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: kayit.belgelendirmeTuru === 'belgelendirme' ? '#fed7aa' : '#fef7cd', color: kayit.belgelendirmeTuru === 'belgelendirme' ? '#c2410c' : '#a16207', border: `1px solid ${kayit.belgelendirmeTuru === 'belgelendirme' ? '#f97316' : '#ca8a04'}` }}>{kayit.belgelendirmeTuru === 'belgelendirme' ? 'BELG.' : 'ÖZEL'}</span>
+                        </td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', fontWeight: '600', color: '#0f172a', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deney.deneyTuru}</td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', color: '#374151', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deney.sorumluPersonel}</td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center', fontWeight: '600', color: '#0f172a', fontSize: '12px' }}>{deney.numuneSayisi || 1}</td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
+                          <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: deney.akredite ? '#dcfce7' : '#fee2e2', color: deney.akredite ? '#166534' : '#dc2626', border: `1px solid ${deney.akredite ? '#16a34a' : '#ef4444'}` }}>{deney.akredite ? 'EVET' : 'HAYIR'}</span>
+                        </td>
+                        <td style={{ padding: '12px 8px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
+                          <span style={{ padding: '3px 6px', borderRadius: '3px', fontSize: '10px', fontWeight: '600', background: deney.uygunluk ? '#ddd6fe' : '#f3f4f6', color: deney.uygunluk ? '#5b21b6' : '#6b7280', border: `1px solid ${deney.uygunluk ? '#8b5cf6' : '#d1d5db'}` }}>{deney.uygunluk ? 'EVET' : 'HAYIR'}</span>
+                        </td>
+                        <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600', color: '#0f172a', fontSize: '12px' }}>{deney.toplamFiyat != null ? `${Number(deney.toplamFiyat).toFixed(2)} ₺` : '-'}</td>
+                      </tr>
+                    </React.Fragment>
+                  ));
+                })}</tbody>
             </table>
           </div>
         )}
