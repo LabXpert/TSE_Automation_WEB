@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
-import type { MachineCalibration } from '../models/MachineCalibration';
-import type { KalibrasyonKurulusu } from '../models/Makine';
-import * as machineCalibrationService from '../services/machineCalibration.service';
+import type { MachineMaintenance } from '../models/MachineMaintenance.tsx';
+import type { BakimKurulusu } from '../models/Makine';
+import * as machineMaintenanceService from '../services/machineMaintenance.service';
 
 interface MakineData {
   id: number;
@@ -10,51 +10,51 @@ interface MakineData {
   brand?: string;
   model?: string;
   measurement_range?: string;
-  last_calibration_date?: string;
-  calibration_org_name?: string;
-  calibration_contact_name?: string;
-  calibration_email?: string;
-  calibration_phone?: string;
+  last_maintenance_date?: string;
+  maintenance_org_name?: string;
+  maintenance_contact_name?: string;
+  maintenance_email?: string;
+  maintenance_phone?: string;
 }
 
-interface KalibrasyonModalProps {
+interface BakimModalProps {
   isOpen: boolean;
   onClose: () => void;
   machineId: number;
   onCompleted: () => void;
 }
 
-const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
+const BakimModal: React.FC<BakimModalProps> = ({
   isOpen,
   onClose,
   machineId,
   onCompleted
 }) => {
   const [formData, setFormData] = useState<{
-    calibration_org_id: number;
-    calibrated_by: string;
+    maintenance_org_id: number;
+    maintained_by: string;
     notes: string;
-    calibration_date: string;
+    maintenance_date: string;
   }>({
-    calibration_org_id: 0,
-    calibrated_by: '',
+    maintenance_org_id: 0,
+    maintained_by: '',
     notes: '',
-    calibration_date: new Date().toISOString().split('T')[0]
+    maintenance_date: new Date().toISOString().split('T')[0]
   });
   
   const [makine, setMakine] = useState<MakineData | null>(null);
-  const [kalibrasyonKuruluslari, setKalibrasyonKuruluslari] = useState<KalibrasyonKurulusu[]>([]);
-  const [kalibrasyonGecmisi, setKalibrasyonGecmisi] = useState<MachineCalibration[]>([]);
+  const [bakimKuruluslari, setBakimKuruluslari] = useState<BakimKurulusu[]>([]);
+  const [bakimGecmisi, setBakimGecmisi] = useState<MachineMaintenance[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gecmisLoading, setGecmisLoading] = useState(false);
 
-  // Makine bilgilerini yükle
+  // Makine bilgilerini ve bakım kuruluşlarını yükle
   useEffect(() => {
     if (isOpen && machineId) {
       loadMachineData(machineId);
-      loadKalibrasyonKuruluslari();
-      loadKalibrasyonGecmisi(machineId);
+      loadBakimKuruluslari();
+      loadBakimGecmisi(machineId);
     }
   }, [isOpen, machineId]);
 
@@ -70,28 +70,28 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
     }
   };
 
-  const loadKalibrasyonKuruluslari = async () => {
+  const loadBakimKuruluslari = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/calibration-orgs');
+      const response = await fetch('http://localhost:3001/api/maintenance-orgs');
       if (response.ok) {
         const data = await response.json();
-        console.log('Kalibrasyon kuruluşları:', data);
-        setKalibrasyonKuruluslari(data.data || data || []);
+        console.log('Bakim kuruluşları:', data);
+        setBakimKuruluslari(data.data || data || []);
       } else {
-        console.error('Kalibrasyon kuruluşları API hatası:', response.statusText);
+        console.error('Bakim kuruluşları API hatası:', response.statusText);
       }
     } catch (error) {
-      console.error('Kalibrasyon kuruluşları yüklenemedi:', error);
+      console.error('Bakim kuruluşları yüklenemedi:', error);
     }
   };
 
-  const loadKalibrasyonGecmisi = async (machineId: number) => {
+  const loadBakimGecmisi = async (machineId: number) => {
     try {
       setGecmisLoading(true);
-      const gecmis = await machineCalibrationService.getMachineCalibrationsByMachine(machineId);
-      setKalibrasyonGecmisi(gecmis);
+      const gecmis = await machineMaintenanceService.getMachineMaintenancesByMachine(machineId);
+      setBakimGecmisi(gecmis);
     } catch (error) {
-      console.error('Kalibrasyon geçmişi yüklenemedi:', error);
+      console.error('Bakim geçmişi yüklenemedi:', error);
     } finally {
       setGecmisLoading(false);
     }
@@ -102,18 +102,18 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
     
     if (!makine) return;
     
-    if (!formData.calibration_org_id || formData.calibration_org_id === 0) {
-      setError('Kalibrasyon kuruluşu seçiniz');
+    if (!formData.maintenance_org_id || formData.maintenance_org_id === 0) {
+      setError('Bakım kuruluşu seçiniz');
       return;
     }
 
-    if (!formData.calibration_date) {
-      setError('Kalibrasyon tarihi gereklidir');
+    if (!formData.maintenance_date) {
+      setError('Bakım tarihi gereklidir');
       return;
     }
 
-    if (!formData.calibrated_by || formData.calibrated_by.trim() === '') {
-      setError('Kalibre eden kişi gereklidir');
+    if (!formData.maintained_by || formData.maintained_by.trim() === '') {
+      setError('Bakım yapan kişi gereklidir');
       return;
     }
 
@@ -121,27 +121,27 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
       setLoading(true);
       setError(null);
 
-      await machineCalibrationService.calibrateMachine(machineId, {
-        calibration_org_id: formData.calibration_org_id,
-        calibrated_by: formData.calibrated_by || '',
+      await machineMaintenanceService.maintainMachine(machineId, {
+        maintenance_org_id: formData.maintenance_org_id,
+        maintained_by: formData.maintained_by || '',
         notes: formData.notes || undefined,
-        calibration_date: new Date(formData.calibration_date)
+        maintenance_date: new Date(formData.maintenance_date)
       });
 
-      // Başarılı kalibrasyon sonrası
+      // Başarılı bakim sonrası
       onCompleted();
       onClose();
       
       // Formu sıfırla
       setFormData({
-        calibration_org_id: 0,
-        calibrated_by: '',
+        maintenance_org_id: 0,
+        maintained_by: '',
         notes: '',
-        calibration_date: new Date().toISOString().split('T')[0]
+        maintenance_date: new Date().toISOString().split('T')[0]
       });
 
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Kalibrasyon kaydedilemedi');
+      setError(error instanceof Error ? error.message : 'Bakim kaydedilemedi');
     } finally {
       setLoading(false);
     }
@@ -149,10 +149,10 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
 
   const handleClose = () => {
     setFormData({
-      calibration_org_id: 0,
-      calibrated_by: '',
+      maintenance_org_id: 0,
+      maintained_by: '',
       notes: '',
-      calibration_date: new Date().toISOString().split('T')[0]
+      maintenance_date: new Date().toISOString().split('T')[0]
     });
     setError(null);
     onClose();
@@ -203,7 +203,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                 color: '#ffffff',
                 margin: '0 0 4px 0'
               }}>
-                Makine Kalibrasyonu
+                Makine Bakımı
               </h2>
               {makine && (
                 <p style={{
@@ -286,16 +286,16 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                   <div style={{ color: '#0f172a', fontWeight: '600' }}>{makine.model || 'Belirtilmemiş'}</div>
                 </div>
                 <div>
-                  <span style={{ color: '#64748b', fontWeight: '500' }}>Son Kalibrasyon:</span>
+                  <span style={{ color: '#64748b', fontWeight: '500' }}>Son Bakım:</span>
                   <div style={{ color: '#0f172a', fontWeight: '600' }}>
-                    {makine.last_calibration_date ? new Date(makine.last_calibration_date).toLocaleDateString('tr-TR') : '-'}
+                    {makine.last_maintenance_date ? new Date(makine.last_maintenance_date).toLocaleDateString('tr-TR') : '-'}
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Kalibrasyon Formu */}
+          {/* Bakım Formu */}
           <form onSubmit={handleSubmit} style={{ marginBottom: '24px' }}>
             <h3 style={{
               fontSize: '18px',
@@ -303,7 +303,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
               color: '#0f172a',
               margin: '0 0 16px 0'
             }}>
-              Yeni Kalibrasyon Kaydı
+              Yeni Bakım Kaydı
             </h3>
 
             {error && (
@@ -326,7 +326,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
               gap: '16px',
               marginBottom: '16px'
             }}>
-              {/* Kalibrasyon Kuruluşu */}
+              {/* Bakım Kuruluşu */}
               <div>
                 <label style={{
                   display: 'block',
@@ -335,13 +335,13 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  Kalibrasyon Kuruluşu *
+                  Bakım Kuruluşu *
                 </label>
                 <select
-                  value={formData.calibration_org_id}
+                  value={formData.maintenance_org_id}
                   onChange={(e) => setFormData({
                     ...formData,
-                    calibration_org_id: parseInt(e.target.value)
+                    maintenance_org_id: parseInt(e.target.value)
                   })}
                   required
                   style={{
@@ -362,7 +362,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                   }}
                 >
                   <option value={0}>Kuruluş seçiniz</option>
-                  {kalibrasyonKuruluslari.map((org) => (
+                  {bakimKuruluslari.map((org) => (
                     <option key={org.id} value={org.id}>
                       {org.org_name}
                     </option>
@@ -370,7 +370,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                 </select>
               </div>
 
-              {/* Kalibrasyon Tarihi */}
+              {/* Bakım Tarihi */}
               <div>
                 <label style={{
                   display: 'block',
@@ -379,14 +379,14 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                   color: '#374151',
                   marginBottom: '8px'
                 }}>
-                  Kalibrasyon Tarihi *
+                  Bakım Tarihi *
                 </label>
                 <input
                   type="date"
-                  value={formData.calibration_date}
+                  value={formData.maintenance_date}
                   onChange={(e) => setFormData({
                     ...formData,
-                    calibration_date: e.target.value
+                    maintenance_date: e.target.value
                   })}
                   max={new Date().toISOString().split('T')[0]}
                   required
@@ -410,7 +410,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
               </div>
             </div>
 
-            {/* Kalibre Eden Kişi */}
+            {/* Bakım Yapan Kişi */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{
                 display: 'block',
@@ -419,16 +419,16 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                 color: '#374151',
                 marginBottom: '8px'
               }}>
-                Kalibre Eden Kişi *
+                Bakım Yapan Kişi *
               </label>
               <input
                 type="text"
-                value={formData.calibrated_by}
+                value={formData.maintained_by}
                 onChange={(e) => setFormData({
                   ...formData,
-                  calibrated_by: e.target.value
+                  maintained_by: e.target.value
                 })}
-                placeholder="Kalibrasyon yapan kişinin adı"
+                placeholder="Bakım yapan kişinin adı"
                 required
                 style={{
                   width: '100%',
@@ -466,7 +466,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                   ...formData,
                   notes: e.target.value
                 })}
-                placeholder="Kalibrasyon ile ilgili ek notlar (opsiyonel)"
+                placeholder="Bakım ile ilgili ek notlar (opsiyonel)"
                 rows={3}
                 style={{
                   width: '100%',
@@ -558,12 +558,12 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                     animation: 'spin 1s linear infinite'
                   }}></div>
                 )}
-                {loading ? 'Kaydediliyor...' : 'Kalibrasyon Kaydet'}
+                {loading ? 'Kaydediliyor...' : 'Bakım Kaydet'}
               </button>
             </div>
           </form>
 
-          {/* Kalibrasyon Geçmişi */}
+          {/* Bakım Geçmişi */}
           <div>
             <h3 style={{
               fontSize: '18px',
@@ -577,7 +577,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM14 21L7 12H10V7H14V12H17L14 21Z"/>
               </svg>
-              Kalibrasyon Geçmişi
+              Bakım Geçmişi
             </h3>
 
             {gecmisLoading ? (
@@ -599,7 +599,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                 }}></div>
                 Geçmiş yükleniyor...
               </div>
-            ) : kalibrasyonGecmisi.length > 0 ? (
+            ) : bakimGecmisi.length > 0 ? (
               <div style={{
                 border: '1px solid #e5e7eb',
                 borderRadius: '8px',
@@ -639,7 +639,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                         color: '#374151',
                         borderBottom: '1px solid #e5e7eb'
                       }}>
-                        Kalibre Eden
+                        Bakım Yapan
                       </th>
                       <th style={{
                         padding: '12px',
@@ -653,8 +653,8 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {kalibrasyonGecmisi.map((kalibrasyon, index) => (
-                      <tr key={kalibrasyon.id} style={{
+                    {bakimGecmisi.map((bakim, index) => (
+                      <tr key={bakim.id} style={{
                         backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8fafc'
                       }}>
                         <td style={{
@@ -662,21 +662,21 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                           borderBottom: '1px solid #f1f5f9',
                           color: '#0f172a'
                         }}>
-                          {new Date(kalibrasyon.calibration_date).toLocaleDateString('tr-TR')}
+                          {new Date(bakim.maintenance_date).toLocaleDateString('tr-TR')}
                         </td>
                         <td style={{
                           padding: '12px',
                           borderBottom: '1px solid #f1f5f9',
                           color: '#0f172a'
                         }}>
-                          {kalibrasyon.calibration_org_name || 'Belirtilmemiş'}
+                          {bakim.maintenance_org_name || 'Belirtilmemiş'}
                         </td>
                         <td style={{
                           padding: '12px',
                           borderBottom: '1px solid #f1f5f9',
                           color: '#64748b'
                         }}>
-                          {kalibrasyon.calibrated_by || 'Belirtilmemiş'}
+                          {bakim.maintained_by || 'Belirtilmemiş'}
                         </td>
                         <td style={{
                           padding: '12px',
@@ -685,7 +685,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                           maxWidth: '200px',
                           wordWrap: 'break-word'
                         }}>
-                          {kalibrasyon.notes || 'Not yok'}
+                          {bakim.notes || 'Not yok'}
                         </td>
                       </tr>
                     ))}
@@ -701,7 +701,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                 textAlign: 'center',
                 color: '#64748b'
               }}>
-                Bu makine için henüz kalibrasyon kaydı bulunmamaktadır.
+                Bu makine için henüz bakim kaydı bulunmamaktadır.
               </div>
             )}
           </div>
@@ -719,6 +719,5 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
   );
 };
 
-export default KalibrasyonModal;
-
+export default BakimModal;
 

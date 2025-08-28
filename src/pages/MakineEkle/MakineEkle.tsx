@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import MakineEkleView from './MakineEkleView.tsx';
-import type { Makine, MakineInput, KalibrasyonKurulusu } from '../../models/Makine';
+import type { Makine, MakineInput, KalibrasyonKurulusu, BakimKurulusu } from '../../models/Makine';
 
 const MakineEkle: React.FC = () => {
   // State'ler
   const [makineler, setMakineler] = useState<Makine[]>([]);
   const [kalibrasyonKuruluslari, setKalibrasyonKuruluslari] = useState<KalibrasyonKurulusu[]>([]);
+  const [bakimKuruluslari, setBakimKuruluslari] = useState<BakimKurulusu[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -20,7 +21,10 @@ const MakineEkle: React.FC = () => {
     measurement_range: '',
     last_calibration_date: new Date(),
     calibration_org_id: 0,
-    calibration_interval: 1
+    calibration_interval: 1,
+    last_maintenance_date: new Date(),
+    maintenance_org_id: 0,
+    maintenance_interval: 1
   });
 
   // Pagination state'leri
@@ -32,6 +36,7 @@ const MakineEkle: React.FC = () => {
   useEffect(() => {
     fetchMakineler();
     fetchKalibrasyonKuruluslari();
+    fetchBakimKuruluslari();
   }, []);
 
   // Makineleri getir
@@ -68,6 +73,22 @@ const MakineEkle: React.FC = () => {
     } catch (error) {
       console.error('Kalibrasyon kuruluşları fetch hatası:', error);
       setError('Kalibrasyon kuruluşları yüklenirken hata oluştu');
+    }
+  };
+
+  // Bakım kuruluşlarını getir
+  const fetchBakimKuruluslari = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/maintenance-orgs');
+      const data = await response.json();
+      if (data.success) {
+        setBakimKuruluslari(data.data);
+      } else {
+        setError('Bakım kuruluşları yüklenemedi');
+      }
+    } catch (error) {
+      console.error('Bakım kuruluşları fetch hatası:', error);
+      setError('Bakım kuruluşları yüklenirken hata oluştu');
     }
   };
 
@@ -120,7 +141,10 @@ const MakineEkle: React.FC = () => {
       measurement_range: '',
       last_calibration_date: new Date(),
       calibration_org_id: 0,
-      calibration_interval: 1
+      calibration_interval: 1,
+      last_maintenance_date: new Date(),
+      maintenance_org_id: 0,
+      maintenance_interval: 1
     });
     setEditingMakine(null);
     setError('');
@@ -137,7 +161,10 @@ const MakineEkle: React.FC = () => {
       measurement_range: makine.measurement_range || '',
       last_calibration_date: new Date(makine.last_calibration_date),
       calibration_org_id: makine.calibration_org_id,
-      calibration_interval: makine.calibration_interval
+      calibration_interval: makine.calibration_interval,
+      last_maintenance_date: makine.last_maintenance_date ? new Date(makine.last_maintenance_date) : new Date(),
+      maintenance_org_id: makine.maintenance_org_id || 0,
+      maintenance_interval: makine.maintenance_interval || 1
     });
     setEditingMakine(makine);
   };
@@ -212,6 +239,7 @@ const MakineEkle: React.FC = () => {
     <MakineEkleView
       makineler={currentMakineler}
       kalibrasyonKuruluslari={kalibrasyonKuruluslari}
+      bakimKuruluslari={bakimKuruluslari}
       formData={formData}
       loading={loading}
       error={error}

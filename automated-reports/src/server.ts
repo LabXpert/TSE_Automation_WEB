@@ -20,7 +20,7 @@ const config = {
   cronExpression: process.env.CRON_EXPRESSION || '0 9 * * 1', // Varsayılan: Pazartesi 09:00
   cronTz: process.env.CRON_TZ || 'Europe/Istanbul',     // Zaman dilimi
   reportDir: process.env.REPORT_DIR || './reports',     // Rapor dosyalarının kaydedileceği klasör
-  tseBackendUrl: process.env.TSE_BACKEND_URL || 'http://localhost:3000' // Ana TSE backend URL'si
+  tseBackendUrl: process.env.TSE_BACKEND_URL || 'http://localhost:3001' // Ana TSE backend URL'si
 };
 
 // Gerekli çevre değişkenlerinin kontrol edilmesi

@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import * as ExcelJS from 'exceljs';
 import MakineRaporlaView from './MakineRaporlaView.tsx';
 
-// Makine veri tipi - veritabanı şemasına göre
 interface MakineData {
   id: number;
   serial_no: string;
@@ -12,45 +11,43 @@ interface MakineData {
   measurement_range: string;
   last_calibration_date: string;
   calibration_interval: number;
-  calibration_org_name: string; // JOIN ile kalibrasyon kuruluş adı
+  calibration_org_name: string;
   calibration_contact_name?: string;
   calibration_email?: string;
   calibration_phone?: string;
+  last_maintenance_date?: string;
+  maintenance_interval?: number;
+  maintenance_org_name?: string;
+  maintenance_contact_name?: string;
+  maintenance_email?: string;
+  maintenance_phone?: string;
 }
 
 const MakineRaporla: React.FC = () => {
   const [makineData, setMakineData] = useState<MakineData[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Arama ve filtreleme state'leri
-  const [aramaMetni, setAramaMetni] = useState<string>('');
-  const [secilenMarka, setSecilenMarka] = useState<string>('');
-  const [secilenModel, setSecilenModel] = useState<string>('');
-  const [secilenKalibrasyonOrg, setSecilenKalibrasyonOrg] = useState<string>('');
-  const [secilenDurumlar, setSecilenDurumlar] = useState<string[]>([]);
-  const [filtrelenmisKayitlar, setFiltrelenmisKayitlar] = useState<MakineData[]>([]);
 
-  // Veritabanından makine verilerini yükle
+  // Filters
+  const [aramaMetni, setAramaMetni] = useState('');
+  const [secilenMarkalar, setSecilenMarkalar] = useState<string[]>([]);
+  const [secilenModeller, setSecilenModeller] = useState<string[]>([]);
+  const [secilenKalibrasyonOrglari, setSecilenKalibrasyonOrglari] = useState<string[]>([]);
+  const [secilenBakimOrglari, setSecilenBakimOrglari] = useState<string[]>([]);
+  const [secilenDurumlar, setSecilenDurumlar] = useState<string[]>([]);
+
   const fetchMachineData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/machine-reports/data');
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Gerçek veriler alındı:', data);
-        setMakineData(Array.isArray(data) ? data : []);
-        // İlk başta sadece makineData'yı set et, filtreleme otomatik çalışacak
-      } else {
-        console.error('API hatası:', response.statusText);
-        setError(`API hatası: ${response.statusText}`);
-        setMakineData([]); // Hata durumunda boş liste
-      }
-    } catch (error) {
-      console.error('Veri çekme hatası:', error);
+      const res = await fetch('/api/machine-reports/data');
+      if (!res.ok) throw new Error(res.statusText);
+      const data = await res.json();
+      setMakineData(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Makine verileri alınamadı:', e);
       setError('Veri çekme hatası oluştu');
-      setMakineData([]); // Hata durumunda boş liste
+      setMakineData([]);
     } finally {
       setLoading(false);
     }
@@ -60,364 +57,195 @@ const MakineRaporla: React.FC = () => {
     fetchMachineData();
   }, [fetchMachineData]);
 
-  // Sonraki kalibrasyon tarihini ve durumunu hesapla
+  // Durum hesaplama
   const getKalibrasyonDurumu = useCallback((lastCalibrationDate: string, calibrationInterval: number = 1) => {
-    // Güvenlik kontrolü
     if (!lastCalibrationDate) {
-      return {
-        sonrakiTarih: new Date().toISOString().split('T')[0],
-        durum: 'normal',
-        durumText: 'Tarih belirtilmemiş'
-      };
+      const today = new Date().toISOString().split('T')[0];
+      return { sonrakiTarih: today, durum: 'normal', durumText: 'Tarih belirtilmemiş' };
     }
-
-    const lastDate = new Date(lastCalibrationDate);
-    
-    // Tarih geçerliliği kontrolü
-    if (isNaN(lastDate.getTime())) {
-      return {
-        sonrakiTarih: new Date().toISOString().split('T')[0],
-        durum: 'normal',
-        durumText: 'Geçersiz tarih'
-      };
+    const last = new Date(lastCalibrationDate);
+    if (isNaN(last.getTime())) {
+      const today = new Date().toISOString().split('T')[0];
+      return { sonrakiTarih: today, durum: 'normal', durumText: 'Geçersiz tarih' };
     }
-
-    // Kalibrasyon aralığı kontrolü ve varsayılan değer
-    const interval = calibrationInterval && calibrationInterval > 0 ? calibrationInterval : 1;
-
-    const nextDate = new Date(lastDate);
-    nextDate.setFullYear(lastDate.getFullYear() + interval); // Dinamik kalibrasyon aralığı
-    
+    const interval = calibrationInterval > 0 ? calibrationInterval : 1;
+    const next = new Date(last);
+    next.setFullYear(last.getFullYear() + interval);
     const today = new Date();
-    const diffTime = nextDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    let durum = 'normal';
-    let durumText = 'Normal';
-    
-    if (diffDays < 0) {
-      durum = 'gecti';
-      durumText = `${Math.abs(diffDays)} gün geçti`;
-    } else if (diffDays <= 30) {
-      durum = 'yaklasıyor';
-      durumText = `${diffDays} gün kaldı`;
-    } else {
-      durum = 'normal';
-      durumText = `${diffDays} gün kaldı`;
-    }
-    
-    return {
-      sonrakiTarih: nextDate.toISOString().split('T')[0],
-      durum,
-      durumText
-    };
+    const diffDays = Math.ceil((next.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return { sonrakiTarih: next.toISOString(), durum: 'gecti', durumText: `${Math.abs(diffDays)} gün geçti` };
+    if (diffDays <= 30) return { sonrakiTarih: next.toISOString(), durum: 'yaklaşıyor', durumText: `${diffDays} gün kaldı` };
+    return { sonrakiTarih: next.toISOString(), durum: 'normal', durumText: `${diffDays} gün kaldı` };
   }, []);
 
-  // Benzersiz marka, model ve kalibrasyon org listelerini hesapla
-  const markalar = makineData && makineData.length > 0 
-    ? [...new Set(makineData.map(m => m.brand).filter(Boolean))].sort()
-    : [];
-  const modeller = makineData && makineData.length > 0 
-    ? [...new Set(makineData.map(m => m.model).filter(Boolean))].sort()
-    : [];
-  const kalibrasyonOrglari = makineData && makineData.length > 0 
-    ? [...new Set(makineData.map(m => m.calibration_org_name).filter(Boolean))].sort()
-    : [];
+  // Derived options
+  const markalar = useMemo(() => {
+    const set = new Set(makineData.map(m => m.brand).filter(Boolean));
+    const arr = Array.from(set);
+    if (makineData.some(m => !m.brand)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
+  const modeller = useMemo(() => {
+    const set = new Set(makineData.map(m => m.model).filter(Boolean));
+    const arr = Array.from(set);
+    if (makineData.some(m => !m.model)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
+  const kalibrasyonOrglari = useMemo(() => {
+    const set = new Set(makineData.map(m => m.calibration_org_name).filter(Boolean));
+    const arr = Array.from(set);
+    if (makineData.some(m => !m.calibration_org_name)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
+  const bakimOrglari = useMemo(() => {
+    const set = new Set(
+      makineData
+        .map((m) => m.maintenance_org_name)
+        .filter((name): name is string => Boolean(name))
+    );
+    const arr = Array.from(set);
+    if (makineData.some((m) => !m.maintenance_org_name)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
 
-  // Tüm filtreleri temizle
-  const filtreleriTemizle = () => {
+  const filtreleriTemizle = useCallback(() => {
     setAramaMetni('');
-    setSecilenMarka('');
-    setSecilenModel('');
-    setSecilenKalibrasyonOrg('');
+    setSecilenMarkalar([]);
+    setSecilenModeller([]);
+    setSecilenKalibrasyonOrglari([]);
+    setSecilenBakimOrglari([]);
     setSecilenDurumlar([]);
-  };
+  }, []);
 
-  // Makine kalibrasyon tarihini güncelle (eski yöntem - artık modal kullanıyoruz)
-  /*const makineKalibrasyonGuncelle = async (makineId: number, yeniTarih: string) => {
-    try {
-      const response = await fetch(`/api/machines/${makineId}/calibration`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          calibrationDate: yeniTarih
-        }),
-      });
-
-      if (response.ok) {
-        // Başarılı güncelleme sonrası local state'i güncelle
-        setMakineData(prevData => 
-          prevData.map(makine => 
-            makine.id === makineId 
-              ? { ...makine, last_calibration_date: yeniTarih }
-              : makine
-          )
-        );
-        alert('Kalibrasyon tarihi başarıyla güncellendi!');
-      } else {
-        const errorData = await response.json();
-        alert(`Güncelleme hatası: ${errorData.message || 'Bilinmeyen hata'}`);
+  // Filtered list
+  const filtrelenmisKayitlar = useMemo(() => {
+    return makineData.filter(m => {
+      const haystack = `${m.equipment_name} ${m.serial_no} ${m.brand} ${m.model}`.toLowerCase();
+      if (aramaMetni && !haystack.includes(aramaMetni.toLowerCase())) return false;
+      if (secilenMarkalar.length > 0) {
+        const brandVal = m.brand || 'Belirlenmemiş';
+        if (!secilenMarkalar.includes(brandVal)) return false;
       }
-    } catch (error) {
-      console.error('Kalibrasyon güncelleme hatası:', error);
-      alert('Kalibrasyon tarihi güncellenirken bir hata oluştu!');
-    }
-  };*/
+      if (secilenModeller.length > 0) {
+        const modelVal = m.model || 'Belirlenmemiş';
+        if (!secilenModeller.includes(modelVal)) return false;
+      }
+      if (secilenKalibrasyonOrglari.length > 0) {
+        const orgVal = m.calibration_org_name || 'Belirlenmemiş';
+        if (!secilenKalibrasyonOrglari.includes(orgVal)) return false;
+      }
+      if (secilenBakimOrglari.length > 0) {
+        const orgVal = m.maintenance_org_name || 'Belirlenmemiş';
+        if (!secilenBakimOrglari.includes(orgVal)) return false;
+      }
+      if (secilenDurumlar.length > 0) {
+        const d = getKalibrasyonDurumu(m.last_calibration_date, m.calibration_interval).durum;
+        if (!secilenDurumlar.includes(d)) return false;
+      }
+      return true;
+    });
+  }, [makineData, aramaMetni, secilenMarkalar, secilenModeller, secilenKalibrasyonOrglari, secilenBakimOrglari, secilenDurumlar, getKalibrasyonDurumu]);
 
-  // Excel çıktısı alma fonksiyonu
-  const exceleCikart = async () => {
+  // Excel export (güncel başlık ve kolonlar ile)
+  const exceleCikart = useCallback(async () => {
     try {
-      console.log('Excel export başlıyor...');
-      
-      // Yeni workbook oluştur
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Makine Raporları');
 
-      // Başlık satırını tanımla
       const headers = [
-        'No',
-        'Makine Adı',
-        'Marka', 
-        'Model',
-        'Seri No',
-        'Ölçüm Aralığı',
-        'Son Kalibrasyon',
-        'Kalibrasyon Aralığı (Yıl)',
-        'Sonraki Kalibrasyon',
-        'Kalibrasyon Durumu',
-        'Kalibrasyon Kuruluşu',
-        'İletişim Kişisi',
-        'Telefon',
-        'E-posta'
+        'No', 'Makine Adı', 'Seri No', 'Ölçüm Aralığı', 'Marka', 'Model',
+        'Son Kalibrasyon', 'Sonraki Kalibrasyon', 'Kalibrasyon Durumu',
+        'Kalibrasyon Kuruluşu', 'İletişim Kişisi', 'Telefon', 'E-posta',
+        'Bakım Kuruluşu', 'Bakım İletişim', 'Bakım Telefon', 'Bakım E-posta'
       ];
-
-      // Başlık satırını ekle
       worksheet.addRow(headers);
-
-      // Başlık satırına stil ver
       const headerRow = worksheet.getRow(1);
       headerRow.eachCell((cell) => {
         cell.font = { bold: true, color: { argb: 'FFFFFF' } };
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'DC2626' } // Kırmızı tema
-        };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DC2626' } };
         cell.alignment = { horizontal: 'center', vertical: 'middle' };
-        cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' }
-        };
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
       });
 
-      // Veri satırlarını ekle
-      filtrelenmisKayitlar.forEach((makine, index) => {
-        const kalibrasyonDurumu = getKalibrasyonDurumu(makine.last_calibration_date, makine.calibration_interval);
-        
+      filtrelenmisKayitlar.forEach((m, index) => {
+        const durum = getKalibrasyonDurumu(m.last_calibration_date, m.calibration_interval);
         const rowData = [
           index + 1,
-          makine.equipment_name,
-          makine.brand || '-',
-          makine.model || '-',
-          makine.serial_no,
-          makine.measurement_range || '-',
-          new Date(makine.last_calibration_date).toLocaleDateString('tr-TR'),
-          makine.calibration_interval,
-          new Date(kalibrasyonDurumu.sonrakiTarih).toLocaleDateString('tr-TR'),
-          kalibrasyonDurumu.durumText,
-          makine.calibration_org_name || '-',
-          makine.calibration_contact_name || '-',
-          makine.calibration_phone || '-',
-          makine.calibration_email || '-'
+          m.equipment_name,
+          m.serial_no,
+          m.measurement_range || '-',
+          m.brand || '-',
+          m.model || '-',
+          m.last_calibration_date ? new Date(m.last_calibration_date).toLocaleDateString('tr-TR') : '-',
+          new Date(durum.sonrakiTarih).toLocaleDateString('tr-TR'),
+          durum.durumText,
+          m.calibration_org_name || '-',
+          m.calibration_contact_name || '-',
+          m.calibration_phone || '-',
+          m.calibration_email || '-',
+          m.maintenance_org_name || '-',
+          m.maintenance_contact_name || '-',
+          m.maintenance_phone || '-',
+          m.maintenance_email || '-',
         ];
-        
         const row = worksheet.addRow(rowData);
-        
-        // Satır stilini ayarla
-        row.eachCell((cell, colNumber) => {
-          cell.border = {
-            top: { style: 'thin' },
-            left: { style: 'thin' },
-            bottom: { style: 'thin' },
-            right: { style: 'thin' }
-          };
-          
-          // Hizalama
-          if (colNumber === 1 || colNumber === 7 || colNumber === 8 || colNumber === 9 || colNumber === 10) {
+        row.eachCell((cell, col) => {
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+          if ([1, 7, 8, 9, 15, 16].includes(col)) {
             cell.alignment = { horizontal: 'center', vertical: 'middle' };
           }
-          
-          // Durum renklandırması
-          if (colNumber === 10) { // Kalibrasyon durumu kolonu (sütun kaydı)
-            let bgColor = 'DCFCE7'; // Yeşil (normal)
-            if (kalibrasyonDurumu.durum === 'yaklasıyor') {
-              bgColor = 'FEF3C7'; // Sarı
-            } else if (kalibrasyonDurumu.durum === 'gecti') {
-              bgColor = 'FEE2E2'; // Kırmızı
-            }
-            
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: bgColor }
-            };
+          if (col === 9) {
+            let bg = 'DCFCE7';
+            if (durum.durum === 'yaklaşıyor') bg = 'FEF3C7';
+            if (durum.durum === 'gecti') bg = 'FEE2E2';
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } } as any;
           }
         });
       });
 
-      // Sütun genişliklerini ayarla
-      const columnWidths = [8, 30, 15, 15, 15, 20, 15, 12, 15, 20, 25, 20, 15, 25];
-      columnWidths.forEach((width, index) => {
-        worksheet.getColumn(index + 1).width = width;
-      });
+      const widths = [8, 28, 18, 18, 14, 14, 16, 16, 18, 24, 20, 16, 22, 24, 20, 16, 22];
+      widths.forEach((w, i) => (worksheet.getColumn(i + 1).width = w));
 
-      // Dosya adını oluştur
-      const today = new Date();
-      const dosyaAdi = `Makine_Raporlari_${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}.xlsx`;
-      
-      // Excel dosyasını indir
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const buf = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = dosyaAdi;
-      link.click();
+      const a = document.createElement('a');
+      a.href = url;
+      const today = new Date();
+      a.download = `Makine_Raporlari_${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}.xlsx`;
+      a.click();
       window.URL.revokeObjectURL(url);
-      
-      console.log('Excel export tamamlandı!');
-    } catch (error) {
-      console.error('Excel export hatası:', error);
-      alert('Excel dosyası oluşturulurken bir hata oluştu!');
+    } catch (e) {
+      console.error('Excel export hatası:', e);
     }
-  };
-
-  // Birleşik filtreleme fonksiyonu
-  const filtreleriUygula = useCallback(() => {
-    try {
-      // Eğer makine verisi henüz yüklenmediyse çık
-      if (!makineData || makineData.length === 0) {
-        setFiltrelenmisKayitlar([]);
-        return;
-      }
-
-      let sonuc = makineData;
-
-    // Arama filtresi
-    if (aramaMetni.trim()) {
-      const aramaTerimi = aramaMetni.toLowerCase().trim();
-      sonuc = sonuc.filter(makine => 
-        makine.equipment_name.toLowerCase().includes(aramaTerimi) ||
-        makine.serial_no.toLowerCase().includes(aramaTerimi) ||
-        (makine.brand && makine.brand.toLowerCase().includes(aramaTerimi)) ||
-        (makine.model && makine.model.toLowerCase().includes(aramaTerimi)) ||
-        (makine.calibration_org_name && makine.calibration_org_name.toLowerCase().includes(aramaTerimi))
-      );
-    }
-
-    // Marka filtresi
-    if (secilenMarka) {
-      sonuc = sonuc.filter(makine => makine.brand === secilenMarka);
-    }
-
-    // Model filtresi
-    if (secilenModel) {
-      sonuc = sonuc.filter(makine => makine.model === secilenModel);
-    }
-
-    // Kalibrasyon org filtresi
-    if (secilenKalibrasyonOrg) {
-      sonuc = sonuc.filter(makine => makine.calibration_org_name === secilenKalibrasyonOrg);
-    }
-
-    // Durum filtresi (kalibrasyon durumu)
-    if (secilenDurumlar.length > 0) {
-      sonuc = sonuc.filter(makine => {
-        const kalibrasyonDurumu = getKalibrasyonDurumu(makine.last_calibration_date, makine.calibration_interval);
-        return secilenDurumlar.includes(kalibrasyonDurumu.durum);
-      });
-    }
-
-    // Kalibrasyon durumuna göre sırala: geçenler -> yaklaşanlar -> normallar
-    sonuc = sonuc.sort((a, b) => {
-      // Güvenlik kontrolleri
-      if (!a.last_calibration_date || !b.last_calibration_date) {
-        return 0; // Tarih yoksa sıralama yapma
-      }
-
-      const durumA = getKalibrasyonDurumu(a.last_calibration_date, a.calibration_interval);
-      const durumB = getKalibrasyonDurumu(b.last_calibration_date, b.calibration_interval);
-      
-      // Durum önceliği: gecti (0) -> yaklasıyor (1) -> normal (2)
-      const oncelikA = durumA.durum === 'gecti' ? 0 : durumA.durum === 'yaklasıyor' ? 1 : 2;
-      const oncelikB = durumB.durum === 'gecti' ? 0 : durumB.durum === 'yaklasıyor' ? 1 : 2;
-      
-      if (oncelikA !== oncelikB) {
-        return oncelikA - oncelikB; // Öncelik sırası: 0 (gecti) -> 1 (yaklasıyor) -> 2 (normal)
-      }
-      
-      // Aynı durumdaysa, kritiklik derecesine göre sırala
-      const sonrakiA = new Date(durumA.sonrakiTarih);
-      const sonrakiB = new Date(durumB.sonrakiTarih);
-      
-      // Tarih geçerliliği kontrolü
-      if (isNaN(sonrakiA.getTime()) || isNaN(sonrakiB.getTime())) {
-        return 0;
-      }
-      
-      if (oncelikA === 0) {
-        // Geçenler: En çok geçmiş olanlar en üstte (en eski sonraki tarih)
-        return sonrakiA.getTime() - sonrakiB.getTime();
-      } else if (oncelikA === 1) {
-        // Yaklaşanlar: En yakın süresi dolanlar en üstte
-        return sonrakiA.getTime() - sonrakiB.getTime();
-      } else {
-        // Normallar: Sonraki kalibrasyonu en yakın olanlar en üstte
-        return sonrakiA.getTime() - sonrakiB.getTime();
-      }
-    });
-
-    setFiltrelenmisKayitlar(sonuc);
-    } catch (error) {
-      console.error('Filtreleme sırasında hata:', error);
-      setFiltrelenmisKayitlar([]);
-    }
-  }, [aramaMetni, secilenMarka, secilenModel, secilenKalibrasyonOrg, secilenDurumlar, makineData, getKalibrasyonDurumu]);
-
-  // Filtreler değiştiğinde otomatik uygula
-  useEffect(() => {
-    filtreleriUygula();
-  }, [filtreleriUygula]);
+  }, [filtrelenmisKayitlar, getKalibrasyonDurumu]);
 
   return (
-    <>
-      <MakineRaporlaView 
-        makineData={filtrelenmisKayitlar}
-        loading={loading}
-        error={error}
-        getKalibrasyonDurumu={getKalibrasyonDurumu}
-        exceleCikart={exceleCikart}
-        aramaMetni={aramaMetni}
-        setAramaMetni={setAramaMetni}
-        secilenMarka={secilenMarka}
-        setSecilenMarka={setSecilenMarka}
-        secilenModel={secilenModel}
-        setSecilenModel={setSecilenModel}
-        secilenKalibrasyonOrg={secilenKalibrasyonOrg}
-        setSecilenKalibrasyonOrg={setSecilenKalibrasyonOrg}
-        secilenDurumlar={secilenDurumlar}
-        setSecilenDurumlar={setSecilenDurumlar}
-        markalar={markalar}
-        modeller={modeller}
-        kalibrasyonOrglari={kalibrasyonOrglari}
-        filtreleriTemizle={filtreleriTemizle}
-        onMakineDataRefresh={fetchMachineData}
-      />
-    </>
+    <MakineRaporlaView
+      makineData={filtrelenmisKayitlar}
+      loading={loading}
+      error={error}
+      getKalibrasyonDurumu={getKalibrasyonDurumu}
+      exceleCikart={exceleCikart}
+      aramaMetni={aramaMetni}
+      setAramaMetni={setAramaMetni}
+      secilenMarkalar={secilenMarkalar}
+      setSecilenMarkalar={setSecilenMarkalar}
+      secilenModeller={secilenModeller}
+      setSecilenModeller={setSecilenModeller}
+      secilenKalibrasyonOrglari={secilenKalibrasyonOrglari}
+      setSecilenKalibrasyonOrglari={setSecilenKalibrasyonOrglari}
+      secilenBakimOrglari={secilenBakimOrglari}
+      setSecilenBakimOrglari={setSecilenBakimOrglari}
+      secilenDurumlar={secilenDurumlar}
+      setSecilenDurumlar={setSecilenDurumlar}
+      markalar={markalar}
+      modeller={modeller}
+      kalibrasyonOrglari={kalibrasyonOrglari}
+      bakimOrglari={bakimOrglari}
+      filtreleriTemizle={filtreleriTemizle}
+      onMakineDataRefresh={fetchMachineData}
+    />
   );
 };
 

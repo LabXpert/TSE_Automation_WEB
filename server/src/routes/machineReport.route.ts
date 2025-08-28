@@ -63,7 +63,13 @@ router.get('/data', async (req: Request, res: Response) => {
       calibration_org_name: machine.calibration_org_name || 'Belirtilmemiş',
       calibration_contact_name: machine.calibration_contact_name || null,
       calibration_email: machine.calibration_email || null,
-      calibration_phone: machine.calibration_phone || null
+      calibration_phone: machine.calibration_phone || null,
+      last_maintenance_date: machine.last_maintenance_date,
+      maintenance_interval: machine.maintenance_interval,
+      maintenance_org_name: machine.maintenance_org_name || 'Belirtilmemi�Y',
+      maintenance_contact_name: machine.maintenance_contact_name || null,
+      maintenance_email: machine.maintenance_email || null,
+      maintenance_phone: machine.maintenance_phone || null
     }));
 
     res.json(reportData); // Direkt array döndür
