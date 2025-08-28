@@ -1409,38 +1409,38 @@ const RaporlaView: React.FC<RaporlaViewProps> = ({
                               </svg>
                             </button>
                                                                                       {openInfo === `${kayit.id}-${deney.id}` && (
-        <div
-          className="company-info-popover"
-          style={{
-            position: 'absolute',
-            left: '100%',
-            top: 0,
-            marginLeft: '8px',
-            backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            padding: '12px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            zIndex: 99999,
-            width: '200px',
-            fontSize: '12px',
-            color: '#374151',
-            lineHeight: '1.6',
-            userSelect: 'text',
-            WebkitUserSelect: 'text',
-            MozUserSelect: 'text',
-            msUserSelect: 'text',
-            pointerEvents: 'auto',
-            isolation: 'isolate'
-          }}
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-        >
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Vergi No:</strong> {kayit.companyInfo?.taxNo || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Yetkili:</strong> {kayit.companyInfo?.contactName || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Adres:</strong> {kayit.companyInfo?.address || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>Telefon:</strong> {kayit.companyInfo?.phone || '-'}</div>
-         <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'text' }}><strong>E-posta:</strong> {kayit.companyInfo?.email || '-'}</div>
+                          <div
+                            className="company-info-popover"
+                            style={{
+                              position: 'absolute',
+                              left: '100%',
+                              top: 0,
+                              marginLeft: '8px',
+                              backgroundColor: '#ffffff',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '8px',
+                              padding: '12px',
+                              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                              zIndex: 99999,
+                              width: '200px',
+                              fontSize: '12px',
+                              color: '#374151',
+                              lineHeight: '1.6',
+                              userSelect: 'text',
+                              WebkitUserSelect: 'text',
+                              MozUserSelect: 'text',
+                              msUserSelect: 'text',
+                              pointerEvents: 'auto',
+                              isolation: 'isolate'
+                            }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Vergi No:</strong> {kayit.companyInfo?.taxNo || '-'}</div>
+                          <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Yetkili:</strong> {kayit.companyInfo?.contactName || '-'}</div>
+                          <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Adres:</strong> {kayit.companyInfo?.address || '-'}</div>
+                          <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>Telefon:</strong> {kayit.companyInfo?.phone || '-'}</div>
+                          <div style={{ userSelect: 'text', WebkitUserSelect: 'text', MozUserSelect: 'text', msUserSelect: 'text', pointerEvents: 'auto', WebkitTouchCallout: 'default' }}><strong>E-posta:</strong> {kayit.companyInfo?.email || '-'}</div>
                              </div>
                            )}  </div>
 
