@@ -554,6 +554,82 @@ function SidebarComponent() {
                       marginTop: '4px'
                     }}
                   >
+                    {/* Makine Kayıtları */}
+                    <MenuItem 
+                      active={location.pathname === '/makine-ekle'}
+                      component={<Link to="/makine-ekle" />}
+                      style={{
+                        margin: '3px 8px',
+                        fontSize: '13px',
+                        padding: '8px 12px'
+                      }}
+                    >
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '10px',
+                        paddingLeft: '8px'
+                      }}>
+                        <span style={{ 
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '16px',
+                          height: '16px'
+                        }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,18.5C15.5,18.5 19.31,16.69 21.58,12C19.31,7.31 15.5,5.5 12,5.5C8.5,5.5 4.69,7.31 2.42,12C4.69,16.69 8,18.5 12,18.5M12,7C14.76,7 17,9.24 17,12C17,14.76 14.76,17 12,17C9.24,17 7,14.76 7,12C7,9.24 9.24,7 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/>
+                          </svg>
+                        </span>
+                        <span style={{ 
+                          letterSpacing: '-0.01em',
+                          lineHeight: '1.4',
+                          fontSize: '13px'
+                        }}>
+                          Makine Kayıtları
+                        </span>
+                      </div>
+                    </MenuItem>
+
+                    {/* Deney Türü Kayıtları */}
+                    <MenuItem 
+                      active={location.pathname === '/deney-turu-ekle'}
+                      component={<Link to="/deney-turu-ekle" />}
+                      style={{
+                        margin: '3px 8px',
+                        fontSize: '13px',
+                        padding: '8px 12px'
+                      }}
+                    >
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '10px',
+                        paddingLeft: '8px'
+                      }}>
+                        <span style={{ 
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '16px',
+                          height: '16px'
+                        }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11ZM19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
+                          </svg>
+                        </span>
+                        <span style={{ 
+                          letterSpacing: '-0.01em',
+                          lineHeight: '1.4',
+                          fontSize: '13px'
+                        }}>
+                          Deney Türü Kayıtları
+                        </span>
+                      </div>
+                    </MenuItem>
+
                     {/* Personel Kayıtları */}
                     <MenuItem 
                       active={location.pathname === '/personel-ekle'}
@@ -592,7 +668,45 @@ function SidebarComponent() {
                       </div>
                     </MenuItem>
 
-                    {/* Bakım Kuruluşları */}
+                    {/* Kalibrasyon Kuruluşları */}
+                    <MenuItem 
+                      active={location.pathname === '/kalibrasyon-kurulus-ekle'}
+                      component={<Link to="/kalibrasyon-kurulus-ekle" />}
+                      style={{
+                        margin: '3px 8px',
+                        fontSize: '13px',
+                        padding: '8px 12px'
+                      }}
+                    >
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '10px',
+                        paddingLeft: '8px'
+                      }}>
+                        <span style={{ 
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '16px',
+                          height: '16px'
+                        }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,2L2,7L12,12L22,7L12,2M17,13V18A1,1 0 0,1 16,19H8A1,1 0 0,1 7,18V13H5V18A3,3 0 0,0 8,21H16A3,3 0 0,0 19,18V13H17Z"/>
+                          </svg>
+                        </span>
+                        <span style={{ 
+                          letterSpacing: '-0.01em',
+                          lineHeight: '1.4',
+                          fontSize: '13px'
+                        }}>
+                          Kalibrasyon Kuruluşları
+                        </span>
+                      </div>
+                    </MenuItem>
+
+                     {/* Bakım Kuruluşları */}
                     <MenuItem 
                       active={location.pathname === '/bakim-kurulus-ekle'}
                       component={<Link to="/bakim-kurulus-ekle" />}
@@ -668,119 +782,6 @@ function SidebarComponent() {
                       </div>
                     </MenuItem>
 
-                    {/* Deney Türü Kayıtları */}
-                    <MenuItem 
-                      active={location.pathname === '/deney-turu-ekle'}
-                      component={<Link to="/deney-turu-ekle" />}
-                      style={{
-                        margin: '3px 8px',
-                        fontSize: '13px',
-                        padding: '8px 12px'
-                      }}
-                    >
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '10px',
-                        paddingLeft: '8px'
-                      }}>
-                        <span style={{ 
-                          fontSize: '14px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '16px',
-                          height: '16px'
-                        }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11ZM19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19Z"/>
-                          </svg>
-                        </span>
-                        <span style={{ 
-                          letterSpacing: '-0.01em',
-                          lineHeight: '1.4',
-                          fontSize: '13px'
-                        }}>
-                          Deney Türü Kayıtları
-                        </span>
-                      </div>
-                    </MenuItem>
-
-                    {/* Makine Kayıtları */}
-                    <MenuItem 
-                      active={location.pathname === '/makine-ekle'}
-                      component={<Link to="/makine-ekle" />}
-                      style={{
-                        margin: '3px 8px',
-                        fontSize: '13px',
-                        padding: '8px 12px'
-                      }}
-                    >
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '10px',
-                        paddingLeft: '8px'
-                      }}>
-                        <span style={{ 
-                          fontSize: '14px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '16px',
-                          height: '16px'
-                        }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12,18.5C15.5,18.5 19.31,16.69 21.58,12C19.31,7.31 15.5,5.5 12,5.5C8.5,5.5 4.69,7.31 2.42,12C4.69,16.69 8,18.5 12,18.5M12,7C14.76,7 17,9.24 17,12C17,14.76 14.76,17 12,17C9.24,17 7,14.76 7,12C7,9.24 9.24,7 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/>
-                          </svg>
-                        </span>
-                        <span style={{ 
-                          letterSpacing: '-0.01em',
-                          lineHeight: '1.4',
-                          fontSize: '13px'
-                        }}>
-                          Makine Kayıtları
-                        </span>
-                      </div>
-                    </MenuItem>
-
-                    {/* Kalibrasyon Kuruluşları */}
-                    <MenuItem 
-                      active={location.pathname === '/kalibrasyon-kurulus-ekle'}
-                      component={<Link to="/kalibrasyon-kurulus-ekle" />}
-                      style={{
-                        margin: '3px 8px',
-                        fontSize: '13px',
-                        padding: '8px 12px'
-                      }}
-                    >
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '10px',
-                        paddingLeft: '8px'
-                      }}>
-                        <span style={{ 
-                          fontSize: '14px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '16px',
-                          height: '16px'
-                        }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12,2L2,7L12,12L22,7L12,2M17,13V18A1,1 0 0,1 16,19H8A1,1 0 0,1 7,18V13H5V18A3,3 0 0,0 8,21H16A3,3 0 0,0 19,18V13H17Z"/>
-                          </svg>
-                        </span>
-                        <span style={{ 
-                          letterSpacing: '-0.01em',
-                          lineHeight: '1.4',
-                          fontSize: '13px'
-                        }}>
-                          Kalibrasyon Kuruluşları
-                        </span>
-                      </div>
-                    </MenuItem>
                   </div>
                 )}
               </>
