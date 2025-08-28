@@ -1,4 +1,17 @@
 import pool from '../database/connection';
+
+// Augment TestData with optional sample_count via interface merging
+export interface TestData {
+  sample_count?: number;
+}
+
+// Compute unit price based on experiment type base price
+async function computeUnitPrice(experimentTypeId: number, uygunluk: boolean): Promise<number> {
+  const res = await pool.query('SELECT base_price FROM experiment_types WHERE id = $1', [experimentTypeId]);
+  const base = res.rows?.[0]?.base_price != null ? Number(res.rows[0].base_price) : 0;
+  // Future hook: adjust by uygunluk if needed
+  return isFinite(base) ? base : 0;
+}
 export interface ApplicationData {
   company_id: number;
   application_no: string;
@@ -193,15 +206,14 @@ export class ApplicationRepository {
           `INSERT INTO tests (application_id, experiment_type_id, responsible_personnel_id, unit_price, total_price, sample_count, is_accredited, uygunluk, created_at)
            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
            RETURNING *`,
-          [
-            newApp.id,
-            test.experiment_type_id,
-            test.responsible_personnel_id,
-            unitPrice,
-            test.sample_count || 1,
-            test.is_accredited,
-            test.uygunluk
-          ]        );
+          [
+            newApp.id,
+            test.experiment_type_id,
+            test.responsible_personnel_id,
+            test.uygunluk,
+            test.is_accredited,
+            test.sample_count ?? 1
+          ]       );
         createdTests.push(testResult.rows[0] as unknown);
       }
       
