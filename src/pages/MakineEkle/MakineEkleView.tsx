@@ -1,9 +1,10 @@
 import React from 'react';
-import type { Makine, MakineInput, KalibrasyonKurulusu } from '../../models/Makine';
+import type { Makine, MakineInput, KalibrasyonKurulusu, BakimKurulusu } from '../../models/Makine';
 
 interface MakineEkleViewProps {
   makineler: Makine[];
   kalibrasyonKuruluslari: KalibrasyonKurulusu[];
+  bakimKuruluslari: BakimKurulusu[];
   formData: MakineInput;
   loading: boolean;
   error: string;
@@ -25,6 +26,7 @@ interface MakineEkleViewProps {
 const MakineEkleView: React.FC<MakineEkleViewProps> = ({
   makineler,
   kalibrasyonKuruluslari,
+  bakimKuruluslari,
   formData,
   loading,
   error,
@@ -211,13 +213,14 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                     e.target.style.borderColor = '#dc2626';
                     e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
                   }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#e5e7eb';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                />
-              </div>
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
 
+             
               {/* Seri No */}
               <div>
                 <label style={{ 
@@ -424,7 +427,7 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                   ))}
                 </select>
               </div>
-{/* Kalibrasyon Aralığı */}
+              {/* Kalibrasyon Aralığı */}
               <div>
                 <label style={{ 
                   display: 'block',
@@ -475,7 +478,7 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
               </div>
               
               {/* Son Kalibrasyon Tarihi */}
-              <div style={{ marginBottom: '24px' }}>
+              <div>
                 <label style={{ 
                   display: 'block',
                   marginBottom: '8px', 
@@ -516,6 +519,127 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                     e.target.style.boxShadow = 'none';
                   }}
                 />
+              </div>
+              {/* Bakım Kuruluşu */}
+              <div>
+                <label style={{ 
+                  display: 'block',
+                  marginBottom: '8px', 
+                  fontWeight: '600', 
+                  color: '#374151',
+                  fontSize: '14px'
+                }}>
+                  Bakım Kuruluşu <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                <select
+                  value={formData.maintenance_org_id || 0}
+                  onChange={(e) => onInputChange('maintenance_org_id', parseInt(e.target.value))}
+                  required
+                  disabled={loading}
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px',
+                    border: `2px solid #e5e7eb`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
+                    color: '#374151',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  <option value={0} disabled>Bakım kuruluşu seçin</option>
+                  {bakimKuruluslari.map((org) => (
+                    <option key={org.id} value={org.id}>
+                      {org.org_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Bakım Aralığı (Yıl) */}
+              <div>
+                <label style={{ 
+                  display: 'block',
+                  marginBottom: '8px', 
+                  fontWeight: '600', 
+                  color: '#374151',
+                  fontSize: '14px'
+                }}>
+                  Bakım Aralığı (Yıl) <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={formData.maintenance_interval || 1}
+                  onChange={(e) => onInputChange('maintenance_interval', parseInt(e.target.value) || 1)}
+                  required
+                  disabled={loading}
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px',
+                    border: `2px solid #e5e7eb`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
+                    color: '#374151',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#dc2626';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+                {/* Son Bakım Tarihi */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ 
+                  display: 'block',
+                  marginBottom: '8px', 
+                  fontWeight: '600', 
+                  color: '#374151',
+                  fontSize: '14px'
+                }}>
+                  Son Bakım Tarihi <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                <input
+                  type="date"
+                  value={typeof formData.last_maintenance_date === 'string'
+                    ? formData.last_maintenance_date
+                    : formData.last_maintenance_date instanceof Date
+                      ? formData.last_maintenance_date.toISOString().split('T')[0]
+                      : ''}
+                  onChange={(e) => onInputChange('last_maintenance_date', e.target.value)}
+                  required
+                  disabled={loading}
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px',
+                    border: `2px solid #e5e7eb`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: loading ? '#f9fafb' : '#ffffff',
+                    color: '#374151',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#dc2626';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
               </div>
 
             </div>

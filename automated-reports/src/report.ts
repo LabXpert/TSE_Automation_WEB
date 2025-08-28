@@ -16,6 +16,12 @@ interface MachineData {
   calibration_contact_name?: string; // İletişim kişisi (opsiyonel)
   calibration_email?: string;        // Email (opsiyonel)
   calibration_phone?: string;        // Telefon (opsiyonel)
+  // Bakım alanları (rapora eklendi)
+  last_maintenance_date?: string;
+  maintenance_org_name?: string;
+  maintenance_contact_name?: string;
+  maintenance_email?: string;
+  maintenance_phone?: string;
 }
 
 // Deney verisi için tip tanımı
@@ -201,6 +207,27 @@ export class ReportGenerator {
 
     // Style header row
     const headerRow = worksheet.getRow(1);
+    // Override header titles to match UI Excel (and include maintenance details)
+    headerRow.values = [
+      null,
+      'Makine Adı',
+      'Seri No',
+      'Ölçüm Aralığı',
+      'Marka',
+      'Model',
+      'Son Kalibrasyon',
+      'Sonraki Kalibrasyon',
+      'Son Bakım',
+      'Kalibrasyon Durumu',
+      'Kalibrasyon Kuruluşu',
+      'İletişim Kişisi',
+      'Telefon',
+      'E-posta',
+      'Bakım Kuruluşu',
+      'Bakım İletişim',
+      'Bakım Telefon',
+      'Bakım E-posta'
+    ];
     headerRow.eachCell((cell) => {
       cell.font = { bold: true, color: { argb: 'FFFFFF' } };
       cell.fill = {
@@ -224,17 +251,22 @@ export class ReportGenerator {
       const rowData = [
         index + 1,
         machine.equipment_name,
-        machine.brand || '-',
-        machine.model || '-',
         machine.serial_no,
         machine.measurement_range || '-',
-        new Date(machine.last_calibration_date).toLocaleDateString('tr-TR'),
+        machine.brand || '-',
+        machine.model || '-',
+        machine.last_calibration_date ? new Date(machine.last_calibration_date).toLocaleDateString('tr-TR') : '-',
         new Date(calibrationStatus.nextDate).toLocaleDateString('tr-TR'),
+        machine.last_maintenance_date ? new Date(machine.last_maintenance_date).toLocaleDateString('tr-TR') : '-',
         calibrationStatus.statusText,
         machine.calibration_org_name || '-',
         machine.calibration_contact_name || '-',
         machine.calibration_phone || '-',
-        machine.calibration_email || '-'
+        machine.calibration_email || '-',
+        machine.maintenance_org_name || '-',
+        machine.maintenance_contact_name || '-',
+        machine.maintenance_phone || '-',
+        machine.maintenance_email || '-'
       ];
       
       const row = worksheet.addRow(rowData);
@@ -248,13 +280,13 @@ export class ReportGenerator {
           right: { style: 'thin' }
         };
         
-        // Alignment
-        if (colNumber === 1 || colNumber === 7 || colNumber === 8 || colNumber === 9) {
+        // Alignment (No + tarihler ve durum)
+        if (colNumber === 1 || colNumber === 7 || colNumber === 8 || colNumber === 9 || colNumber === 10) {
           cell.alignment = { horizontal: 'center', vertical: 'middle' };
         }
         
         // Status color coding
-        if (colNumber === 9) { // Calibration status column
+        if (colNumber === 10) { // Calibration status column (güncel index)
           let bgColor = 'DCFCE7'; // Green (normal)
           if (calibrationStatus.status === 'expiring') {
             bgColor = 'FEF3C7'; // Yellow
@@ -271,8 +303,8 @@ export class ReportGenerator {
       });
     });
 
-    // Set column widths
-    const columnWidths = [8, 30, 15, 15, 15, 20, 15, 15, 20, 25, 20, 15, 25];
+    // Set column widths (güncel başlıklarla uyumlu)
+    const columnWidths = [8, 28, 18, 18, 14, 14, 16, 16, 16, 18, 24, 20, 16, 22, 24, 20, 16, 22];
     columnWidths.forEach((width, index) => {
       worksheet.getColumn(index + 1).width = width;
     });

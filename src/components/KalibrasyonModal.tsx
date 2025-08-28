@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import type { MachineCalibration } from '../models/MachineCalibration';
 import type { KalibrasyonKurulusu } from '../models/Makine';
 import * as machineCalibrationService from '../services/machineCalibration.service';
@@ -7,11 +7,11 @@ interface MakineData {
   id: number;
   serial_no: string;
   equipment_name: string;
-  brand: string;
-  model: string;
-  measurement_range: string;
-  last_calibration_date: string;
-  calibration_org_name: string;
+  brand?: string;
+  model?: string;
+  measurement_range?: string;
+  last_calibration_date?: string;
+  calibration_org_name?: string;
   calibration_contact_name?: string;
   calibration_email?: string;
   calibration_phone?: string;
@@ -20,15 +20,15 @@ interface MakineData {
 interface KalibrasyonModalProps {
   isOpen: boolean;
   onClose: () => void;
-  makine: MakineData | null;
-  onKalibrasyonTamamlandi: () => void;
+  machineId: number;
+  onCompleted: () => void;
 }
 
 const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
   isOpen,
   onClose,
-  makine,
-  onKalibrasyonTamamlandi
+  machineId,
+  onCompleted
 }) => {
   const [formData, setFormData] = useState<{
     calibration_org_id: number;
@@ -42,21 +42,33 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
     calibration_date: new Date().toISOString().split('T')[0]
   });
   
+  const [makine, setMakine] = useState<MakineData | null>(null);
   const [kalibrasyonKuruluslari, setKalibrasyonKuruluslari] = useState<KalibrasyonKurulusu[]>([]);
   const [kalibrasyonGecmisi, setKalibrasyonGecmisi] = useState<MachineCalibration[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gecmisLoading, setGecmisLoading] = useState(false);
 
-  // Kalibrasyon kuruluşlarını yükle
+  // Makine bilgilerini yükle
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && machineId) {
+      loadMachineData(machineId);
       loadKalibrasyonKuruluslari();
-      if (makine) {
-        loadKalibrasyonGecmisi(makine.id);
-      }
+      loadKalibrasyonGecmisi(machineId);
     }
-  }, [isOpen, makine]);
+  }, [isOpen, machineId]);
+
+  const loadMachineData = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/machines/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMakine(data?.data ?? data);
+      }
+    } catch (error) {
+      console.error('Makine verileri yüklenemedi:', error);
+    }
+  };
 
   const loadKalibrasyonKuruluslari = async () => {
     try {
@@ -109,7 +121,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
       setLoading(true);
       setError(null);
 
-      await machineCalibrationService.calibrateMachine(makine.id, {
+      await machineCalibrationService.calibrateMachine(machineId, {
         calibration_org_id: formData.calibration_org_id,
         calibrated_by: formData.calibrated_by || '',
         notes: formData.notes || undefined,
@@ -117,7 +129,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
       });
 
       // Başarılı kalibrasyon sonrası
-      onKalibrasyonTamamlandi();
+      onCompleted();
       onClose();
       
       // Formu sıfırla
@@ -276,7 +288,7 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
                 <div>
                   <span style={{ color: '#64748b', fontWeight: '500' }}>Son Kalibrasyon:</span>
                   <div style={{ color: '#0f172a', fontWeight: '600' }}>
-                    {new Date(makine.last_calibration_date).toLocaleDateString('tr-TR')}
+                    {makine.last_calibration_date ? new Date(makine.last_calibration_date).toLocaleDateString('tr-TR') : '-'}
                   </div>
                 </div>
               </div>
@@ -708,3 +720,5 @@ const KalibrasyonModal: React.FC<KalibrasyonModalProps> = ({
 };
 
 export default KalibrasyonModal;
+
+

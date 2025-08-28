@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import type { MachineMaintenance } from '../models/MachineMaintenance.tsx';
 import type { BakimKurulusu } from '../models/Makine';
 import * as machineMaintenanceService from '../services/machineMaintenance.service';
@@ -7,11 +7,11 @@ interface MakineData {
   id: number;
   serial_no: string;
   equipment_name: string;
-  brand: string;
-  model: string;
-  measurement_range: string;
-  last_maintenance_date: string;
-  maintenance_org_name: string;
+  brand?: string;
+  model?: string;
+  measurement_range?: string;
+  last_maintenance_date?: string;
+  maintenance_org_name?: string;
   maintenance_contact_name?: string;
   maintenance_email?: string;
   maintenance_phone?: string;
@@ -20,15 +20,15 @@ interface MakineData {
 interface BakimModalProps {
   isOpen: boolean;
   onClose: () => void;
-  makine: MakineData | null;
-  onBakimTamamlandi: () => void;
+  machineId: number;
+  onCompleted: () => void;
 }
 
 const BakimModal: React.FC<BakimModalProps> = ({
   isOpen,
   onClose,
-  makine,
-  onBakimTamamlandi
+  machineId,
+  onCompleted
 }) => {
   const [formData, setFormData] = useState<{
     maintenance_org_id: number;
@@ -42,21 +42,33 @@ const BakimModal: React.FC<BakimModalProps> = ({
     maintenance_date: new Date().toISOString().split('T')[0]
   });
   
+  const [makine, setMakine] = useState<MakineData | null>(null);
   const [bakimKuruluslari, setBakimKuruluslari] = useState<BakimKurulusu[]>([]);
   const [bakimGecmisi, setBakimGecmisi] = useState<MachineMaintenance[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gecmisLoading, setGecmisLoading] = useState(false);
 
-  // Bakim kuruluşlarını yükle
+  // Makine bilgilerini ve bakım kuruluşlarını yükle
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && machineId) {
+      loadMachineData(machineId);
       loadBakimKuruluslari();
-      if (makine) {
-        loadBakimGecmisi(makine.id);
-      }
+      loadBakimGecmisi(machineId);
     }
-  }, [isOpen, makine]);
+  }, [isOpen, machineId]);
+
+  const loadMachineData = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/machines/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMakine(data?.data ?? data);
+      }
+    } catch (error) {
+      console.error('Makine verileri yüklenemedi:', error);
+    }
+  };
 
   const loadBakimKuruluslari = async () => {
     try {
@@ -109,7 +121,7 @@ const BakimModal: React.FC<BakimModalProps> = ({
       setLoading(true);
       setError(null);
 
-      await machineMaintenanceService.maintainMachine(makine.id, {
+      await machineMaintenanceService.maintainMachine(machineId, {
         maintenance_org_id: formData.maintenance_org_id,
         maintained_by: formData.maintained_by || '',
         notes: formData.notes || undefined,
@@ -117,7 +129,7 @@ const BakimModal: React.FC<BakimModalProps> = ({
       });
 
       // Başarılı bakim sonrası
-      onBakimTamamlandi();
+      onCompleted();
       onClose();
       
       // Formu sıfırla
@@ -276,7 +288,7 @@ const BakimModal: React.FC<BakimModalProps> = ({
                 <div>
                   <span style={{ color: '#64748b', fontWeight: '500' }}>Son Bakım:</span>
                   <div style={{ color: '#0f172a', fontWeight: '600' }}>
-                    {new Date(makine.last_maintenance_date).toLocaleDateString('tr-TR')}
+                    {makine.last_maintenance_date ? new Date(makine.last_maintenance_date).toLocaleDateString('tr-TR') : '-'}
                   </div>
                 </div>
               </div>
@@ -708,3 +720,4 @@ const BakimModal: React.FC<BakimModalProps> = ({
 };
 
 export default BakimModal;
+
