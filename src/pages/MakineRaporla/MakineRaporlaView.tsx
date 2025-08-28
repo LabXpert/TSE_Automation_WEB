@@ -241,7 +241,7 @@ const MakineRaporlaView: React.FC<Props> = ({
                 padding: '20px',
                 boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                 zIndex: 1000,
-                minWidth: '220px'
+                minWidth: '260px'
               }}>
                 <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Marka Seçin</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
@@ -257,11 +257,44 @@ const MakineRaporlaView: React.FC<Props> = ({
                       cursor: 'pointer',
                       fontSize: '13px'
                     }}
+                      onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        secilenMarkalar.length === markalar.length && markalar.length > 0 ? '#dc2626' : '#f8fafc';
+                      e.currentTarget.style.color =
+                        secilenMarkalar.length === markalar.length && markalar.length > 0 ? '#ffffff' : '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
                   >
                     Tümü
                   </button>
                   {markalar.map((m) => (
-                    <label key={m} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                    <label
+                      key={m}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        backgroundColor: secilenMarkalar.includes(m) ? '#fef3c7' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!secilenMarkalar.includes(m)) {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!secilenMarkalar.includes(m)) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={secilenMarkalar.includes(m)}
@@ -271,21 +304,49 @@ const MakineRaporlaView: React.FC<Props> = ({
                             : [...secilenMarkalar, m];
                           setSecilenMarkalar(next);
                         }}
+                        style={{ width: '16px', height: '16px', accentColor: '#dc2626' }}
                       />
-                      {m}
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenMarkalar.includes(m) ? 600 : 400
+                        }}
+                      >
+                        {m}
+                      </span>
                     </label>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginTop: '12px'
+                  }}
+                >
                   <button
                     onClick={() => setSecilenMarkalar([])}
                     style={{
-                      padding: '6px 12px',
+                      padding: '8px 16px',
+                      background: '#f8fafc',                      
                       border: '1px solid #e2e8f0',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                       fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
                     }}
                   >
                     Temizle
@@ -293,12 +354,21 @@ const MakineRaporlaView: React.FC<Props> = ({
                   <button
                     onClick={() => setMarkaPanelAcik(false)}
                     style={{
-                      padding: '6px 12px',
-                      border: '1px solid #e2e8f0',
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
                     }}
                   >
                     Kapat
@@ -352,7 +422,7 @@ const MakineRaporlaView: React.FC<Props> = ({
                 padding: '20px',
                 boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                 zIndex: 1000,
-                minWidth: '220px'
+                minWidth: '260px'
               }}>
                 <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Model Seçin</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
@@ -368,11 +438,44 @@ const MakineRaporlaView: React.FC<Props> = ({
                       cursor: 'pointer',
                       fontSize: '13px'
                     }}
+                                        onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        secilenModeller.length === modeller.length && modeller.length > 0 ? '#dc2626' : '#f8fafc';
+                      e.currentTarget.style.color =
+                        secilenModeller.length === modeller.length && modeller.length > 0 ? '#ffffff' : '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
                   >
                     Tümü
                   </button>
                   {modeller.map((m) => (
-                    <label key={m} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                    <label
+                      key={m}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        backgroundColor: secilenModeller.includes(m) ? '#fef3c7' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!secilenModeller.includes(m)) {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!secilenModeller.includes(m)) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={secilenModeller.includes(m)}
@@ -382,21 +485,49 @@ const MakineRaporlaView: React.FC<Props> = ({
                             : [...secilenModeller, m];
                           setSecilenModeller(next);
                         }}
+                        style={{ width: '16px', height: '16px', accentColor: '#dc2626' }}
                       />
-                      {m}
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenModeller.includes(m) ? 600 : 400
+                        }}
+                      >
+                        {m}
+                      </span>
                     </label>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginTop: '12px'
+                  }}
+                >
                   <button
                     onClick={() => setSecilenModeller([])}
                     style={{
-                      padding: '6px 12px',
+                      padding: '8px 16px',
+                      background: '#f8fafc',
                       border: '1px solid #e2e8f0',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
                     }}
                   >
                     Temizle
@@ -404,12 +535,21 @@ const MakineRaporlaView: React.FC<Props> = ({
                   <button
                     onClick={() => setModelPanelAcik(false)}
                     style={{
-                      padding: '6px 12px',
-                      border: '1px solid #e2e8f0',
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
                     }}
                   >
                     Kapat
@@ -463,7 +603,7 @@ const MakineRaporlaView: React.FC<Props> = ({
                 padding: '20px',
                 boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                 zIndex: 1000,
-                minWidth: '240px'
+                minWidth: '260px'
               }}>
                 <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Kuruluş Seçin</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
@@ -474,16 +614,59 @@ const MakineRaporlaView: React.FC<Props> = ({
                       padding: '8px 12px',
                       border: '1px solid #e2e8f0',
                       borderRadius: '6px',
-                      background: secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0 ? '#dc2626' : '#f8fafc',
-                      color: secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0 ? '#ffffff' : '#374151',
+                      background:
+                        secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0
+                          ? '#dc2626'
+                          : '#f8fafc',
+                      color:
+                        secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0
+                          ? '#ffffff'
+                          : '#374151',
                       cursor: 'pointer',
                       fontSize: '13px'
+                    }}
+                      onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0
+                          ? '#dc2626'
+                          : '#f8fafc';
+                      e.currentTarget.style.color =
+                        secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0
+                          ? '#ffffff'
+                          : '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
                     }}
                   >
                     Tümü
                   </button>
                   {kalibrasyonOrglari.map((o) => (
-                    <label key={o} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                    <label
+                      key={o}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',  
+                        cursor: 'pointer',
+                        backgroundColor: secilenKalibrasyonOrglari.includes(o) ? '#fef3c7' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!secilenKalibrasyonOrglari.includes(o)) {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!secilenKalibrasyonOrglari.includes(o)) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={secilenKalibrasyonOrglari.includes(o)}
@@ -493,21 +676,49 @@ const MakineRaporlaView: React.FC<Props> = ({
                             : [...secilenKalibrasyonOrglari, o];
                           setSecilenKalibrasyonOrglari(next);
                         }}
+                        style={{ width: '16px', height: '16px', accentColor: '#dc2626' }}
                       />
-                      {o}
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenKalibrasyonOrglari.includes(o) ? 600 : 400
+                        }}
+                      >
+                        {o}
+                      </span>
                     </label>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginTop: '12px'
+                  }}
+                >
                   <button
                     onClick={() => setSecilenKalibrasyonOrglari([])}
                     style={{
-                      padding: '6px 12px',
+                      padding: '8px 16px',
+                      background: '#f8fafc',
                       border: '1px solid #e2e8f0',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
                     }}
                   >
                     Temizle
@@ -515,12 +726,21 @@ const MakineRaporlaView: React.FC<Props> = ({
                   <button
                     onClick={() => setKalibrasyonPanelAcik(false)}
                     style={{
-                      padding: '6px 12px',
-                      border: '1px solid #e2e8f0',
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
                     }}
                   >
                     Kapat
@@ -574,7 +794,7 @@ const MakineRaporlaView: React.FC<Props> = ({
                 padding: '20px',
                 boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                 zIndex: 1000,
-                minWidth: '240px'
+                minWidth: '260px'
               }}>
                 <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Kuruluş Seçin</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
@@ -585,16 +805,59 @@ const MakineRaporlaView: React.FC<Props> = ({
                       padding: '8px 12px',
                       border: '1px solid #e2e8f0',
                       borderRadius: '6px',
-                      background: secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0 ? '#dc2626' : '#f8fafc',
-                      color: secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0 ? '#ffffff' : '#374151',
+                      background:
+                        secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0
+                          ? '#dc2626'
+                          : '#f8fafc',
+                      color:
+                        secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0
+                          ? '#ffffff'
+                          : '#374151',
                       cursor: 'pointer',
                       fontSize: '13px'
+                    }}
+                      onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0
+                          ? '#dc2626'
+                          : '#f8fafc';
+                      e.currentTarget.style.color =
+                        secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0
+                          ? '#ffffff'
+                          : '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
                     }}
                   >
                     Tümü
                   </button>
                   {bakimOrglari.map((o) => (
-                    <label key={o} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                    <label
+                      key={o}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        backgroundColor: secilenBakimOrglari.includes(o) ? '#fef3c7' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!secilenBakimOrglari.includes(o)) {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!secilenBakimOrglari.includes(o)) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={secilenBakimOrglari.includes(o)}
@@ -604,21 +867,49 @@ const MakineRaporlaView: React.FC<Props> = ({
                             : [...secilenBakimOrglari, o];
                           setSecilenBakimOrglari(next);
                         }}
+                        style={{ width: '16px', height: '16px', accentColor: '#dc2626' }}
                       />
-                      {o}
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenBakimOrglari.includes(o) ? 600 : 400
+                        }}
+                      >
+                        {o}
+                      </span>
                     </label>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginTop: '12px'
+                  }}
+                >
                   <button
                     onClick={() => setSecilenBakimOrglari([])}
                     style={{
-                      padding: '6px 12px',
+                      padding: '8px 16px',
+                      background: '#f8fafc', 
                       border: '1px solid #e2e8f0',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
                     }}
                   >
                     Temizle
@@ -626,12 +917,21 @@ const MakineRaporlaView: React.FC<Props> = ({
                   <button
                     onClick={() => setBakimPanelAcik(false)}
                     style={{
-                      padding: '6px 12px',
-                      border: '1px solid #e2e8f0',
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
                     }}
                   >
                     Kapat
@@ -685,7 +985,7 @@ const MakineRaporlaView: React.FC<Props> = ({
                 padding: '20px',
                 boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                 zIndex: 1000,
-                minWidth: '240px'
+                minWidth: '260px'
               }}>
                 <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Kalibrasyon Durumu</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
@@ -701,11 +1001,43 @@ const MakineRaporlaView: React.FC<Props> = ({
                       cursor: 'pointer',
                       fontSize: '13px'
                     }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background =
+                        secilenDurumlar.length === 3 ? '#dc2626' : '#f8fafc';
+                      e.currentTarget.style.color = secilenDurumlar.length === 3 ? '#ffffff' : '#374151';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                    }}
                   >
                     Tümü
                   </button>
                   {[{ key: 'gecti', label: 'Geçenler' }, { key: 'yaklaşıyor', label: 'Yaklaşıyor' }, { key: 'normal', label: 'Normal' }].map(({ key, label }) => (
-                    <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                    <label
+                      key={key}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        backgroundColor: secilenDurumlar.includes(key) ? '#fef3c7' : 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!secilenDurumlar.includes(key)) {
+                          e.currentTarget.style.backgroundColor = '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!secilenDurumlar.includes(key)) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={secilenDurumlar.includes(key)}
@@ -715,21 +1047,49 @@ const MakineRaporlaView: React.FC<Props> = ({
                             : [...secilenDurumlar, key];
                           setSecilenDurumlar(next);
                         }}
+                        style={{ width: '16px', height: '16px', accentColor: '#dc2626' }}
                       />
-                      {label}
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: secilenDurumlar.includes(key) ? 600 : 400
+                        }}
+                      >
+                        {label}
+                      </span>
                     </label>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginTop: '12px'
+                  }}
+                >
                   <button
                     onClick={() => setSecilenDurumlar([])}
                     style={{
-                      padding: '6px 12px',
+                      padding: '8px 16px',
+                      background: '#f8fafc',                      
                       border: '1px solid #e2e8f0',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#f1f5f9';
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#f8fafc';
+                      e.currentTarget.style.borderColor = '#e2e8f0';
                     }}
                   >
                     Temizle
@@ -737,12 +1097,21 @@ const MakineRaporlaView: React.FC<Props> = ({
                   <button
                     onClick={() => setDurumPanelAcik(false)}
                     style={{
-                      padding: '6px 12px',
-                      border: '1px solid #e2e8f0',
+                      padding: '8px 16px',
+                      background: '#dc2626',
+                      border: 'none',
                       borderRadius: '6px',
-                      background: '#f8fafc',
-                      fontSize: '12px',
-                      cursor: 'pointer'
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
                     }}
                   >
                     Kapat
@@ -756,22 +1125,23 @@ const MakineRaporlaView: React.FC<Props> = ({
           {/* Filtreleri Temizle */}
           <button
             onClick={filtreleriTemizle}
+            title="Filtreleri Temizle"
             style={{
+              marginLeft: 'auto',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '12px 16px',
+              padding: '8px',
               background: '#f9fafb',
               border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              fontWeight: 600,
               color: '#374151',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap'
+              cursor: 'pointer'
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM6 7h12l-5 6v6h-2v-6L6 7z"/></svg>
-            Filtreleri Temizle
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 6h18v2H3V6zm2 3h14v12H5V9zm3-6h8v2h5v2H3V5h5V3z" />
+            </svg>
+            <span style={{ marginLeft: '6px', fontSize: '13px', fontWeight: '500' }}>Filtreleri Temizle</span>
           </button>
         </div>
       </div>
@@ -797,9 +1167,9 @@ const MakineRaporlaView: React.FC<Props> = ({
                   <th style={cellHeaderStyle}>Seri No & Ölçüm Aralığı</th>
                   <th style={cellHeaderStyle}>Marka & Model</th>
                   <th style={cellHeaderStyle}>Kalibrasyon Kuruluşu</th>
-                  <th style={cellCenterHeaderStyle}>Bakım Kuruluşu</th>
                   <th style={cellCenterHeaderStyle}>Son Kalibrasyon</th>
                   <th style={cellCenterHeaderStyle}>Sonraki Kalibrasyon</th>
+                  <th style={cellCenterHeaderStyle}>Bakım Kuruluşu</th>
                   <th style={cellCenterHeaderStyle}>Son Bakım</th>
                   <th style={cellCenterHeaderStyle}>Durum</th>
                   <th style={cellCenterHeaderStyle}>İşlemler</th>
@@ -836,6 +1206,14 @@ const MakineRaporlaView: React.FC<Props> = ({
                           </div>
                         )}
                       </td>
+                      {/* Son Kalibrasyon */}
+                      <td style={{ padding: '16px 12px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
+                        {makine.last_calibration_date ? new Date(makine.last_calibration_date).toLocaleDateString('tr-TR') : '-'}
+                      </td>
+                      {/* Sonraki Kalibrasyon */}
+                      <td style={{ padding: '16px 12px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
+                        {durumInfo ? new Date(durumInfo.sonrakiTarih).toLocaleDateString('tr-TR') : '-'}
+                      </td>
                       {/* Bakım Kuruluşu */}
                       <td style={{ padding: '16px 12px', borderRight: '1px solid #f1f5f9' }}>
                         <div style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', marginBottom: 2 }}>
@@ -863,14 +1241,6 @@ const MakineRaporlaView: React.FC<Props> = ({
                             )}
                           </div>
                         )}
-                      </td>
-                      {/* Son Kalibrasyon */}
-                      <td style={{ padding: '16px 12px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
-                        {makine.last_calibration_date ? new Date(makine.last_calibration_date).toLocaleDateString('tr-TR') : '-'}
-                      </td>
-                      {/* Sonraki Kalibrasyon */}
-                      <td style={{ padding: '16px 12px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
-                        {durumInfo ? new Date(durumInfo.sonrakiTarih).toLocaleDateString('tr-TR') : '-'}
                       </td>
                       {/* Son Bakım */}
                       <td style={{ padding: '16px 12px', borderRight: '1px solid #f1f5f9', textAlign: 'center' }}>
