@@ -117,11 +117,18 @@ function DeneyEkle() {
     }
     setDeneyler(yeniDeneyler);
   }, [deneySayisi]); // eslint-disable-line react-hooks/exhaustive-deps
-  const deneyGuncelle = (index: number, field: keyof Deney, value: string | boolean) => {
-    const guncelDeneyler = [...deneyler];
-    guncelDeneyler[index] = { ...guncelDeneyler[index], [field]: value };
-    setDeneyler(guncelDeneyler);
-  };
+  const deneyGuncelle = (index: number, field: keyof Deney, value: string | boolean) => {
+    const guncelDeneyler = [...deneyler];
+    guncelDeneyler[index] = { ...guncelDeneyler[index], [field]: value };
+
+    // Birim fiyatı hesapla: base_price + (uygunluk seçiliyse 750)
+    const tur = deneyTurleri.find(t => t.name === guncelDeneyler[index].deneyTuru);
+    const base = Number(tur?.base_price ?? 0);
+    const uygunlukEk = guncelDeneyler[index].uygunluk ? 750 : 0;
+    guncelDeneyler[index].unit_price = base + uygunlukEk;
+
+    setDeneyler(guncelDeneyler);
+  };
   const formTemizle = () => {
     setFirmaAdi('');
     setBasvuruNo('');

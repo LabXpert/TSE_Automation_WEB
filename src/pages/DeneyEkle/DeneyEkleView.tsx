@@ -77,8 +77,15 @@ function DeneyEkleView({
   const renderDeneyGrupları = () => {
     const gruplar = [];
     for (let i = 0; i < deneySayisi; i++) {
+      const tur = deneyTurleri.find(t => t.name === deneyler[i]?.deneyTuru);
+      const base = Number(tur?.base_price ?? 0);
+      const unitPrice = base + (deneyler[i]?.uygunluk ? 750 : 0);
+      const unitPriceTxt = new Intl.NumberFormat('tr-TR', {
+        style: 'currency',
+        currency: 'TRY'
+      }).format(unitPrice);
       gruplar.push(
-        <div key={i} className="card" style={{ 
+        <div key={i} className="card" style={{
           marginBottom: '16px',
           background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
           border: '1px solid #e2e8f0',
@@ -339,9 +346,18 @@ function DeneyEkleView({
                   color: '#64748b',
                   fontWeight: '400'
                 }}>
-                  (+750₺ ek ücret)
+                (+750₺ ek ücret)
                 </div>
               </label>
+                <div style={{
+                marginTop: '8px',
+                textAlign: 'right',
+                fontWeight: '600',
+                color: '#0f172a'
+              }}
+              >
+                {unitPriceTxt}
+              </div>
             </div>
           </div>
         </div>
