@@ -34,14 +34,14 @@ interface Props {
   exceleCikart?: () => Promise<void>;
   aramaMetni: string;
   setAramaMetni: (metin: string) => void;
-  secilenMarka: string;
-  setSecilenMarka: (marka: string) => void;
-  secilenModel: string;
-  setSecilenModel: (model: string) => void;
-  secilenKalibrasyonOrg: string;
-  setSecilenKalibrasyonOrg: (org: string) => void;
-  secilenBakimOrg: string;
-  setSecilenBakimOrg: (org: string) => void;
+  secilenMarkalar: string[];
+  setSecilenMarkalar: (markalar: string[]) => void;
+  secilenModeller: string[];
+  setSecilenModeller: (modeller: string[]) => void;
+  secilenKalibrasyonOrglari: string[];
+  setSecilenKalibrasyonOrglari: (orglar: string[]) => void;
+  secilenBakimOrglari: string[];
+  setSecilenBakimOrglari: (orglar: string[]) => void;
   secilenDurumlar: string[];
   setSecilenDurumlar: (durumlar: string[]) => void;
   markalar: string[];
@@ -72,14 +72,14 @@ const MakineRaporlaView: React.FC<Props> = ({
   exceleCikart,
   aramaMetni,
   setAramaMetni,
-  secilenMarka,
-  setSecilenMarka,
-  secilenModel,
-  setSecilenModel,
-  secilenKalibrasyonOrg,
-  setSecilenKalibrasyonOrg,
-  secilenBakimOrg,
-  setSecilenBakimOrg,
+  secilenMarkalar,
+  setSecilenMarkalar,
+  secilenModeller,
+  setSecilenModeller,
+  secilenKalibrasyonOrglari,
+  setSecilenKalibrasyonOrglari,
+  secilenBakimOrglari,
+  setSecilenBakimOrglari,
   secilenDurumlar,
   setSecilenDurumlar,
   markalar,
@@ -92,6 +92,11 @@ const MakineRaporlaView: React.FC<Props> = ({
   const [kalibrasyonModalAcik, setKalibrasyonModalAcik] = useState(false);
   const [bakimModalAcik, setBakimModalAcik] = useState(false);
   const [secilenMakine, setSecilenMakine] = useState<MakineData | null>(null);
+  const [markaPanelAcik, setMarkaPanelAcik] = useState(false);
+  const [modelPanelAcik, setModelPanelAcik] = useState(false);
+  const [kalibrasyonPanelAcik, setKalibrasyonPanelAcik] = useState(false);
+  const [bakimPanelAcik, setBakimPanelAcik] = useState(false);
+  const [durumPanelAcik, setDurumPanelAcik] = useState(false);
 
   const handleKalibreEtClick = (makine: MakineData) => {
     setSecilenMakine(makine);
@@ -124,137 +129,655 @@ const MakineRaporlaView: React.FC<Props> = ({
         <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>Makine bilgileri, kalibrasyon ve bakım durumları</p>
       </div>
 
-      {/* Filtreler - eski stile yakın */}
-      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 16px 64px 16px', marginBottom: '16px', position: 'relative' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr 1fr 1fr 1fr', gap: '12px', alignItems: 'end' }}>
-          {/* Genel arama */}
-          <div style={{ position: 'relative' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 2a8 8 0 105.29 14.29l4.2 4.2 1.41-1.42-4.2-4.2A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/></svg>
-              Genel Arama
-            </label>
+      {/* Arama ve filtreler */}
+      <div style={{
+        background: '#ffffff',
+        padding: '24px',
+        borderRadius: '12px',
+        border: '1px solid #e2e8f0',
+        marginBottom: '24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          {/* Arama Kutusu */}
+          <div style={{ flex: '1', minWidth: '300px', maxWidth: '500px', position: 'relative' }}>
             <input
               type="text"
+              placeholder="Makine adı, seri no, marka veya model ara..."
               value={aramaMetni}
               onChange={(e) => setAramaMetni(e.target.value)}
-              placeholder="Makine adı, seri no, marka, model ara..."
-              style={{ width: '100%', padding: '12px 14px 12px 36px', border: '2px solid #e5e7eb', borderRadius: 8, fontSize: 14, outline: 'none' }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#dc2626'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = '#e5e7eb'; }}
+              style={{
+                width: '100%',
+                padding: '12px 16px 12px 48px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '14px',
+                backgroundColor: '#ffffff',
+                color: '#374151',
+                outline: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#dc2626';
+                e.target.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e5e7eb';
+                e.target.style.boxShadow = 'none';
+              }}
             />
-            <div style={{ position: 'absolute', left: 10, top: 30, color: '#9ca3af' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-              </svg>
-            </div>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="#6b7280"
+              style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+            >
+              <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3S3 5.91 3 9.5S5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14Z" />
+            </svg>
+            {aramaMetni && (
+              <button
+                onClick={() => setAramaMetni('')}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px'
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#6b7280">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            )}
           </div>
-          {/* Marka */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+
+          {/* Marka Filtresi */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setMarkaPanelAcik(!markaPanelAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenMarkalar.length > 0 ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${secilenMarkalar.length > 0 ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenMarkalar.length > 0 ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v2H3V3zm2 4h14v2H5V7zm-2 4h18v2H3v-2zm2 4h14v2H5v-2z"/></svg>
-              Marka
-            </label>
-            <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} style={{ width: '100%', padding: 10, border: '2px solid #e5e7eb', borderRadius: 8, fontSize: 14 }}>
-              <option value="">Tümü</option>
-              {markalar.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
-          </div>
-          {/* Model */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v12H4z"/><path d="M2 8h2v8H2zM20 8h2v8h-2z"/></svg>
-              Model
-            </label>
-            <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} style={{ width: '100%', padding: 10, border: '2px solid #e5e7eb', borderRadius: 8, fontSize: 14 }}>
-              <option value="">Tümü</option>
-              {modeller.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
-          </div>
-          {/* Kalibrasyon Kuruluşu */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 12l9-9 9 9v9H3v-9zm9-5l-7 7v5h14v-5l-7-7z"/></svg>
-              Kalibrasyon Kuruluşu
-            </label>
-            <select value={secilenKalibrasyonOrg} onChange={(e) => setSecilenKalibrasyonOrg(e.target.value)} style={{ width: '100%', padding: 10, border: '2px solid #e5e7eb', borderRadius: 8, fontSize: 14 }}>
-              <option value="">Tümü</option>
-              {kalibrasyonOrglari.map((o) => (
-                <option key={o} value={o}>{o}</option>
-              ))}
-            </select>
-          </div>
-          {/* Bakım Kuruluşu */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l4 4-8 8-4-4 8-8zm-6 10l-2 6 6-2-4-4z"/></svg>
-              Bakım Kuruluşu
-            </label>
-            <select value={secilenBakimOrg} onChange={(e) => setSecilenBakimOrg(e.target.value)} style={{ width: '100%', padding: 10, border: '2px solid #e5e7eb', borderRadius: 8, fontSize: 14 }}>
-              <option value="">Tümü</option>
-              {bakimOrglari.map((o) => (
-                <option key={o} value={o}>{o}</option>
-              ))}
-            </select>
-          </div>
-          {/* Reset butonunu alt satır sağa aldık */}
-        </div>
-        {/* Kalibrasyon Durumu rozetleri + sağda reset */}
-        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'start' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 8 }}>Kalibrasyon Durumu</label>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {[
-              { key: 'gecti', label: 'Geçenler', fg: '#dc2626', bg: '#fee2e2' },
-              { key: 'yaklaşıyor', label: 'Yaklaşıyor', fg: '#a16207', bg: '#fef3c7' },
-              { key: 'normal', label: 'Normal', fg: '#166534', bg: '#dcfce7' },
-            ].map((opt) => {
-              const key = opt.key as unknown as string;
-              const active = secilenDurumlar.includes(key);
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => {
-                    const next = active ? secilenDurumlar.filter((x) => x !== key) : [...secilenDurumlar, key];
-                    setSecilenDurumlar(next);
-                  }}
-                  style={{ padding: '6px 12px', borderRadius: 9999, border: `2px solid ${active ? opt.fg : 'transparent'}`, background: opt.bg, color: opt.fg, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-            </div>
-          </div>
-          <div style={{ position: 'absolute', right: 16, bottom: 16 }}>
-            <button onClick={filtreleriTemizle} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#f9fafb', fontWeight: 600, color: '#374151' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM6 7h12l-5 6v6h-2v-6L6 7z"/></svg>
-              Filtreleri Temizle
+              {secilenMarkalar.length > 0 ? `Marka (${secilenMarkalar.length})` : 'Marka Filtresi'}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ transform: markaPanelAcik ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+              >
+                <path d="M7 10L12 15L17 10H7Z" />
+              </svg>
             </button>
+            {markaPanelAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                zIndex: 1000,
+                minWidth: '220px'
+              }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Marka Seçin</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+                  <button
+                    onClick={() => setSecilenMarkalar(markalar)}
+                    style={{
+                      textAlign: 'left',
+                      padding: '8px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: secilenMarkalar.length === markalar.length && markalar.length > 0 ? '#dc2626' : '#f8fafc',
+                      color: secilenMarkalar.length === markalar.length && markalar.length > 0 ? '#ffffff' : '#374151',
+                      cursor: 'pointer',
+                      fontSize: '13px'
+                    }}
+                  >
+                    Tümü
+                  </button>
+                  {markalar.map((m) => (
+                    <label key={m} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                      <input
+                        type="checkbox"
+                        checked={secilenMarkalar.includes(m)}
+                        onChange={() => {
+                          const next = secilenMarkalar.includes(m)
+                            ? secilenMarkalar.filter((x) => x !== m)
+                            : [...secilenMarkalar, m];
+                          setSecilenMarkalar(next);
+                        }}
+                      />
+                      {m}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <button
+                    onClick={() => setSecilenMarkalar([])}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  <button
+                    onClick={() => setMarkaPanelAcik(false)}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-        {/* Bakım Kuruluşu + Reset (sağ altta) */}
-        <div style={{ display: 'none' }}>
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l4 4-8 8-4-4 8-8zm-6 10l-2 6 6-2-4-4z"/></svg>
-              Bakım Kuruluşu
-            </label>
-            <select value={secilenBakimOrg} onChange={(e) => setSecilenBakimOrg(e.target.value)} style={{ width: '100%', padding: 10, border: '2px solid #e5e7eb', borderRadius: 8, fontSize: 14 }}>
-              <option value="">Tümü</option>
-              {bakimOrglari.map((o) => (
-                <option key={o} value={o}>{o}</option>
-              ))}
-            </select>
+
+          {/* Model Filtresi */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setModelPanelAcik(!modelPanelAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenModeller.length > 0 ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${secilenModeller.length > 0 ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenModeller.length > 0 ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v12H4z"/><path d="M2 8h2v8H2zM20 8h2v8h-2z"/></svg>
+              {secilenModeller.length > 0 ? `Model (${secilenModeller.length})` : 'Model Filtresi'}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ transform: modelPanelAcik ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+              >
+                <path d="M7 10L12 15L17 10H7Z" />
+              </svg>
+            </button>
+            {modelPanelAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                zIndex: 1000,
+                minWidth: '220px'
+              }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Model Seçin</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+                  <button
+                    onClick={() => setSecilenModeller(modeller)}
+                    style={{
+                      textAlign: 'left',
+                      padding: '8px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: secilenModeller.length === modeller.length && modeller.length > 0 ? '#dc2626' : '#f8fafc',
+                      color: secilenModeller.length === modeller.length && modeller.length > 0 ? '#ffffff' : '#374151',
+                      cursor: 'pointer',
+                      fontSize: '13px'
+                    }}
+                  >
+                    Tümü
+                  </button>
+                  {modeller.map((m) => (
+                    <label key={m} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                      <input
+                        type="checkbox"
+                        checked={secilenModeller.includes(m)}
+                        onChange={() => {
+                          const next = secilenModeller.includes(m)
+                            ? secilenModeller.filter((x) => x !== m)
+                            : [...secilenModeller, m];
+                          setSecilenModeller(next);
+                        }}
+                      />
+                      {m}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <button
+                    onClick={() => setSecilenModeller([])}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  <button
+                    onClick={() => setModelPanelAcik(false)}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Kalibrasyon Kuruluşu Filtresi */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setKalibrasyonPanelAcik(!kalibrasyonPanelAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenKalibrasyonOrglari.length > 0 ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${secilenKalibrasyonOrglari.length > 0 ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenKalibrasyonOrglari.length > 0 ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 12l9-9 9 9v9H3v-9zm9-5l-7 7v5h14v-5l-7-7z"/></svg>
+{secilenKalibrasyonOrglari.length > 0 ? `Kalibrasyon (${secilenKalibrasyonOrglari.length})` : 'Kalibrasyon Kuruluşu'}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ transform: kalibrasyonPanelAcik ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+              >
+                <path d="M7 10L12 15L17 10H7Z" />
+              </svg>
+            </button>
+            {kalibrasyonPanelAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                zIndex: 1000,
+                minWidth: '240px'
+              }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Kuruluş Seçin</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+                  <button
+                    onClick={() => setSecilenKalibrasyonOrglari(kalibrasyonOrglari)}
+                    style={{
+                      textAlign: 'left',
+                      padding: '8px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0 ? '#dc2626' : '#f8fafc',
+                      color: secilenKalibrasyonOrglari.length === kalibrasyonOrglari.length && kalibrasyonOrglari.length > 0 ? '#ffffff' : '#374151',
+                      cursor: 'pointer',
+                      fontSize: '13px'
+                    }}
+                  >
+                    Tümü
+                  </button>
+                  {kalibrasyonOrglari.map((o) => (
+                    <label key={o} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                      <input
+                        type="checkbox"
+                        checked={secilenKalibrasyonOrglari.includes(o)}
+                        onChange={() => {
+                          const next = secilenKalibrasyonOrglari.includes(o)
+                            ? secilenKalibrasyonOrglari.filter((x) => x !== o)
+                            : [...secilenKalibrasyonOrglari, o];
+                          setSecilenKalibrasyonOrglari(next);
+                        }}
+                      />
+                      {o}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <button
+                    onClick={() => setSecilenKalibrasyonOrglari([])}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  <button
+                    onClick={() => setKalibrasyonPanelAcik(false)}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bakım Kuruluşu Filtresi */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setBakimPanelAcik(!bakimPanelAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenBakimOrglari.length > 0 ? '#fef3c7' : '#ffffff',
+                border: `2px solid ${secilenBakimOrglari.length > 0 ? '#f59e0b' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenBakimOrglari.length > 0 ? '#92400e' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v2H4zm0 7h16v2H4zm0 7h16v2H4z"/></svg>
+             {secilenBakimOrglari.length > 0 ? `Bakım (${secilenBakimOrglari.length})` : 'Bakım Kuruluşu'}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ transform: bakimPanelAcik ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+              >
+                <path d="M7 10L12 15L17 10H7Z" />
+              </svg>
+            </button>
+            {bakimPanelAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                zIndex: 1000,
+                minWidth: '240px'
+              }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Kuruluş Seçin</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+                  <button
+                    onClick={() => setSecilenBakimOrglari(bakimOrglari)}
+                    style={{
+                      textAlign: 'left',
+                      padding: '8px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0 ? '#dc2626' : '#f8fafc',
+                      color: secilenBakimOrglari.length === bakimOrglari.length && bakimOrglari.length > 0 ? '#ffffff' : '#374151',
+                      cursor: 'pointer',
+                      fontSize: '13px'
+                    }}
+                  >
+                    Tümü
+                  </button>
+                  {bakimOrglari.map((o) => (
+                    <label key={o} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                      <input
+                        type="checkbox"
+                        checked={secilenBakimOrglari.includes(o)}
+                        onChange={() => {
+                          const next = secilenBakimOrglari.includes(o)
+                            ? secilenBakimOrglari.filter((x) => x !== o)
+                            : [...secilenBakimOrglari, o];
+                          setSecilenBakimOrglari(next);
+                        }}
+                      />
+                      {o}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <button
+                    onClick={() => setSecilenBakimOrglari([])}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  <button
+                    onClick={() => setBakimPanelAcik(false)}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Durum Filtresi */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setDurumPanelAcik(!durumPanelAcik)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                background: secilenDurumlar.length > 0 ? '#dcfce7' : '#ffffff',
+                border: `2px solid ${secilenDurumlar.length > 0 ? '#16a34a' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: secilenDurumlar.length > 0 ? '#166534' : '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v2H4zm0 7h16v2H4zm0 7h16v2H4z"/></svg>
+              {secilenDurumlar.length > 0 ? `Durum (${secilenDurumlar.length})` : 'Durum Filtresi'}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ transform: durumPanelAcik ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+              >
+                <path d="M7 10L12 15L17 10H7Z" />
+              </svg>
+            </button>
+            {durumPanelAcik && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                zIndex: 1000,
+                minWidth: '240px'
+              }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', marginBottom: '12px' }}>Kalibrasyon Durumu</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+                  <button
+                    onClick={() => setSecilenDurumlar(['gecti', 'yaklaşıyor', 'normal'])}
+                    style={{
+                      textAlign: 'left',
+                      padding: '8px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: secilenDurumlar.length === 3 ? '#dc2626' : '#f8fafc',
+                      color: secilenDurumlar.length === 3 ? '#ffffff' : '#374151',
+                      cursor: 'pointer',
+                      fontSize: '13px'
+                    }}
+                  >
+                    Tümü
+                  </button>
+                  {[{ key: 'gecti', label: 'Geçenler' }, { key: 'yaklaşıyor', label: 'Yaklaşıyor' }, { key: 'normal', label: 'Normal' }].map(({ key, label }) => (
+                    <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                      <input
+                        type="checkbox"
+                        checked={secilenDurumlar.includes(key)}
+                        onChange={() => {
+                          const next = secilenDurumlar.includes(key)
+                            ? secilenDurumlar.filter((d) => d !== key)
+                            : [...secilenDurumlar, key];
+                          setSecilenDurumlar(next);
+                        }}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <button
+                    onClick={() => setSecilenDurumlar([])}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Temizle
+                  </button>
+                  <button
+                    onClick={() => setDurumPanelAcik(false)}
+                    style={{
+                      padding: '6px 12px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      background: '#f8fafc',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           
+
+          {/* Filtreleri Temizle */}
+          <button
+            onClick={filtreleriTemizle}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 16px',
+              background: '#f9fafb',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontWeight: 600,
+              color: '#374151',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM6 7h12l-5 6v6h-2v-6L6 7z"/></svg>
+            Filtreleri Temizle
+          </button>
         </div>
       </div>
+
+
+
 
       {error && (
         <div style={{ backgroundColor: '#fee2e2', border: '1px solid #fecaca', color: '#dc2626', padding: '12px 16px', borderRadius: '8px', marginBottom: '24px', fontSize: '14px' }}>{error}</div>

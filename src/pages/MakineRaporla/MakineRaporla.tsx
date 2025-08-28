@@ -30,10 +30,10 @@ const MakineRaporla: React.FC = () => {
 
   // Filters
   const [aramaMetni, setAramaMetni] = useState('');
-  const [secilenMarka, setSecilenMarka] = useState('');
-  const [secilenModel, setSecilenModel] = useState('');
-  const [secilenKalibrasyonOrg, setSecilenKalibrasyonOrg] = useState('');
-  const [secilenBakimOrg, setSecilenBakimOrg] = useState('');
+  const [secilenMarkalar, setSecilenMarkalar] = useState<string[]>([]);
+  const [secilenModeller, setSecilenModeller] = useState<string[]>([]);
+  const [secilenKalibrasyonOrglari, setSecilenKalibrasyonOrglari] = useState<string[]>([]);
+  const [secilenBakimOrglari, setSecilenBakimOrglari] = useState<string[]>([]);
   const [secilenDurumlar, setSecilenDurumlar] = useState<string[]>([]);
 
   const fetchMachineData = useCallback(async () => {
@@ -79,17 +79,41 @@ const MakineRaporla: React.FC = () => {
   }, []);
 
   // Derived options
-  const markalar = useMemo(() => Array.from(new Set(makineData.map(m => m.brand).filter(Boolean))), [makineData]);
-  const modeller = useMemo(() => Array.from(new Set(makineData.map(m => m.model).filter(Boolean))), [makineData]);
-  const kalibrasyonOrglari = useMemo(() => Array.from(new Set(makineData.map(m => m.calibration_org_name).filter(Boolean))), [makineData]);
-  const bakimOrglari = useMemo(() => Array.from(new Set(makineData.map(m => m.maintenance_org_name).filter((name): name is string => Boolean(name)))), [makineData]);
+  const markalar = useMemo(() => {
+    const set = new Set(makineData.map(m => m.brand).filter(Boolean));
+    const arr = Array.from(set);
+    if (makineData.some(m => !m.brand)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
+  const modeller = useMemo(() => {
+    const set = new Set(makineData.map(m => m.model).filter(Boolean));
+    const arr = Array.from(set);
+    if (makineData.some(m => !m.model)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
+  const kalibrasyonOrglari = useMemo(() => {
+    const set = new Set(makineData.map(m => m.calibration_org_name).filter(Boolean));
+    const arr = Array.from(set);
+    if (makineData.some(m => !m.calibration_org_name)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
+  const bakimOrglari = useMemo(() => {
+    const set = new Set(
+      makineData
+        .map((m) => m.maintenance_org_name)
+        .filter((name): name is string => Boolean(name))
+    );
+    const arr = Array.from(set);
+    if (makineData.some((m) => !m.maintenance_org_name)) arr.unshift('Belirlenmemiş');
+    return arr;
+  }, [makineData]);
 
   const filtreleriTemizle = useCallback(() => {
     setAramaMetni('');
-    setSecilenMarka('');
-    setSecilenModel('');
-    setSecilenKalibrasyonOrg('');
-    setSecilenBakimOrg('');
+    setSecilenMarkalar([]);
+    setSecilenModeller([]);
+    setSecilenKalibrasyonOrglari([]);
+    setSecilenBakimOrglari([]);
     setSecilenDurumlar([]);
   }, []);
 
@@ -98,17 +122,29 @@ const MakineRaporla: React.FC = () => {
     return makineData.filter(m => {
       const haystack = `${m.equipment_name} ${m.serial_no} ${m.brand} ${m.model}`.toLowerCase();
       if (aramaMetni && !haystack.includes(aramaMetni.toLowerCase())) return false;
-      if (secilenMarka && m.brand !== secilenMarka) return false;
-      if (secilenModel && m.model !== secilenModel) return false;
-      if (secilenKalibrasyonOrg && m.calibration_org_name !== secilenKalibrasyonOrg) return false;
-      if (secilenBakimOrg && m.maintenance_org_name !== secilenBakimOrg) return false;
+      if (secilenMarkalar.length > 0) {
+        const brandVal = m.brand || 'Belirlenmemiş';
+        if (!secilenMarkalar.includes(brandVal)) return false;
+      }
+      if (secilenModeller.length > 0) {
+        const modelVal = m.model || 'Belirlenmemiş';
+        if (!secilenModeller.includes(modelVal)) return false;
+      }
+      if (secilenKalibrasyonOrglari.length > 0) {
+        const orgVal = m.calibration_org_name || 'Belirlenmemiş';
+        if (!secilenKalibrasyonOrglari.includes(orgVal)) return false;
+      }
+      if (secilenBakimOrglari.length > 0) {
+        const orgVal = m.maintenance_org_name || 'Belirlenmemiş';
+        if (!secilenBakimOrglari.includes(orgVal)) return false;
+      }
       if (secilenDurumlar.length > 0) {
         const d = getKalibrasyonDurumu(m.last_calibration_date, m.calibration_interval).durum;
         if (!secilenDurumlar.includes(d)) return false;
       }
       return true;
     });
-  }, [makineData, aramaMetni, secilenMarka, secilenModel, secilenKalibrasyonOrg, secilenDurumlar, getKalibrasyonDurumu]);
+  }, [makineData, aramaMetni, secilenMarkalar, secilenModeller, secilenKalibrasyonOrglari, secilenBakimOrglari, secilenDurumlar, getKalibrasyonDurumu]);
 
   // Excel export (güncel başlık ve kolonlar ile)
   const exceleCikart = useCallback(async () => {
@@ -193,14 +229,14 @@ const MakineRaporla: React.FC = () => {
       exceleCikart={exceleCikart}
       aramaMetni={aramaMetni}
       setAramaMetni={setAramaMetni}
-      secilenMarka={secilenMarka}
-      setSecilenMarka={setSecilenMarka}
-      secilenModel={secilenModel}
-      setSecilenModel={setSecilenModel}
-      secilenKalibrasyonOrg={secilenKalibrasyonOrg}
-      setSecilenKalibrasyonOrg={setSecilenKalibrasyonOrg}
-      secilenBakimOrg={secilenBakimOrg}
-      setSecilenBakimOrg={setSecilenBakimOrg}
+      secilenMarkalar={secilenMarkalar}
+      setSecilenMarkalar={setSecilenMarkalar}
+      secilenModeller={secilenModeller}
+      setSecilenModeller={setSecilenModeller}
+      secilenKalibrasyonOrglari={secilenKalibrasyonOrglari}
+      setSecilenKalibrasyonOrglari={setSecilenKalibrasyonOrglari}
+      secilenBakimOrglari={secilenBakimOrglari}
+      setSecilenBakimOrglari={setSecilenBakimOrglari}
       secilenDurumlar={secilenDurumlar}
       setSecilenDurumlar={setSecilenDurumlar}
       markalar={markalar}
