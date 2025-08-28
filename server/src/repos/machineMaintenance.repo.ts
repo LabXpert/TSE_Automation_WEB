@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { query, getClient, isSQLite } from '../db';
 
 // Makine bakım geçmişi tipi
 export interface MachineMaintenance {
@@ -33,10 +33,9 @@ export interface MachineMaintenanceInput {
 }
 
 export class MachineMaintenanceRepository {
-  constructor(private db: Pool) {}
 
   async findAll(): Promise<MachineMaintenance[]> {
-    const query = `
+    const sql = `
       SELECT
         mm.id,
         mm.machine_id,
@@ -59,12 +58,12 @@ export class MachineMaintenanceRepository {
       LEFT JOIN maintenance_orgs mo ON mm.maintenance_org_id = mo.id
       ORDER BY mm.maintenance_date DESC, mm.created_at DESC
     `;
-    const result = await this.db.query(query);
+    const result = await query(sql);
     return result.rows;
   }
 
   async findById(id: number): Promise<MachineMaintenance | null> {
-    const query = `
+    const sql = `
       SELECT
         mm.id,
         mm.machine_id,
@@ -87,12 +86,12 @@ export class MachineMaintenanceRepository {
       LEFT JOIN maintenance_orgs mo ON mm.maintenance_org_id = mo.id
       WHERE mm.id = $1
     `;
-    const result = await this.db.query(query, [id]);
+    const result = await query(sql, [id]);
     return result.rows[0] || null;
   }
 
   async findByMachineId(machineId: number): Promise<MachineMaintenance[]> {
-    const query = `
+    const sql = `
       SELECT
         mm.id,
         mm.machine_id,
@@ -116,12 +115,12 @@ export class MachineMaintenanceRepository {
       WHERE mm.machine_id = $1
       ORDER BY mm.maintenance_date DESC, mm.created_at DESC
     `;
-    const result = await this.db.query(query, [machineId]);
+    const result = await query(sql, [machineId]);
     return result.rows;
   }
 
   async findByMaintenanceOrgId(orgId: number): Promise<MachineMaintenance[]> {
-    const query = `
+    const sql = `
       SELECT
         mm.id,
         mm.machine_id,
@@ -145,15 +144,15 @@ export class MachineMaintenanceRepository {
       WHERE mm.maintenance_org_id = $1
       ORDER BY mm.maintenance_date DESC, mm.created_at DESC
     `;
-    const result = await this.db.query(query, [orgId]);
+    const result = await query(sql, [orgId]);
     return result.rows;
   }
 
   async create(data: MachineMaintenanceInput): Promise<MachineMaintenance> {
+    const client = await getClient();
     try {
-      await this.db.query('BEGIN');
-
-      const insertQuery = `
+      await client.begin();
+      const baseSql = `
         INSERT INTO machine_maintenances (
           machine_id,
           maintenance_org_id,
@@ -163,7 +162,6 @@ export class MachineMaintenanceRepository {
           next_maintenance_date
         )
         VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING *
       `;
       const values = [
         data.machine_id,
@@ -171,28 +169,36 @@ export class MachineMaintenanceRepository {
         data.maintained_by || null,
         data.notes || null,
         data.maintenance_date,
-        data.next_maintenance_date || null
+        data.next_maintenance_date || null,
       ];
-      const insertResult = await this.db.query(insertQuery, values);
-
-      const updateMachineQuery = `
+      let newId: number;
+      if (isSQLite) {
+        const insertResult = await client.query(baseSql, values);
+        newId = insertResult.lastID!;
+      } else {
+        const insertResult = await client.query(baseSql + ' RETURNING id', values);
+        newId = insertResult.rows[0].id;
+      }
+      const updateMachineSql = `
         UPDATE machines
         SET last_maintenance_date = $1, maintenance_org_id = $2
         WHERE id = $3
       `;
-      await this.db.query(updateMachineQuery, [
+      await client.query(updateMachineSql, [
         data.maintenance_date,
         data.maintenance_org_id,
-        data.machine_id
+        data.machine_id,
       ]);
 
-      await this.db.query('COMMIT');
+      await client.commit();
 
-      return await this.findById(insertResult.rows[0].id) as MachineMaintenance;
+      return await this.findById(newId) as MachineMaintenance;
     } catch (error) {
-      await this.db.query('ROLLBACK');
+      await client.rollback();
       console.error('Error creating machine maintenance:', error);
       throw error;
+    } finally {
+      client.release();
     }
   }
 
@@ -231,27 +237,35 @@ export class MachineMaintenanceRepository {
     }
 
     values.push(id);
-    const query = `
+    const baseSql = `
       UPDATE machine_maintenances
       SET ${fields.join(', ')}
       WHERE id = $${param}
-      RETURNING *
     `;
-    const result = await this.db.query(query, values);
-    if (result.rows.length === 0) {
-      return null;
+    if (isSQLite) {
+      await query(baseSql, values);
+      return await this.findById(id);
+    } else {
+      const result = await query(baseSql + ' RETURNING id', values);
+      if (result.rows.length === 0) {
+        return null;
+      }
+      return await this.findById(id);
     }
-    return await this.findById(id);
   }
 
   async delete(id: number): Promise<boolean> {
-    const query = 'DELETE FROM machine_maintenances WHERE id = $1';
-    const result = await this.db.query(query, [id]);
-    return (result.rowCount ?? 0) > 0;
+    if (isSQLite) {
+      const result = await query('DELETE FROM machine_maintenances WHERE id = $1', [id]);
+      return (result.changes || 0) > 0;
+    } else {
+      const result = await query('DELETE FROM machine_maintenances WHERE id = $1 RETURNING id', [id]);
+      return result.rows.length > 0;
+    }
   }
 
   async findByDateRange(startDate: string, endDate: string): Promise<MachineMaintenance[]> {
-    const query = `
+    const sql = `
       SELECT
         mm.id,
         mm.machine_id,
@@ -275,7 +289,7 @@ export class MachineMaintenanceRepository {
       WHERE mm.maintenance_date BETWEEN $1 AND $2
       ORDER BY mm.maintenance_date DESC, mm.created_at DESC
     `;
-    const result = await this.db.query(query, [startDate, endDate]);
+    const result = await query(sql, [startDate, endDate]);
     return result.rows;
   }
 
@@ -286,39 +300,73 @@ export class MachineMaintenanceRepository {
     topMaintenanceOrgs: Array<{org_name: string; count: number}>;
     monthlyMaintenances: Array<{month: string; count: number}>;
   }> {
-    const totalResult = await this.db.query('SELECT COUNT(*) as total FROM machine_maintenances');
+    const totalResult = await query('SELECT COUNT(*) as total FROM machine_maintenances');
 
-    const thisMonthResult = await this.db.query(`
-      SELECT COUNT(*) as count
-      FROM machine_maintenances
-      WHERE EXTRACT(YEAR FROM maintenance_date) = EXTRACT(YEAR FROM CURRENT_DATE)
-        AND EXTRACT(MONTH FROM maintenance_date) = EXTRACT(MONTH FROM CURRENT_DATE)
-    `);
 
-    const thisYearResult = await this.db.query(`
-      SELECT COUNT(*) as count
-      FROM machine_maintenances
-      WHERE EXTRACT(YEAR FROM maintenance_date) = EXTRACT(YEAR FROM CURRENT_DATE)
-    `);
-
-    const topOrgsResult = await this.db.query(`
-      SELECT mo.org_name, COUNT(*) as count
-      FROM machine_maintenances mm
-      LEFT JOIN maintenance_orgs mo ON mm.maintenance_org_id = mo.id
-      GROUP BY mo.org_name
-      ORDER BY count DESC
-      LIMIT 5
-    `);
-
-    const monthlyResult = await this.db.query(`
-      SELECT
-        TO_CHAR(maintenance_date, 'YYYY-MM') as month,
-        COUNT(*) as count
-      FROM machine_maintenances
-      WHERE maintenance_date >= CURRENT_DATE - INTERVAL '12 months'
-      GROUP BY TO_CHAR(maintenance_date, 'YYYY-MM')
-      ORDER BY month DESC
-    `);
+    let thisMonthQuery: string;
+    let thisYearQuery: string;
+    let monthlyQuery: string;
+    let topOrgsResult;
+    if (isSQLite) {
+      thisMonthQuery = `
+        SELECT COUNT(*) as count
+        FROM machine_maintenances
+        WHERE strftime('%Y', maintenance_date) = strftime('%Y', 'now')
+          AND strftime('%m', maintenance_date) = strftime('%m', 'now')
+      `;
+      thisYearQuery = `
+        SELECT COUNT(*) as count
+        FROM machine_maintenances
+        WHERE strftime('%Y', maintenance_date) = strftime('%Y', 'now')
+      `;
+      topOrgsResult = await query(`
+        SELECT mo.org_name, COUNT(*) as count
+        FROM machine_maintenances mm
+        LEFT JOIN maintenance_orgs mo ON mm.maintenance_org_id = mo.id
+        GROUP BY mo.org_name
+        ORDER BY count DESC
+        LIMIT 5
+      `);
+      monthlyQuery = `
+        SELECT strftime('%Y-%m', maintenance_date) as month, COUNT(*) as count
+        FROM machine_maintenances
+        WHERE maintenance_date >= DATE('now', '-12 months')
+        GROUP BY strftime('%Y-%m', maintenance_date)
+        ORDER BY month DESC
+      `;
+    } else {
+      thisMonthQuery = `
+        SELECT COUNT(*) as count
+        FROM machine_maintenances
+        WHERE EXTRACT(YEAR FROM maintenance_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+          AND EXTRACT(MONTH FROM maintenance_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+      `;
+      thisYearQuery = `
+        SELECT COUNT(*) as count
+        FROM machine_maintenances
+        WHERE EXTRACT(YEAR FROM maintenance_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+      `;
+      topOrgsResult = await query(`
+        SELECT mo.org_name, COUNT(*) as count
+        FROM machine_maintenances mm
+        LEFT JOIN maintenance_orgs mo ON mm.maintenance_org_id = mo.id
+        GROUP BY mo.org_name
+        ORDER BY count DESC
+        LIMIT 5
+      `);
+      monthlyQuery = `
+        SELECT
+          TO_CHAR(maintenance_date, 'YYYY-MM') as month,
+          COUNT(*) as count
+        FROM machine_maintenances
+        WHERE maintenance_date >= CURRENT_DATE - INTERVAL '12 months'
+        GROUP BY TO_CHAR(maintenance_date, 'YYYY-MM')
+        ORDER BY month DESC
+      `;
+    }
+    const thisMonthResult = await query(thisMonthQuery);
+    const thisYearResult = await query(thisYearQuery);
+    const monthlyResult = await query(monthlyQuery);
 
     return {
       totalMaintenances: parseInt(totalResult.rows[0].total),
@@ -330,7 +378,7 @@ export class MachineMaintenanceRepository {
   }
 
   async getLastMaintenanceByMachine(machineId: number): Promise<MachineMaintenance | null> {
-    const query = `
+    const sql = `
       SELECT
         mm.id,
         mm.machine_id,
@@ -355,7 +403,7 @@ export class MachineMaintenanceRepository {
       ORDER BY mm.maintenance_date DESC, mm.created_at DESC
       LIMIT 1
     `;
-    const result = await this.db.query(query, [machineId]);
+    const result = await query(sql, [machineId]);
     return result.rows[0] || null;
   }
 }

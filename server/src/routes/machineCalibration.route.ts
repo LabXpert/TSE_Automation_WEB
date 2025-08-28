@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { MachineCalibrationService } from '../services/machineCalibration.service';
 import { MachineCalibrationRepository } from '../repos/machineCalibration.repo';
-import db from '../database/connection';
 
 const router = Router();
-const machineCalibrationRepo = new MachineCalibrationRepository(db);
+const machineCalibrationRepo = new MachineCalibrationRepository();
 const machineCalibrationService = new MachineCalibrationService(machineCalibrationRepo);
 
 // GET /api/machine-calibrations - Tüm kalibrasyon kayıtlarını getir

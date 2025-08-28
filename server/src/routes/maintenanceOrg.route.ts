@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { MaintenanceOrgService } from '../services/maintenanceOrg.service';
 import { MaintenanceOrgRepository } from '../repos/maintenanceOrg.repo';
-import db from '../database/connection';
 
 const router = Router();
-const maintenanceOrgRepo = new MaintenanceOrgRepository(db);
+const maintenanceOrgRepo = new MaintenanceOrgRepository();
 const maintenanceOrgService = new MaintenanceOrgService(maintenanceOrgRepo);
 
 // GET /api/maintenance-orgs - list all

@@ -1,10 +1,9 @@
 import express from 'express';
 import { AlertService } from '../services/alert.service';
 import { MachineRepository } from '../repos/machine.repo';
-import db from '../database/connection';
 
 const router = express.Router();
-const machineRepo = new MachineRepository(db);
+const machineRepo = new MachineRepository();
 const alertService = new AlertService(machineRepo);
 
 // Tüm kalibrasyon uyarılarını getir

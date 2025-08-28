@@ -1,6 +1,5 @@
-import { Pool } from 'pg';
+import { query, isSQLite } from '../db';
 
-// Şemaya uygun makine tipi
 export interface Machine {
   id: number;
   serial_no: string;
@@ -14,7 +13,6 @@ export interface Machine {
   created_at: string;
 }
 
-// Makine oluşturma/güncelleme için input tipi
 export interface MachineInput {
   serial_no: string;
   equipment_name: string;
@@ -26,12 +24,11 @@ export interface MachineInput {
 }
 
 export class MachineRepository {
-  constructor(private db: Pool) {}
 
   // Tüm makineleri getir (kalibrasyon kuruluş adı ile birlikte)
   async findAll(): Promise<Machine[]> {
-    const query = `
-      SELECT 
+    const sql = `
+      SELECT
         m.id,
         m.serial_no,
         m.equipment_name,
@@ -47,14 +44,14 @@ export class MachineRepository {
       ORDER BY m.created_at DESC
     `;
     
-    const result = await this.db.query(query);
+    const result = await query(sql);
     return result.rows;
   }
 
   // ID ile makine getir
   async findById(id: number): Promise<Machine | null> {
-    const query = `
-      SELECT 
+    const sql = `
+      SELECT
         m.id,
         m.serial_no,
         m.equipment_name,
@@ -70,24 +67,23 @@ export class MachineRepository {
       WHERE m.id = $1
     `;
     
-    const result = await this.db.query(query, [id]);
+    const result = await query(sql, [id]);
     return result.rows[0] || null;
   }
 
   // Yeni makine oluştur
   async create(machineData: MachineInput): Promise<Machine> {
-    const query = `
+    const baseSql = `
       INSERT INTO machines (
-        serial_no, 
-        equipment_name, 
-        brand, 
-        model, 
-        measurement_range, 
-        last_calibration_date, 
+        serial_no,
+        equipment_name,
+        brand,
+        model,
+        measurement_range,
+        last_calibration_date,
         calibration_org_id
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *
     `;
     
     const values = [
@@ -97,19 +93,21 @@ export class MachineRepository {
       machineData.model || null,
       machineData.measurement_range || null,
       machineData.last_calibration_date,
-      machineData.calibration_org_id
+      machineData.calibration_org_id,
     ];
-    
-    const result = await this.db.query(query, values);
-    
-    // Kalibrasyon kuruluş adını da getir
-    return await this.findById(result.rows[0].id) as Machine;
+    if (isSQLite) {
+      const result = await query(baseSql, values);
+      return (await this.findById(result.lastID!)) as Machine;
+    } else {
+      const result = await query(baseSql + ' RETURNING id', values);
+      return (await this.findById(result.rows[0].id)) as Machine;
+    }
   }
 
   // Makine güncelle
   async update(id: number, machineData: Partial<MachineInput>): Promise<Machine | null> {
-    const fields = [];
-    const values = [];
+    const fields: string[] = [];
+    const values: any[] = [];
     let paramIndex = 1;
 
     if (machineData.serial_no !== undefined) {
@@ -146,32 +144,39 @@ export class MachineRepository {
     }
 
     values.push(id);
-    const query = `
-      UPDATE machines 
+    const baseSql = `
+      UPDATE machines
       SET ${fields.join(', ')}
       WHERE id = $${paramIndex}
-      RETURNING *
     `;
+    if (isSQLite) {
+      await query(baseSql, values);
+      return await this.findById(id);
+    } else {
+      const result = await query(baseSql + ' RETURNING id', values);
+      if (result.rows.length === 0) {
+        return null;
+      }
+      return await this.findById(id);
+  }
 
-    const result = await this.db.query(query, values);
-    if (result.rows.length === 0) {
-      return null;
-    }
-
-    return await this.findById(id);
   }
 
   // Makine sil
   async delete(id: number): Promise<boolean> {
-    const query = 'DELETE FROM machines WHERE id = $1';
-    const result = await this.db.query(query, [id]);
-    return (result.rowCount ?? 0) > 0;
+    if (isSQLite) {
+      const result = await query('DELETE FROM machines WHERE id = $1', [id]);
+      return (result.changes || 0) > 0;
+    } else {
+      const result = await query('DELETE FROM machines WHERE id = $1 RETURNING id', [id]);
+      return result.rows.length > 0;
+    }
   }
 
   // Makine ara
   async search(searchTerm: string): Promise<Machine[]> {
-    const query = `
-      SELECT 
+    const sql = `
+      SELECT
         m.id,
         m.serial_no,
         m.equipment_name,
@@ -184,7 +189,7 @@ export class MachineRepository {
         m.created_at
       FROM machines m
       LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
-      WHERE 
+      WHERE
         LOWER(m.equipment_name) LIKE LOWER($1) OR
         LOWER(m.brand) LIKE LOWER($1) OR
         LOWER(m.model) LIKE LOWER($1) OR
@@ -192,57 +197,9 @@ export class MachineRepository {
         LOWER(co.org_name) LIKE LOWER($1)
       ORDER BY m.created_at DESC
     `;
-    
     const searchPattern = `%${searchTerm}%`;
-    const result = await this.db.query(query, [searchPattern]);
-    return result.rows;
-  }
-
-  // Kalibrasyon kuruluşuna göre makineleri getir
-  async findByCalibrationOrg(orgId: number): Promise<Machine[]> {
-    const query = `
-      SELECT 
-        m.id,
-        m.serial_no,
-        m.equipment_name,
-        m.brand,
-        m.model,
-        m.measurement_range,
-        m.last_calibration_date,
-        m.calibration_org_id,
-        co.org_name as calibration_org_name,
-        m.created_at
-      FROM machines m
-      LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
-      WHERE m.calibration_org_id = $1
-      ORDER BY m.created_at DESC
-    `;
-    
-    const result = await this.db.query(query, [orgId]);
-    return result.rows;
-  }
-
-  // Kalibrasyonu yakında dolacak makineleri getir
-  async findExpiringCalibrations(days: number): Promise<Machine[]> {
-    const query = `
-      SELECT 
-        m.id,
-        m.serial_no,
-        m.equipment_name,
-        m.brand,
-        m.model,
-        m.measurement_range,
-        m.last_calibration_date,
-        m.calibration_org_id,
-        co.org_name as calibration_org_name,
-        m.created_at
-      FROM machines m
-      LEFT JOIN calibration_orgs co ON m.calibration_org_id = co.id
-      WHERE m.last_calibration_date + INTERVAL '1 year' <= CURRENT_DATE + INTERVAL '${days} days'
-      ORDER BY m.last_calibration_date ASC
-    `;
-    
-    const result = await this.db.query(query);
+    const result = await query(sql, [searchPattern]);
     return result.rows;
   }
 }
+

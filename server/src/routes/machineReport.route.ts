@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { MachineService } from '../services/machine.service';
 import { MachineRepository } from '../repos/machine.repo';
-import db from '../database/connection';
 
 const router = Router();
-const machineRepo = new MachineRepository(db);
+const machineRepo = new MachineRepository();
 const machineService = new MachineService(machineRepo);
 
 // GET /api/machine-reports/stats - Makine istatistikleri

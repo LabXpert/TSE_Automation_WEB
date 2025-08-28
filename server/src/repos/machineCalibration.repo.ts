@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { query, getClient, isSQLite } from '../db';
 
 // Makine kalibrasyon geçmişi tipi
 export interface MachineCalibration {
@@ -31,14 +31,13 @@ export interface MachineCalibrationInput {
 }
 
 export class MachineCalibrationRepository {
-  constructor(private db: Pool) {}
 
   // Tüm kalibrasyon kayıtlarını getir
   async findAll(): Promise<MachineCalibration[]> {
     try {
       console.log('Executing findAll query for machine calibrations...');
-      const query = `
-        SELECT 
+      const sql= `
+        SELECT
           mc.id,
           mc.machine_id,
           mc.calibration_org_id,
@@ -60,7 +59,7 @@ export class MachineCalibrationRepository {
         ORDER BY mc.calibration_date DESC, mc.created_at DESC
       `;
       
-      const result = await this.db.query(query);
+      const result = await query(sql);
       console.log('Query result:', result.rows.length, 'calibration records');
       return result.rows;
     } catch (error) {
@@ -71,8 +70,8 @@ export class MachineCalibrationRepository {
 
   // ID ile kalibrasyon kaydı getir
   async findById(id: number): Promise<MachineCalibration | null> {
-    const query = `
-      SELECT 
+    const sql= `
+      SELECT
         mc.id,
         mc.machine_id,
         mc.calibration_org_id,
@@ -94,14 +93,14 @@ export class MachineCalibrationRepository {
       WHERE mc.id = $1
     `;
     
-    const result = await this.db.query(query, [id]);
+    const result = await query(sql, [id]);
     return result.rows[0] || null;
   }
 
   // Makine ID'sine göre kalibrasyon geçmişini getir
   async findByMachineId(machineId: number): Promise<MachineCalibration[]> {
-    const query = `
-      SELECT 
+    const sql= `
+      SELECT
         mc.id,
         mc.machine_id,
         mc.calibration_org_id,
@@ -124,13 +123,13 @@ export class MachineCalibrationRepository {
       ORDER BY mc.calibration_date DESC, mc.created_at DESC
     `;
     
-    const result = await this.db.query(query, [machineId]);
+    const result = await query(sql, [machineId]);
     return result.rows;
   }
 
   // Kalibrasyon kuruluşuna göre kayıtları getir
   async findByCalibrationOrgId(orgId: number): Promise<MachineCalibration[]> {
-    const query = `
+    const sql = `
       SELECT 
         mc.id,
         mc.machine_id,
@@ -153,28 +152,25 @@ export class MachineCalibrationRepository {
       WHERE mc.calibration_org_id = $1
       ORDER BY mc.calibration_date DESC, mc.created_at DESC
     `;
-    
-    const result = await this.db.query(query, [orgId]);
+
+    const result = await query(sql, [orgId]);
     return result.rows;
   }
 
   // Yeni kalibrasyon kaydı oluştur
   async create(calibrationData: MachineCalibrationInput): Promise<MachineCalibration> {
+    const client = await getClient();
     try {
-      // Transaction başlat
-      await this.db.query('BEGIN');
-
-      // Kalibrasyon kaydı oluştur
-      const insertQuery = `
+      await client.begin();
+      const baseSql = `
         INSERT INTO machine_calibrations (
-          machine_id, 
-          calibration_org_id, 
-          calibrated_by, 
+          machine_id,
+          calibration_org_id,
+          calibrated_by,
           notes,
           calibration_date
         )
         VALUES ($1, $2, $3, $4, $5)
-        RETURNING *
       `;
       
       const values = [
@@ -182,35 +178,41 @@ export class MachineCalibrationRepository {
         calibrationData.calibration_org_id,
         calibrationData.calibrated_by || null,
         calibrationData.notes || null,
-        calibrationData.calibration_date
+        calibrationData.calibration_date,
       ];
       
-      const insertResult = await this.db.query(insertQuery, values);
-      
-      // Makinenin son kalibrasyon tarihini güncelle
-      const updateMachineQuery = `
-        UPDATE machines 
+      let newId: number;
+      if (isSQLite) {
+        const insertResult = await client.query(baseSql, values);
+        newId = insertResult.lastID!;
+      } else {
+        const insertResult = await client.query(baseSql + ' RETURNING id', values);
+        newId = insertResult.rows[0].id;
+      }
+      const updateMachineSql = `
+        UPDATE machines
         SET last_calibration_date = $1, calibration_org_id = $2
         WHERE id = $3
       `;
       
-      await this.db.query(updateMachineQuery, [
+      await client.query(updateMachineSql, [
         calibrationData.calibration_date,
         calibrationData.calibration_org_id,
-        calibrationData.machine_id
+        calibrationData.machine_id,
       ]);
 
-      // Transaction commit
-      await this.db.query('COMMIT');
-      
-      // Tam veriyi getir
-      return await this.findById(insertResult.rows[0].id) as MachineCalibration;
+      await client.commit();
+      return (await this.findById(newId)) as MachineCalibration;
     } catch (error) {
       // Transaction rollback
-      await this.db.query('ROLLBACK');
+      await client.rollback();
       console.error('Error creating machine calibration:', error);
       throw error;
     }
+    finally {
+      client.release();
+    }
+
   }
 
   // Kalibrasyon kaydını güncelle
@@ -245,31 +247,38 @@ export class MachineCalibrationRepository {
     }
 
     values.push(id);
-    const query = `
-      UPDATE machine_calibrations 
+    const baseSql = `
+      UPDATE machine_calibrations
       SET ${fields.join(', ')}
       WHERE id = $${paramIndex}
-      RETURNING *
     `;
 
-    const result = await this.db.query(query, values);
-    if (result.rows.length === 0) {
-      return null;
+    if (isSQLite) {
+      await query(baseSql, values);
+      return await this.findById(id);
+    } else {
+      const result = await query(baseSql + ' RETURNING id', values);
+      if (result.rows.length === 0) {
+        return null;
+      }
+      return await this.findById(id);
     }
-
-    return await this.findById(id);
   }
 
   // Kalibrasyon kaydını sil
   async delete(id: number): Promise<boolean> {
-    const query = 'DELETE FROM machine_calibrations WHERE id = $1';
-    const result = await this.db.query(query, [id]);
-    return (result.rowCount ?? 0) > 0;
+    if (isSQLite) {
+      const result = await query('DELETE FROM machine_calibrations WHERE id = $1', [id]);
+      return (result.changes || 0) > 0;
+    } else {
+      const result = await query('DELETE FROM machine_calibrations WHERE id = $1 RETURNING id', [id]);
+      return result.rows.length > 0;
+    }
   }
 
   // Belirli tarih aralığındaki kalibrasyonları getir
   async findByDateRange(startDate: string, endDate: string): Promise<MachineCalibration[]> {
-    const query = `
+    const sql = `
       SELECT 
         mc.id,
         mc.machine_id,
@@ -293,7 +302,7 @@ export class MachineCalibrationRepository {
       ORDER BY mc.calibration_date DESC, mc.created_at DESC
     `;
     
-    const result = await this.db.query(query, [startDate, endDate]);
+    const result = await query(sql, [startDate, endDate]);
     return result.rows;
   }
 
@@ -308,24 +317,65 @@ export class MachineCalibrationRepository {
     try {
       // Toplam kalibrasyon sayısı
       const totalQuery = 'SELECT COUNT(*) as total FROM machine_calibrations';
-      const totalResult = await this.db.query(totalQuery);
+      const totalResult = await query(totalQuery);
 
       // Bu ay yapılan kalibrasyonlar
-      const thisMonthQuery = `
+      /* duplicate block (will be replaced below) */
+      const __deprecated_thisMonthQuery = `
         SELECT COUNT(*) as count 
         FROM machine_calibrations 
         WHERE EXTRACT(YEAR FROM calibration_date) = EXTRACT(YEAR FROM CURRENT_DATE)
           AND EXTRACT(MONTH FROM calibration_date) = EXTRACT(MONTH FROM CURRENT_DATE)
       `;
-      const thisMonthResult = await this.db.query(thisMonthQuery);
+      // const __deprecated_thisMonthResult = await this.db.query(__deprecated_thisMonthQuery);
 
       // Bu yıl yapılan kalibrasyonlar
-      const thisYearQuery = `
-        SELECT COUNT(*) as count 
-        FROM machine_calibrations 
-        WHERE EXTRACT(YEAR FROM calibration_date) = EXTRACT(YEAR FROM CURRENT_DATE)
-      `;
-      const thisYearResult = await this.db.query(thisYearQuery);
+      let thisMonthQuery: string;
+      let thisYearQuery: string;
+      let monthlyQuery: string;
+      if (isSQLite) {
+        thisMonthQuery = `
+          SELECT COUNT(*) as count
+          FROM machine_calibrations
+          WHERE strftime('%Y', calibration_date) = strftime('%Y', 'now')
+            AND strftime('%m', calibration_date) = strftime('%m', 'now')
+        `;
+        thisYearQuery = `
+          SELECT COUNT(*) as count
+          FROM machine_calibrations
+          WHERE strftime('%Y', calibration_date) = strftime('%Y', 'now')
+        `;
+        monthlyQuery = `
+          SELECT strftime('%Y-%m', calibration_date) as month, COUNT(*) as count
+          FROM machine_calibrations
+          WHERE calibration_date >= DATE('now', '-12 months')
+          GROUP BY strftime('%Y-%m', calibration_date)
+          ORDER BY month DESC
+        `;
+      } else {
+        thisMonthQuery = `
+          SELECT COUNT(*) as count
+          FROM machine_calibrations
+          WHERE EXTRACT(YEAR FROM calibration_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+            AND EXTRACT(MONTH FROM calibration_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+        `;
+        thisYearQuery = `
+          SELECT COUNT(*) as count
+          FROM machine_calibrations
+          WHERE EXTRACT(YEAR FROM calibration_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+        `;
+        monthlyQuery = `
+          SELECT
+            TO_CHAR(calibration_date, 'YYYY-MM') as month,
+            COUNT(*) as count
+          FROM machine_calibrations
+          WHERE calibration_date >= CURRENT_DATE - INTERVAL '12 months'
+          GROUP BY TO_CHAR(calibration_date, 'YYYY-MM')
+          ORDER BY month DESC
+        `;
+      }
+      const thisMonthResult = await query(thisMonthQuery);
+      const thisYearResult = await query(thisYearQuery);
 
       // En çok kalibrasyon yapan kuruluşlar
       const topOrgsQuery = `
@@ -336,19 +386,9 @@ export class MachineCalibrationRepository {
         ORDER BY count DESC
         LIMIT 5
       `;
-      const topOrgsResult = await this.db.query(topOrgsQuery);
+      const topOrgsResult = await query(topOrgsQuery);
 
-      // Aylık kalibrasyon dağılımı (son 12 ay)
-      const monthlyQuery = `
-        SELECT 
-          TO_CHAR(calibration_date, 'YYYY-MM') as month,
-          COUNT(*) as count
-        FROM machine_calibrations 
-        WHERE calibration_date >= CURRENT_DATE - INTERVAL '12 months'
-        GROUP BY TO_CHAR(calibration_date, 'YYYY-MM')
-        ORDER BY month DESC
-      `;
-      const monthlyResult = await this.db.query(monthlyQuery);
+      const monthlyResult = await query(monthlyQuery);
 
       return {
         totalCalibrations: parseInt(totalResult.rows[0].total),
@@ -365,8 +405,8 @@ export class MachineCalibrationRepository {
 
   // Makine için son kalibrasyon kaydını getir
   async getLastCalibrationByMachine(machineId: number): Promise<MachineCalibration | null> {
-    const query = `
-      SELECT 
+    const sql = `
+      SELECT
         mc.id,
         mc.machine_id,
         mc.calibration_org_id,
@@ -390,7 +430,7 @@ export class MachineCalibrationRepository {
       LIMIT 1
     `;
     
-    const result = await this.db.query(query, [machineId]);
+    const result = await query(sql, [machineId]);
     return result.rows[0] || null;
   }
 }

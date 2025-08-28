@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { MachineMaintenanceService } from '../services/machineMaintenance.service';
 import { MachineMaintenanceRepository } from '../repos/machineMaintenance.repo';
-import db from '../database/connection';
 
 const router = Router();
-const repo = new MachineMaintenanceRepository(db);
+const repo = new MachineMaintenanceRepository();
 const service = new MachineMaintenanceService(repo);
 
 // GET /api/machine-maintenances

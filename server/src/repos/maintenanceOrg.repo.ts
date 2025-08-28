@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { query, isSQLite } from '../db';
 
 export interface MaintenanceOrg {
   id: number;
@@ -17,37 +17,36 @@ export interface MaintenanceOrgInput {
 }
 
 export class MaintenanceOrgRepository {
-  constructor(private db: Pool) {}
 
   async findAll(): Promise<MaintenanceOrg[]> {
-    const query = `
-      SELECT * FROM maintenance_orgs
-      ORDER BY org_name ASC
-    `;
-    const result = await this.db.query(query);
+    const result = await query('SELECT * FROM maintenance_orgs ORDER BY org_name ASC');
     return result.rows;
   }
 
   async findById(id: number): Promise<MaintenanceOrg | null> {
-    const query = 'SELECT * FROM maintenance_orgs WHERE id = $1';
-    const result = await this.db.query(query, [id]);
+    const result = await query('SELECT * FROM maintenance_orgs WHERE id = $1', [id]);
     return result.rows[0] || null;
     }
 
   async create(orgData: MaintenanceOrgInput): Promise<MaintenanceOrg> {
-    const query = `
+    const baseSql = `
       INSERT INTO maintenance_orgs (org_name, contact_name, phone, email)
       VALUES ($1, $2, $3, $4)
-      RETURNING *
     `;
     const values = [
       orgData.org_name,
       orgData.contact_name || null,
       orgData.phone || null,
-      orgData.email || null
+      orgData.email || null,
     ];
-    const result = await this.db.query(query, values);
-    return result.rows[0];
+    if (isSQLite) {
+      const result = await query(baseSql, values);
+      const row = await query('SELECT * FROM maintenance_orgs WHERE id = $1', [result.lastID]);
+      return row.rows[0];
+    } else {
+      const result = await query(baseSql + ' RETURNING *', values);
+      return result.rows[0];
+    }
   }
 
   async update(id: number, orgData: Partial<MaintenanceOrgInput>): Promise<MaintenanceOrg | null> {
@@ -77,33 +76,41 @@ export class MaintenanceOrgRepository {
     }
 
     values.push(id);
-    const query = `
+    const baseSql = `
       UPDATE maintenance_orgs
       SET ${updateFields.join(', ')}
       WHERE id = $${paramCount}
-      RETURNING *
     `;
-
-    const result = await this.db.query(query, values);
-    return result.rows[0] || null;
+    if (isSQLite) {
+      await query(baseSql, values);
+      const row = await query('SELECT * FROM maintenance_orgs WHERE id = $1', [id]);
+      return row.rows[0] || null;
+    } else {
+      const result = await query(baseSql + ' RETURNING *', values);
+      return result.rows[0] || null;
+    }
   }
 
   async delete(id: number): Promise<boolean> {
-    const query = 'DELETE FROM maintenance_orgs WHERE id = $1';
-    const result = await this.db.query(query, [id]);
-    return (result.rowCount ?? 0) > 0;
+    if (isSQLite) {
+      const result = await query('DELETE FROM maintenance_orgs WHERE id = $1', [id]);
+      return (result.changes || 0) > 0;
+    } else {
+      const result = await query('DELETE FROM maintenance_orgs WHERE id = $1 RETURNING id', [id]);
+      return result.rows.length > 0;
+    }
   }
 
   async search(searchTerm: string): Promise<MaintenanceOrg[]> {
-    const query = `
+    const sql = `
       SELECT * FROM maintenance_orgs
-      WHERE org_name ILIKE $1
-         OR contact_name ILIKE $1
-         OR phone ILIKE $1
-         OR email ILIKE $1
+      WHERE LOWER(org_name) LIKE LOWER($1)
+         OR LOWER(contact_name) LIKE LOWER($1)
+         OR LOWER(phone) LIKE LOWER($1)
+         OR LOWER(email) LIKE LOWER($1)
       ORDER BY org_name ASC
     `;
-    const result = await this.db.query(query, [`%${searchTerm}%`]);
+    const result = await query(sql, [`%${searchTerm}%`]);
     return result.rows;
   }
 }

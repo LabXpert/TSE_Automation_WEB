@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { query, isSQLite } from '../db';
 
 export interface CalibrationOrg {
   id: number;
@@ -17,37 +17,36 @@ export interface CalibrationOrgInput {
 }
 
 export class CalibrationOrgRepository {
-  constructor(private db: Pool) {}
 
   async findAll(): Promise<CalibrationOrg[]> {
-    const query = `
-      SELECT * FROM calibration_orgs 
-      ORDER BY org_name ASC
-    `;
-    const result = await this.db.query(query);
+    const result = await query('SELECT * FROM calibration_orgs ORDER BY org_name ASC');
     return result.rows;
   }
 
   async findById(id: number): Promise<CalibrationOrg | null> {
-    const query = 'SELECT * FROM calibration_orgs WHERE id = $1';
-    const result = await this.db.query(query, [id]);
+    const result = await query('SELECT * FROM calibration_orgs WHERE id = $1', [id]);
     return result.rows[0] || null;
   }
 
   async create(orgData: CalibrationOrgInput): Promise<CalibrationOrg> {
-    const query = `
-      INSERT INTO calibration_orgs (org_name, contact_name, email, phone) 
-      VALUES ($1, $2, $3, $4) 
-      RETURNING *
+    const baseSql = `
+      INSERT INTO calibration_orgs (org_name, contact_name, email, phone)
+      VALUES ($1, $2, $3, $4)
     `;
     const values = [
       orgData.org_name,
       orgData.contact_name || null,
       orgData.email || null,
-      orgData.phone || null
+      orgData.phone || null,
     ];
-    const result = await this.db.query(query, values);
-    return result.rows[0];
+    if (isSQLite) {
+      const result = await query(baseSql, values);
+      const row = await query('SELECT * FROM calibration_orgs WHERE id = $1', [result.lastID]);
+      return row.rows[0];
+    } else {
+      const result = await query(baseSql + ' RETURNING *', values);
+      return result.rows[0];
+    }
   }
 
   async update(id: number, orgData: Partial<CalibrationOrgInput>): Promise<CalibrationOrg | null> {
@@ -77,32 +76,41 @@ export class CalibrationOrgRepository {
     }
 
     values.push(id);
-    const query = `
-      UPDATE calibration_orgs 
-      SET ${updateFields.join(', ')} 
+    const baseSql = `
+      UPDATE calibration_orgs
+      SET ${updateFields.join(', ')}
       WHERE id = $${paramCount}
-      RETURNING *
     `;
 
-    const result = await this.db.query(query, values);
-    return result.rows[0] || null;
+    if (isSQLite) {
+      await query(baseSql, values);
+      const row = await query('SELECT * FROM calibration_orgs WHERE id = $1', [id]);
+      return row.rows[0] || null;
+    } else {
+      const result = await query(baseSql + ' RETURNING *', values);
+      return result.rows[0] || null;
+    }
   }
 
   async delete(id: number): Promise<boolean> {
-    const query = 'DELETE FROM calibration_orgs WHERE id = $1';
-    const result = await this.db.query(query, [id]);
-    return (result.rowCount ?? 0) > 0;
+    if (isSQLite) {
+      const result = await query('DELETE FROM calibration_orgs WHERE id = $1', [id]);
+      return (result.changes || 0) > 0;
+    } else {
+      const result = await query('DELETE FROM calibration_orgs WHERE id = $1 RETURNING id', [id]);
+      return result.rows.length > 0;
+    }
   }
 
   async search(searchTerm: string): Promise<CalibrationOrg[]> {
-    const query = `
-      SELECT * FROM calibration_orgs 
-      WHERE org_name ILIKE $1 
-         OR contact_name ILIKE $1 
-         OR email ILIKE $1
+    const sql = `
+      SELECT * FROM calibration_orgs
+      WHERE LOWER(org_name) LIKE LOWER($1)
+         OR LOWER(contact_name) LIKE LOWER($1)
+         OR LOWER(email) LIKE LOWER($1)
       ORDER BY org_name ASC
     `;
-    const result = await this.db.query(query, [`%${searchTerm}%`]);
+    const result = await query(sql, [`%${searchTerm}%`]);
     return result.rows;
   }
 }

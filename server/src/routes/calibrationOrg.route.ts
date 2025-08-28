@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { CalibrationOrgService } from '../services/calibrationOrg.service';
 import { CalibrationOrgRepository } from '../repos/calibrationOrg.repo';
-import db from '../database/connection';
 
 const router = Router();
-const calibrationOrgRepo = new CalibrationOrgRepository(db);
+const calibrationOrgRepo = new CalibrationOrgRepository();
 const calibrationOrgService = new CalibrationOrgService(calibrationOrgRepo);
 
 // GET /api/calibration-orgs - Tüm kalibrasyon kuruluşlarını getir
