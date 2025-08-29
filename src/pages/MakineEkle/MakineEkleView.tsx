@@ -772,9 +772,17 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
 
           {/* Arama Alanı */}
           <div style={{
-            marginBottom: '20px',
-            position: 'relative'
+            margin: '0 16px 16px 16px',
+            padding: '16px',
+            backgroundColor: '#f8fafc',
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0',
+            flexShrink: 0
           }}>
+            <div style={{
+              position: 'relative',
+              width: '100%'
+            }}>
             <input
               type="text"
               placeholder="Makine adı, seri no veya model ile ara..."
@@ -784,31 +792,34 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                 onSearch();
               }}
               style={{
-                width: '100%',
-                padding: '12px 16px 12px 40px',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s ease',
-                boxSizing: 'border-box'
+                  width: '100%',
+                  padding: '12px 16px 12px 48px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  color: '#374151',
+                  outline: 'none',
+                  transition: 'all 0.2s ease',
+                  boxSizing: 'border-box'
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = '#dc2626';
+                  e.target.style.borderColor = '#dc2626';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
               }}
               onBlur={(e) => {
-                e.target.style.borderColor = '#e5e7eb';
-              }}
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.boxShadow = 'none';
+               }}
             />
-            <div style={{
+            <svg
+            style={{
               position: 'absolute',
-              left: '12px',
+              left: '16px',
               top: '50%',
               transform: 'translateY(-50%)',
               color: '#9ca3af',
-              pointerEvents: 'none'
-            }}>
-              <svg
+            }}
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
@@ -818,7 +829,7 @@ const MakineEkleView: React.FC<MakineEkleViewProps> = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <circle cx="11" cy="11" r="8"></circle>
+             <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
             </div>

@@ -16,6 +16,7 @@
     "start:full": "concurrently -n WEB,API -c auto \"npm:preview\" \"npm:server:start\""
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "exceljs": "^4.4.0",
     "lucide-react": "^0.540.0",
     "react": "^19.1.1",
