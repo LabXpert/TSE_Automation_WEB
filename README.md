@@ -1,69 +1,130 @@
-# React + TypeScript + Vite
+# TSE_Automation_WEB
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Automation platform to streamline TSE operations**  
 
-Currently, two official plugins are available:
+This project aims to digitalize and automate operational workflows for the Turkish Standards Institution (TSE).  
+It provides a modern **web-based interface** and **API server** for managing companies, personnel, machines, tests, reports, and notifications.  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Table of Contents
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [Features](#features)  
+- [Technologies](#technologies)  
+- [System Architecture](#system-architecture)  
+- [Installation](#installation)  
+- [Environment Variables](#environment-variables)  
+- [Contributing](#contributing)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Features
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Authentication with JWT, password hashing (bcrypt)  
+- Role-based access control (Admin / User)  
+- Company, Machine, Personnel management (CRUD operations)  
+- Test & Calibration modules with advanced filters  
+- Reporting & Dashboard with charts (Recharts)  
+- Excel import/export support (ExcelJS)  
+- Automated email reports (Nodemailer + Node-Cron)  
+- Responsive UI with React + TypeScript  
+- Dockerized PostgreSQL database support (SQLite for dev mode)  
+
+---
+
+## Technologies
+
+| Layer       | Technology |
+|-------------|------------|
+| Frontend    | React, TypeScript, Vite |
+| Backend     | Node.js, Express |
+| Database    | PostgreSQL (production), SQLite (development) |
+| Other Tools | Docker, ExcelJS, Nodemailer, Node-Cron, ESLint |
+
+---
+
+## System Architecture
+
+- **Frontend (React + TS + Vite):** Provides the UI, connects to backend API via Axios.  
+- **Backend (Node.js + Express):** Exposes REST API endpoints, handles authentication, data validation, and business logic.  
+- **Database:**  
+  - SQLite (default for quick local development).  
+  - PostgreSQL (recommended for production, supported via Docker).  
+- **Deployment:** Docker / Docker Compose (Postgres + PGAdmin).  
+
+---
+
+## Installation
+
+### 1. Clone the repository
+  ```bash
+ git clone https://github.com/LabXpert/TSE_Automation_WEB.git
+ cd TSE_Automation_WEB
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Setup environment variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+See Environment Variables.
+Create .env in project root and server/.env inside the server folder.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. Backend setup
+  ```bash
+cd server
+npm install
+npm run dev
 ```
+Backend will start on default port (e.g. http://localhost:5000).
+
+### 4. Frontend setup
+  ```bash
+cd ../frontend
+npm install
+npm run dev
+```
+Frontend will start on http://localhost:5173.
+
+
+---
+
+## Environment Variables
+Root .env
+
+```bash
+# Database Configuration
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+PGADMIN_DEFAULT_EMAIL=
+PGADMIN_DEFAULT_PASSWORD=
+DATABASE_URL=
+
+# CORS
+CORS_ORIGIN=http://localhost:5173
+
+# Frontend
+VITE_API_BASE_URL=http://localhost:5000
+```
+
+Server .env
+
+```bash
+# TSE Automation API - Environment Variables
+DB_DRIVER=sqlite
+SQLITE_PATH=./data/tse.db
+```
+
+## Contributing
+Contributions are welcome!
+
+1. Fork the repository
+2. Create a feature branch (git checkout -b feature/my-feature)
+3. Commit your changes (git commit -m "Add new feature")
+4. Push to your fork and create a Pull Request
+
+
+
+
+
+
+
+
