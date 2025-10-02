@@ -20,7 +20,7 @@ const DeneyTuruEkle: React.FC = () => {
 
   // Deney türleri listesini API'den çek
   useEffect(() => {
-    fetch('/api/experiment-types')
+    fetch('http://localhost:3001/api/experiment-types')
       .then(res => res.json())
       .then(data => setDeneyTurleriListesi(data))
       .catch(() => setDeneyTurleriListesi([]));
@@ -82,8 +82,8 @@ const DeneyTuruEkle: React.FC = () => {
       // Add or update experiment type in DB
       const method = duzenlemeModu && duzenlenecekDeneyTuruId ? 'PUT' : 'POST';
       const url = duzenlemeModu && duzenlenecekDeneyTuruId
-        ? `/api/experiment-types/${duzenlenecekDeneyTuruId}`
-        : '/api/experiment-types';
+        ? `http://localhost:3001/api/experiment-types/${duzenlenecekDeneyTuruId}`
+        : 'http://localhost:3001/api/experiment-types';
         
       const response = await fetch(url, {
         method,
@@ -140,7 +140,7 @@ const DeneyTuruEkle: React.FC = () => {
     const confirmMsg = `"${deneyTuru.name}" deney türü silinsin mi?\n\nBu işlem geri alınamaz!`;
     if (confirm(confirmMsg)) {
       try {
-        const response = await fetch(`/api/experiment-types/${id}`, { method: 'DELETE' });
+        const response = await fetch(`http://localhost:3001/api/experiment-types/${id}`, { method: 'DELETE' });
         if (!response.ok) {
           const err = await response.json();
           alert('Deney türü silinirken hata oluştu: ' + (err.error || 'Bilinmeyen hata'));
@@ -160,7 +160,7 @@ const DeneyTuruEkle: React.FC = () => {
   const handleSearch = () => {
     // Arama terimi boşsa tüm listeyi göster
     if (!searchTerm.trim()) {
-      fetch('/api/experiment-types')
+      fetch('http://localhost:3001/api/experiment-types')
         .then(res => res.json())
         .then(data => setDeneyTurleriListesi(data))
         .catch(() => setDeneyTurleriListesi([]));
@@ -168,7 +168,7 @@ const DeneyTuruEkle: React.FC = () => {
     }
 
     // Arama terimi varsa filtreleme yap
-    fetch('/api/experiment-types')
+    fetch('http://localhost:3001/api/experiment-types')
       .then(res => res.json())
       .then(data => {
         const filteredData = data.filter((deneyTuru: any) => 

@@ -54,7 +54,7 @@ function DeneyEkle() {
   // Sayfa yüklendiğinde kayıtları ve deney türlerini getir
   useEffect(() => {
     // Son 5 başvuru kaydını API'den çek
-    fetch('/api/applications/recent')
+    fetch('http://localhost:3001/api/applications/recent')
       .then((res) => res.json())
       .then((data) => {
         // API'den gelen veriyi arayüzde beklenen formata dönüştür
@@ -74,7 +74,7 @@ function DeneyEkle() {
         setKayitlariListesi([]);
       });
     // Deney türlerini API'den çek
-    fetch('/api/experiment-types')
+    fetch('http://localhost:3001/api/experiment-types')
       .then((res) => res.json())
       .then((data) => setDeneyTurleri(data))
       .catch((err) => {
@@ -82,7 +82,7 @@ function DeneyEkle() {
         setDeneyTurleri([]);
       });
     // Personel listesini API'den çek
-    fetch('/api/personnel')
+    fetch('http://localhost:3001/api/personnel')
       .then((res) => res.json())
       .then((data) => setPersoneller(data))
       .catch((err) => {
@@ -90,7 +90,7 @@ function DeneyEkle() {
         setPersoneller([]);
       });
     // Firma listesini API'den çek
-    fetch('/api/companies')
+    fetch('http://localhost:3001/api/companies')
       .then((res) => res.json())
       .then((data) => setFirmalar(data))
       .catch((err) => {
@@ -182,7 +182,7 @@ function DeneyEkle() {
       tests: testsPayload
     };
     try {
-      const response = await fetch('/api/applications', {
+      const response = await fetch('http://localhost:3001/api/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -195,7 +195,7 @@ function DeneyEkle() {
         alert('Başvuru ve deneyler başarıyla kaydedildi!');
       formTemizle();
       // Yeni eklenen kaydı hemen listeye ekle
-      fetch('/api/applications/recent')
+      fetch('http://localhost:3001/api/applications/recent')
         .then(res => res.json())
         .then(data => {
           const mapped = data.map((app: ApiApplication) => ({
@@ -262,7 +262,7 @@ function DeneyEkle() {
           return;
         }
         alert('Kayıt başarıyla silindi!');
-        fetch('/api/applications/recent')
+        fetch('http://localhost:3001/api/applications/recent')
           .then(res => res.json())
           .then(data => {
             const mapped = data.map((app: ApiApplication) => ({
@@ -373,7 +373,7 @@ function DeneyEkle() {
           }
           alert('Başvuru başarıyla güncellendi!');
           formTemizle();
-          fetch('/api/applications/recent')
+          fetch('http://localhost:3001/api/applications/recent')
             .then(res => res.json())
             .then(data => {
               const mapped = data.map((app: ApiApplication) => ({

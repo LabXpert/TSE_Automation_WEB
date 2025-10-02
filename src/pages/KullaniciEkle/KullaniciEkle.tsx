@@ -26,7 +26,7 @@ const KullaniciEkle: React.FC = () => {
 
   // Kullanıcı listesini API'den çek
   useEffect(() => {
-    fetch('/api/users')
+    fetch('http://localhost:3001/api/users')
       .then(res => res.json())
       .then(data => setKullaniciListesi(data))
       .catch(() => setKullaniciListesi([]));
@@ -111,7 +111,7 @@ const KullaniciEkle: React.FC = () => {
       const method = duzenlemeModu && duzenlenecekKullaniciId ? 'PUT' : 'POST';
       const url = duzenlemeModu && duzenlenecekKullaniciId
         ? `/api/users/${duzenlenecekKullaniciId}`
-        : '/api/users';
+        : 'http://localhost:3001/api/users';
         
       const body: Record<string, unknown> = {
         username: formData.username.trim(),
@@ -206,7 +206,7 @@ const KullaniciEkle: React.FC = () => {
   const handleSearch = () => {
     // Arama terimi boşsa tüm listeyi göster
     if (!searchTerm.trim()) {
-      fetch('/api/users')
+      fetch('http://localhost:3001/api/users')
         .then(res => res.json())
         .then(data => setKullaniciListesi(data))
         .catch(() => setKullaniciListesi([]));
@@ -214,7 +214,7 @@ const KullaniciEkle: React.FC = () => {
     }
 
     // Arama terimi varsa filtreleme yap
-    fetch('/api/users')
+    fetch('http://localhost:3001/api/users')
       .then(res => res.json())
       .then(data => {
         const filteredData = data.filter((kullanici: any) => 
