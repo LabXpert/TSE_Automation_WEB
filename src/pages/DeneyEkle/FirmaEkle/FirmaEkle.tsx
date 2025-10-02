@@ -32,7 +32,7 @@ const FirmaEkle: React.FC = () => {
 
   // Firma listesini API'den çek
   useEffect(() => {
-    fetch('http://localhost:3001/api/companies')
+    fetch('/api/companies')
       .then(res => res.json())
       .then(data => setFirmaListesi(data))
       .catch(() => setFirmaListesi([]));
@@ -106,8 +106,8 @@ const FirmaEkle: React.FC = () => {
               // Add or update company in DB
               const method = duzenlemeModu && duzenlenecekFirmaId ? 'PUT' : 'POST';
               const url = duzenlemeModu && duzenlenecekFirmaId
-                ? `http://localhost:3001/api/companies/${duzenlenecekFirmaId}`
-                : 'http://localhost:3001/api/companies';
+                ? `/api/companies/${duzenlenecekFirmaId}`
+                : '/api/companies';
               const response = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
@@ -169,7 +169,7 @@ const FirmaEkle: React.FC = () => {
             const confirmMsg = `Bu "${firma.name}" silinsin mi?\n\nBu işlem geri alınamaz!`;
             if (confirm(confirmMsg)) {
               try {
-                const response = await fetch(`http://localhost:3001/api/companies/${id}`, { method: 'DELETE' });
+                const response = await fetch(`/api/companies/${id}`, { method: 'DELETE' });
                 if (!response.ok) {
                   const err = await response.json();
                     alert('Firma silinirken hata oluştu: ' + (err.error || 'Bilinmeyen hata'));
