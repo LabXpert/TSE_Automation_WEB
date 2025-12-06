@@ -187,7 +187,7 @@ Laboratuvar envanterinin canlı takibini sağlar.
 - **Modal Entegrasyonu:** Liste üzerinden direkt olarak yeni bakım veya kalibrasyon kaydı girilebilir (`KalibrasyonModal`, `BakimModal`).
 
 <p align="center">
-  <img src="readMeImage/MakineRaporla.jpg" alt="Makine Listesi" width="100%" style="border-radius: 8px; margin-bottom: 10px;">
+  <img src="readMeImage/MakineRaporlama.jpg" alt="Makine Listesi" width="100%" style="border-radius: 8px; margin-bottom: 10px;">
   <br/>
   <em>Makine Envanter Listesi ve Durum Renk Kodları</em>
 </p>
