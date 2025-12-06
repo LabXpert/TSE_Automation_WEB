@@ -105,8 +105,8 @@ Uygulamaya erişim, güvenli bir kimlik doğrulama katmanı ile korunur.
 - **Bilgilendirme:** Giriş ekranında yer alan "Hakkımızda" butonu, sistemin amacı hakkında özet bilgi veren bir modal açar.
 
 <p align="center">
-  <img src="readMeImage/giris.jpg" alt="Giriş Ekranı" width="48%" style="border-radius: 8px; margin-right: 10px;">
-  <img src="readMeImage/girisHakkimizda.jpg" alt="Hakkımızda" width="48%" style="border-radius: 8px;">
+  <img src="readMeImage/Giri%C5%9F/giris.jpg" alt="Giriş Ekranı" width="48%" style="border-radius: 8px; margin-right: 10px;">
+  <img src="readMeImage/Giri%C5%9F/girisHakkimizda.jpg" alt="Hakkımızda" width="48%" style="border-radius: 8px;">
   <br/>
   <em>Giriş Ekranı ve Hakkımızda Bilgilendirme Paneli</em>
 </p>
@@ -127,14 +127,14 @@ Yöneticilerin laboratuvar performansını tek bakışta görebilmesi için tasa
   - **Test Türü Analizi (Radar/Bar Chart):** En çok talep edilen test türlerini (Çekme, Basma, Sertlik vb.) analiz eder.
 
 <p align="center">
-  <img src="readMeImage/istatistikGenel.jpg" alt="Analiz Genel" width="100%" style="border-radius: 8px; margin-bottom: 10px;">
+  <img src="readMeImage/Dashboard/istatistikGenel.jpg" alt="Analiz Genel" width="100%" style="border-radius: 8px; margin-bottom: 10px;">
   <br/>
   <em>Yönetici Analiz Paneli (Dashboard) Genel Görünüm</em>
 </p>
 <p align="center">
-  <img src="readMeImage/DeneySayisiTrendi.jpg" width="32%" style="border-radius: 8px; margin-right: 5px;">
-  <img src="readMeImage/Firmaİstatistik.jpg" width="32%" style="border-radius: 8px; margin-right: 5px;">
-  <img src="readMeImage/Personelİstatistik.jpg" width="32%" style="border-radius: 8px;">
+  <img src="readMeImage/Dashboard/DeneySayisiTrendi.jpg" width="32%" style="border-radius: 8px; margin-right: 5px;">
+  <img src="readMeImage/Dashboard/Firma%C4%B0statistik.jpg" width="32%" style="border-radius: 8px; margin-right: 5px;">
+  <img src="readMeImage/Dashboard/Personel%C4%B0statistik.jpg" width="32%" style="border-radius: 8px;">
   <br/>
   <em>Zaman Bazlı Trendler, Firma Dağılımı ve Personel Performans Grafikleri</em>
 </p>
@@ -168,7 +168,7 @@ Geçmiş ve güncel tüm deneylerin listelendiği veri merkezidir.
 
 <p align="center">
   <img src="readMeImage/DeneyRaporlama.jpg" alt="Raporlama Arayüzü" width="48%" style="border-radius: 8px; margin-right: 10px;">
-  <img src="readMeImage/ExcelRaporÇıktı.jpg" alt="Excel Çıktısı" width="48%" style="border-radius: 8px;">
+  <img src="readMeImage/ExcelRapor%C3%87%C4%B1kt%C4%B1.jpg" alt="Excel Çıktısı" width="48%" style="border-radius: 8px;">
   <br/>
   <em>Deney Raporlama Ekranı ve Otomatik Oluşturulan Excel Çıktısı</em>
 </p>
